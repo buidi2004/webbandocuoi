@@ -69,4 +69,3 @@ npm install
 cd admin-python
 pip install -r requirements.txt
 ```
-
