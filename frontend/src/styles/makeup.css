@@ -1,0 +1,230 @@
+/* Makeup Services Page Styles */
+
+.makeup-hero {
+    background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 50%, #f48fb1 100%);
+    padding-top: 120px;
+    padding-bottom: 4rem;
+    text-align: center;
+}
+
+/* Services Overview */
+.services-overview {
+    padding: 5rem 0;
+    background: var(--light);
+}
+
+.services-grid-makeup {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.service-makeup-card {
+    background: var(--light);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+    position: relative;
+    border: 2px solid transparent;
+    text-align: center;
+}
+
+.service-makeup-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+}
+
+.service-makeup-card.featured {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, #ffffff 0%, #faf8f5 100%);
+}
+
+.featured-badge {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary);
+    color: var(--light);
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    box-shadow: var(--shadow-md);
+}
+
+.service-makeup-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.service-makeup-card h3 {
+    font-family: var(--font-serif);
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    color: var(--dark);
+}
+
+.service-makeup-card>p {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.service-features {
+    text-align: left;
+    margin-bottom: 1.5rem;
+    padding: 0.5rem;
+}
+
+.service-features li {
+    padding: 0.6rem 0;
+    color: var(--text-light);
+    position: relative;
+    padding-left: 2rem;
+}
+
+.service-features li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--primary);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.service-price {
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-top: 1rem;
+}
+
+/* Expert Team */
+.expert-team {
+    padding: 5rem 0;
+}
+
+.experts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.expert-card {
+    background: var(--light);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+}
+
+.expert-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg);
+}
+
+.expert-image {
+    position: relative;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+}
+
+.expert-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.expert-card:hover .expert-image img {
+    transform: scale(1.1);
+}
+
+.expert-info {
+    padding: 1.5rem;
+}
+
+.expert-name {
+    font-family: var(--font-serif);
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    color: var(--dark);
+}
+
+.expert-title {
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.expert-stats {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.stat {
+    flex: 1;
+    text-align: center;
+}
+
+.stat-number {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.expert-bio {
+    color: var(--text-light);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.expert-specialties {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.specialty {
+    background: var(--secondary);
+    color: var(--dark);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .services-grid-makeup {
+        grid-template-columns: 1fr;
+    }
+
+    .experts-grid {
+        grid-template-columns: 1fr;
+    }
+}

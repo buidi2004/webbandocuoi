@@ -1,0 +1,142 @@
+.cart-page {
+    min-height: 60vh;
+}
+
+.cart-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 3rem;
+    margin-top: 2rem;
+}
+
+.cart-item {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    align-items: center;
+}
+
+.cart-item-img {
+    width: 80px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.cart-item-info {
+    flex: 1;
+}
+
+.cart-item-info h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.item-code {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+}
+
+.quantity-control button {
+    width: 30px;
+    height: 30px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.quantity-control span {
+    padding: 0 10px;
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    color: #ff4d4f;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    text-decoration: underline;
+}
+
+.cart-summary {
+    background: #f9f9f9;
+    padding: 2rem;
+    border-radius: 8px;
+    height: fit-content;
+}
+
+.order-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.order-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.order-form input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+}
+
+.cart-total-details {
+    margin: 2rem 0;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+    color: #444;
+}
+
+.summary-row.discount {
+    color: #27ae60;
+    font-weight: 500;
+}
+
+.summary-row.gift {
+    color: #b59410;
+    font-style: italic;
+    font-size: 0.95rem;
+    border: 1px dashed #b59410;
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(181, 148, 16, 0.05);
+    margin: 1.5rem 0;
+}
+
+.summary-row.final {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid #333;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.total-price {
+    color: #b59410;
+}
+
+@media (max-width: 768px) {
+    .cart-grid {
+        grid-template-columns: 1fr;
+    }
+}

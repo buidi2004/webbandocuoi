@@ -1,0 +1,198 @@
+:root {
+  /* Colors */
+  --primary: #d4a373;
+  /* Gold/Beige */
+  --primary-dark: #b08968;
+  --secondary: #faedcd;
+  /* Light Cream */
+  --accent: #ccd5ae;
+  /* Soft Green */
+  --dark: #1a1a1a;
+  --light: #ffffff;
+  --text: #333333;
+  --text-light: #666666;
+  --border: #e5e5e5;
+
+  /* Typography */
+  --font-serif: 'Cormorant Garamond', serif;
+  --font-sans: 'Montserrat', sans-serif;
+
+  /* Spacing */
+  --container-width: 1200px;
+  --header-height: 80px;
+
+  /* Shadows */
+  --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 8px 15px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.15);
+
+  /* Transitions */
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: var(--light);
+  /* Ensure white background default */
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--text);
+  background-color: transparent;
+  /* Changed to transparent to show HieuUngLaRoi canvas */
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-serif);
+  color: var(--dark);
+  line-height: 1.2;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: var(--transition);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* Utilities */
+.container {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.section {
+  padding: 5rem 0;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.section-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background-color: var(--primary);
+}
+
+.section-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-light);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Components */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2.5rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: var(--transition);
+  font-size: 0.9rem;
+  border-radius: 50px;
+  /* Đồng bộ bo góc tròn cho tất cả nút */
+}
+
+.btn-primary {
+  background-color: var(--dark);
+  color: var(--light);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary);
+  color: var(--light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-outline {
+  border: 1px solid var(--dark);
+  color: var(--dark);
+}
+
+.btn-outline:hover {
+  background-color: var(--dark);
+  color: var(--light);
+}
+
+.card {
+  background: var(--light);
+  transition: var(--transition);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.8s ease forwards;
+}
+
+/* Layout */
+main {
+  min-height: 100vh;
+  padding-top: var(--header-height);
+}
+
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 2.2rem;
+  }
+
+  .container {
+    padding: 0 1.25rem;
+  }
+}

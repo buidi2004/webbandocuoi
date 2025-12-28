@@ -1,0 +1,52 @@
+# Môi trường ảo Python
+.venv/
+venv/
+env/
+.env
+*.env
+backend/.venv312/
+backend/.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Database
+*.db
+*.sqlite3
+
+# Node modules
+node_modules/
+frontend/node_modules/
+
+# Build output
+dist/
+build/
+frontend/dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Tệp tin tải lên
+tep_tin/
+backend/tep_tin/
+
+# Các file tạm
+*.tmp
+*.temp
+*.bak

@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: ivie_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/ivie.db:/app/ivie.db
+      # Mount images/files to be accessible/persistent
+      - ./backend/tep_tin:/app/tep_tin
+      # Also mount the frontend public images so backend can serve them if needed or admin can upload
+      - ./frontend/public/images:/frontend/public/images
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: ivie_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always
+
+  admin:
+    build:
+      context: ./admin-python
+    container_name: ivie_admin
+    ports:
+      - "8501:8501"
+    environment:
+      # Internal Docker Network URL for communicating with Backend
+      - VITE_API_BASE_URL=http://backend:8000
+    depends_on:
+      - backend
+    restart: always

@@ -1,0 +1,36 @@
+/* Button.css - Supplemental styles */
+/* Base styles are in index.css .btn class */
+
+.btn {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+/* Optional: Ripple effect or hover fill */
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    transition: width 0.3s ease;
+    z-index: -1;
+}
+
+.btn:hover::before {
+    width: 100%;
+}
+
+.btn-white {
+    background: transparent;
+    border: 1px solid var(--light);
+    color: var(--light);
+}
+
+.btn-white:hover {
+    background: var(--light);
+    color: var(--dark);
+}
