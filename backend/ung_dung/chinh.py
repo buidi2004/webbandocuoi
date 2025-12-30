@@ -84,3 +84,37 @@ def kiem_tra_suc_khoe():
 def health_check():
     """Health check endpoint for Render"""
     return {"status": "healthy"}
+
+@ung_dung.get("/api/db-test")
+def test_database():
+    """Test database connection and table creation"""
+    from .co_so_du_lieu import dong_co, PhienLamViec, NguoiDung
+    from sqlalchemy import text
+    import os
+    
+    try:
+        # Test connection
+        with dong_co.connect() as conn:
+            result = conn.execute(text("SELECT 1"))
+            conn_status = "OK"
+        
+        # Test table exists
+        db = PhienLamViec()
+        try:
+            user_count = db.query(NguoiDung).count()
+            table_status = f"OK - {user_count} users"
+        except Exception as e:
+            table_status = f"ERROR - {str(e)}"
+        finally:
+            db.close()
+        
+        return {
+            "database_url": os.getenv("DATABASE_URL", "Not set")[:50] + "...",
+            "connection": conn_status,
+            "users_table": table_status
+        }
+    except Exception as e:
+        return {
+            "error": str(e),
+            "database_url": os.getenv("DATABASE_URL", "Not set")[:50] + "..."
+        }
