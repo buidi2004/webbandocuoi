@@ -54,50 +54,65 @@ class Token(BaseModel):
 @bo_dinh_tuyen.post("/dang_ky", response_model=NguoiDungSchema)
 def dang_ky(du_lieu: NguoiDungTao, csdl: Session = Depends(lay_csdl)):
     """Đăng ký người dùng mới"""
-    # Kiểm tra username đã tồn tại chưa
-    db_user = csdl.query(NguoiDungDB).filter(NguoiDungDB.username == du_lieu.username).first()
-    if db_user:
-        raise HTTPException(status_code=400, detail="Tên đăng nhập đã tồn tại")
-    
-    # Kiểm tra email đã tồn tại chưa (nếu có cung cấp)
-    if du_lieu.email:
-        db_email = csdl.query(NguoiDungDB).filter(NguoiDungDB.email == du_lieu.email).first()
-        if db_email:
-            raise HTTPException(status_code=400, detail="Email đã được sử dụng")
-    
-    # Tạo người dùng mới
-    mat_khau_ma_hoa = bam_mat_khau(du_lieu.password)
-    user_moi = NguoiDungDB(
-        username=du_lieu.username,
-        email=du_lieu.email,
-        full_name=du_lieu.full_name,
-        phone=du_lieu.phone,
-        address=du_lieu.address,
-        hashed_password=mat_khau_ma_hoa,
-        is_active=True
-    )
-    csdl.add(user_moi)
-    csdl.commit()
-    csdl.refresh(user_moi)
-    return user_moi
+    try:
+        # Kiểm tra username đã tồn tại chưa
+        db_user = csdl.query(NguoiDungDB).filter(NguoiDungDB.username == du_lieu.username).first()
+        if db_user:
+            raise HTTPException(status_code=400, detail="Tên đăng nhập đã tồn tại")
+        
+        # Kiểm tra email đã tồn tại chưa (nếu có cung cấp)
+        if du_lieu.email:
+            db_email = csdl.query(NguoiDungDB).filter(NguoiDungDB.email == du_lieu.email).first()
+            if db_email:
+                raise HTTPException(status_code=400, detail="Email đã được sử dụng")
+        
+        # Tạo người dùng mới
+        mat_khau_ma_hoa = bam_mat_khau(du_lieu.password)
+        user_moi = NguoiDungDB(
+            username=du_lieu.username,
+            email=du_lieu.email,
+            full_name=du_lieu.full_name,
+            phone=du_lieu.phone,
+            address=du_lieu.address,
+            hashed_password=mat_khau_ma_hoa,
+            is_active=True
+        )
+        csdl.add(user_moi)
+        csdl.commit()
+        csdl.refresh(user_moi)
+        return user_moi
+    except HTTPException:
+        raise
+    except Exception as e:
+        csdl.rollback()
+        print(f"Lỗi đăng ký: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Lỗi server: {str(e)}")
 
 @bo_dinh_tuyen.post("/dang_nhap", response_model=Token)
 def dang_nhap(du_lieu: DangNhapForm, csdl: Session = Depends(lay_csdl)):
     """Đăng nhập và lấy token"""
-    user = csdl.query(NguoiDungDB).filter(NguoiDungDB.username == du_lieu.username).first()
-    if not user or not xac_minh_mat_khau(du_lieu.password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Tên đăng nhập hoặc mật khẩu không chính xác",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    access_token = tao_token_truy_cap(du_lieu={"sub": user.username})
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "user": user
-    }
+    try:
+        user = csdl.query(NguoiDungDB).filter(NguoiDungDB.username == du_lieu.username).first()
+        if not user or not xac_minh_mat_khau(du_lieu.password, user.hashed_password):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Tên đăng nhập hoặc mật khẩu không chính xác",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        access_token = tao_token_truy_cap(du_lieu={"sub": user.username})
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": user
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Lỗi đăng nhập: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Lỗi server: {str(e)}")
 
 @bo_dinh_tuyen.put("/cap_nhat", response_model=NguoiDungSchema)
 def cap_nhat_profile(du_lieu: NguoiDungCapNhat, authorization: Optional[str] = Header(None, alias="Authorization"), csdl: Session = Depends(lay_csdl)):
