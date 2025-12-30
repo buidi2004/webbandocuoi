@@ -91,40 +91,8 @@ const ChonCombo = () => {
     };
 
     const chonGoiDichVu = (goi) => {
-        // Thêm combo vào giỏ hàng như một sản phẩm đặc biệt
-        const comboProduct = {
-            id: `combo-${goi.id}`,
-            name: goi.ten,
-            code: `COMBO-${goi.id}`,
-            category: 'combo',
-            gender: 'unisex',
-            description: goi.mo_ta,
-            rental_price_day: goi.gia,
-            rental_price_week: goi.gia,
-            purchase_price: goi.gia,
-            price_to_use: goi.gia,
-            image_url: goi.hinh_anh,
-            is_combo: true,
-            quantity: 1,
-            loai: 'mua'
-        };
-        
-        // Lấy giỏ hàng hiện tại từ localStorage
-        const currentCart = JSON.parse(localStorage.getItem('ivie_cart') || '[]');
-        
-        // Thêm combo vào giỏ
-        currentCart.push(comboProduct);
-        localStorage.setItem('ivie_cart', JSON.stringify(currentCart));
-        
-        addToast({ 
-            message: `Đã thêm ${goi.ten} vào giỏ hàng!`, 
-            type: 'success' 
-        });
-        
-        // Chuyển đến giỏ hàng
-        setTimeout(() => {
-            navigate('/gio-hang');
-        }, 500);
+        setGoiDaChon(goi);
+        setBuoc(2);
     };
 
     const xuLyChon = (item, danhSachDaChon, setDanhSachDaChon) => {
@@ -168,7 +136,43 @@ Ghi chú thêm: ${thongTin.ghiChu}
                 phone: thongTin.sdt,
                 message: noiDungTinNhan
             });
+            
+            // Thêm combo vào giỏ hàng sau khi gửi form thành công
+            const comboProduct = {
+                id: `combo-${goiDaChon.id}`,
+                name: goiDaChon.ten,
+                code: `COMBO-${goiDaChon.id}`,
+                category: 'combo',
+                gender: 'unisex',
+                description: goiDaChon.mo_ta,
+                rental_price_day: goiDaChon.gia,
+                rental_price_week: goiDaChon.gia,
+                purchase_price: goiDaChon.gia,
+                price_to_use: goiDaChon.gia,
+                image_url: goiDaChon.hinh_anh,
+                is_combo: true,
+                quantity: 1,
+                loai: 'mua',
+                // Lưu thông tin sản phẩm đã chọn
+                selected_items: {
+                    vay: chonNu.map(i => ({ id: i.id, name: i.name, code: i.code })),
+                    vest: chonNam.map(i => ({ id: i.id, name: i.name, code: i.code }))
+                }
+            };
+            
+            // Lấy giỏ hàng hiện tại từ localStorage
+            const currentCart = JSON.parse(localStorage.getItem('ivie_cart') || '[]');
+            
+            // Thêm combo vào giỏ
+            currentCart.push(comboProduct);
+            localStorage.setItem('ivie_cart', JSON.stringify(currentCart));
+            
             setTrangThaiGui('success');
+            
+            addToast({ 
+                message: `Đã thêm ${goiDaChon.ten} vào giỏ hàng!`, 
+                type: 'success' 
+            });
         } catch (error) {
             console.error(error);
             setTrangThaiGui('error');
@@ -195,7 +199,13 @@ Ghi chú thêm: ${thongTin.ghiChu}
                     <h2 style={{ color: 'green' }}>Đăng Ký Thành Công!</h2>
                     <p>Cảm ơn bạn đã lựa chọn gói <strong>{goiDaChon?.ten}</strong>.</p>
                     <p>Chúng tôi sẽ sớm liên hệ lại để xác nhận lịch thử đồ.</p>
-                    <NutBam onClick={() => window.location.href = '/'} style={{ marginTop: '20px' }}>Về Trang Chủ</NutBam>
+                    <p style={{ marginTop: '20px', fontSize: '16px' }}>
+                        ✅ Gói combo đã được thêm vào giỏ hàng của bạn!
+                    </p>
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '30px' }}>
+                        <NutBam onClick={() => navigate('/gio-hang')}>Xem Giỏ Hàng</NutBam>
+                        <NutBam variant="outline" onClick={() => window.location.href = '/'}>Về Trang Chủ</NutBam>
+                    </div>
                 </div>
             </div>
         );
