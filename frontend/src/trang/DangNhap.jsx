@@ -136,6 +136,7 @@ const DangNhap = () => {
                         {socialLoading.google ? 'Đang xử lý...' : 'Đăng nhập với Google'}
                     </button>
                     
+                    {/* Facebook login - cần tạo Facebook App để bật
                     <button 
                         type="button"
                         className="social-btn facebook-btn"
@@ -147,6 +148,7 @@ const DangNhap = () => {
                         </svg>
                         {socialLoading.facebook ? 'Đang xử lý...' : 'Đăng nhập với Facebook'}
                     </button>
+                    */}
                 </div>
                 
                 <div className="divider">
