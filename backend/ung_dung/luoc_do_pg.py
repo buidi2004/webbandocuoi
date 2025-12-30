@@ -1,9 +1,10 @@
 """
 Pydantic Schemas cho PostgreSQL API - IVIE Studio
 """
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 from typing import Optional, List
 from datetime import datetime
+import json
 
 
 # ============ SẢN PHẨM ============
@@ -214,16 +215,15 @@ class ComboPhanHoi(ComboCoSo):
     id: int
     ngay_tao: datetime
 
+    @field_validator('quyen_loi', mode='before')
+    @classmethod
+    def parse_quyen_loi(cls, v):
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except:
+                return []
+        return v or []
+
     class Config:
         from_attributes = True
-        
-    @classmethod
-    def from_orm(cls, obj):
-        import json
-        # Convert JSON string to list if needed
-        if hasattr(obj, 'quyen_loi') and isinstance(obj.quyen_loi, str):
-            try:
-                obj.quyen_loi = json.loads(obj.quyen_loi)
-            except:
-                obj.quyen_loi = []
-        return super().from_orm(obj)
