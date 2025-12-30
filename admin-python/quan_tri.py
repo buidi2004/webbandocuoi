@@ -103,12 +103,12 @@ with st.sidebar:
 
 
 # --- Helpers ---
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, ttl=300)  # Cache 5 phút
 def fetch_api_data(endpoint):
-    """Cached version for GET requests"""
+    """Cached version for GET requests with 5min TTL"""
     url = f"{API_URL}{endpoint}"
     try:
-        res = requests.get(url)
+        res = requests.get(url, timeout=10)  # Thêm timeout
         if res.status_code == 200:
             return res.json()
         return None
@@ -118,19 +118,22 @@ def fetch_api_data(endpoint):
 def call_api(method, endpoint, data=None, files=None, clear_cache=True):
     url = f"{API_URL}{endpoint}"
     try:
-        with st.spinner("Đang xử lý..."):
+        # Không hiển thị spinner cho GET requests (mượt hơn)
+        show_spinner = method != "GET"
+        
+        with st.spinner("Đang xử lý...") if show_spinner else st.empty():
             if method == "GET":
                 if not clear_cache: # If we explicitly want cached data
                     return fetch_api_data(endpoint)
-                res = requests.get(url)
+                res = requests.get(url, timeout=10)
             elif method == "POST":
-                res = requests.post(url, json=data, files=files)
+                res = requests.post(url, json=data, files=files, timeout=30)
             elif method == "PUT":
-                res = requests.put(url, json=data)
+                res = requests.put(url, json=data, timeout=30)
             elif method == "PATCH":
-                res = requests.patch(url, json=data)
+                res = requests.patch(url, json=data, timeout=30)
             elif method == "DELETE":
-                res = requests.delete(url)
+                res = requests.delete(url, timeout=10)
             
             if res.status_code in [200, 201]:
                 if method != "GET" and clear_cache:
@@ -139,6 +142,9 @@ def call_api(method, endpoint, data=None, files=None, clear_cache=True):
             else:
                 st.error(f"Lỗi API ({res.status_code}): {res.text}")
                 return None
+    except requests.Timeout:
+        st.error("⏱️ Timeout: Server phản hồi quá lâu")
+        return None
     except Exception as e:
         st.error(f"Lỗi kết nối: {e}")
         return None
@@ -148,20 +154,70 @@ def upload_image(uploaded_file):
         files = {"file": (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}
         url = f"{API_URL}/api/tap_tin/upload"
         try:
-            res = requests.post(url, files=files)
+            res = requests.post(url, files=files, timeout=60)  # Timeout dài hơn cho upload
             if res.status_code == 200:
                 return res.json().get("url")
             st.error("Lỗi tải ảnh lên")
+        except requests.Timeout:
+            st.error("⏱️ Timeout: Upload ảnh quá lâu")
         except Exception as e:
             st.error(f"Lỗi kết nối tải ảnh: {e}")
     return None
 
+@st.cache_data(show_spinner=False)
 def lay_url_anh(path):
+    """Cached image URL generation"""
     if not path: return "https://placehold.co/400x300/000000/ffffff?text=No+Image"
     if path.startswith("http"): return path
     if not path.startswith("/"):
         path = "/" + path
     return f"{API_URL}{path}"
+
+def paginate_list(items, page_size=20):
+    """Helper function for pagination"""
+    if "current_page" not in st.session_state:
+        st.session_state.current_page = 1
+    
+    total_pages = max(1, (len(items) + page_size - 1) // page_size)
+    
+    # Ensure current page is valid
+    if st.session_state.current_page > total_pages:
+        st.session_state.current_page = total_pages
+    
+    start_idx = (st.session_state.current_page - 1) * page_size
+    end_idx = start_idx + page_size
+    
+    return items[start_idx:end_idx], st.session_state.current_page, total_pages
+
+def show_pagination(current_page, total_pages):
+    """Display pagination controls"""
+    if total_pages <= 1:
+        return
+    
+    col1, col2, col3, col4, col5 = st.columns([1, 1, 2, 1, 1])
+    
+    with col1:
+        if st.button("⏮️ Đầu", disabled=current_page == 1, use_container_width=True):
+            st.session_state.current_page = 1
+            st.rerun()
+    
+    with col2:
+        if st.button("◀️ Trước", disabled=current_page == 1, use_container_width=True):
+            st.session_state.current_page -= 1
+            st.rerun()
+    
+    with col3:
+        st.markdown(f"<div style='text-align: center; padding: 8px;'>Trang {current_page} / {total_pages}</div>", unsafe_allow_html=True)
+    
+    with col4:
+        if st.button("Sau ▶️", disabled=current_page == total_pages, use_container_width=True):
+            st.session_state.current_page += 1
+            st.rerun()
+    
+    with col5:
+        if st.button("Cuối ⏭️", disabled=current_page == total_pages, use_container_width=True):
+            st.session_state.current_page = total_pages
+            st.rerun()
 
 def cap_nhat_trang_thai_lien_he(id_lien_he, status):
     url = f"{API_URL}/api/lien_he/{id_lien_he}/status"
@@ -588,6 +644,17 @@ def ui_san_pham():
                     )
             
             st.markdown("---")
+            
+            # PAGINATION
+            page_size = st.selectbox("Số sản phẩm/trang", [10, 20, 50, 100], index=1, key="page_size_products")
+            paginated_prods, current_page, total_pages = paginate_list(filtered_prods, page_size)
+            
+            st.text(f"📊 Hiển thị {len(paginated_prods)} / {len(filtered_prods)} sản phẩm (Trang {current_page}/{total_pages})")
+            
+            # Pagination controls
+            show_pagination(current_page, total_pages)
+            
+            st.markdown("---")
             h1, h2, h3, h4 = st.columns([1, 2, 1, 1])
             h1.write("**ẢNH**")
             h2.write("**THÔNG TIN**")
@@ -595,7 +662,7 @@ def ui_san_pham():
             h4.write("**HÀNH ĐỘNG**")
             st.markdown("---")
             
-            for p in filtered_prods:
+            for p in paginated_prods:  # Chỉ hiển thị sản phẩm trong trang hiện tại
                 edit_key = f"edit_{p['id']}"
                 is_editing = st.session_state.get(edit_key, False)
                 
@@ -736,6 +803,10 @@ def ui_san_pham():
                                     st.toast("Đã xóa sản phẩm")
                                     st.rerun()
                     st.markdown("<div style='border-bottom: 1px solid #222; margin: 10px 0;'></div>", unsafe_allow_html=True)
+            
+            # Pagination controls ở cuối
+            st.markdown("---")
+            show_pagination(current_page, total_pages)
 
 def ui_thu_vien():
     st.header("Quản lý Thư viện")
@@ -1072,8 +1143,16 @@ def ui_don_hang():
     
     st.write(f"📦 Tổng: **{len(filtered)}** đơn hàng")
     
+    # PAGINATION
+    page_size_orders = st.selectbox("Số đơn hàng/trang", [10, 20, 50], index=1, key="page_size_orders")
+    paginated_orders, current_page, total_pages = paginate_list(filtered, page_size_orders)
+    
+    st.text(f"Hiển thị {len(paginated_orders)} / {len(filtered)} đơn (Trang {current_page}/{total_pages})")
+    show_pagination(current_page, total_pages)
+    st.markdown("---")
+    
     # Hiển thị đơn hàng
-    for dh in filtered:
+    for dh in paginated_orders:  # Chỉ hiển thị đơn trong trang hiện tại
         status = dh.get('status', 'pending')
         status_color = {
             'pending': '🟡',
@@ -1117,6 +1196,10 @@ def ui_don_hang():
                         if call_api("PUT", f"/api/don_hang/{dh['id']}", data={"status": new_status}):
                             st.toast("Đã cập nhật trạng thái!")
                             st.rerun()
+    
+    # Pagination controls ở cuối
+    st.markdown("---")
+    show_pagination(current_page, total_pages)
 
 # --- Main Layout ---
 if "Tổng quan" in choice:
