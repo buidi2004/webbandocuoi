@@ -3,6 +3,8 @@ import api from './khach_hang';
 export const nguoiDungAPI = {
     dangKy: (duLieu) => api.post('/api/nguoi_dung/dang_ky', duLieu),
     dangNhap: (duLieu) => api.post('/api/nguoi_dung/dang_nhap', duLieu),
+    // Đăng nhập bằng Google/Facebook
+    dangNhapSocial: (duLieu) => api.post('/api/nguoi_dung/dang_nhap_social', duLieu),
     layDonHang: (token) => api.get('/api/nguoi_dung/don_hang', {
         headers: { 'Authorization': `Bearer ${token}` }
     }),

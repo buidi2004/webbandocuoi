@@ -178,3 +178,74 @@ def kiem_tra_giam_gia(authorization: Optional[str] = Header(None, alias="Authori
         return {"co_the_giam": True, "phan_tram": 5.0, "message": "Bạn là khách hàng thân thiết, được giảm 5%!"}
     
     return {"co_the_giam": False, "phan_tram": 0, "message": "Giảm giá 5% cho lần mua hàng sau."}
+
+
+# ============ ĐĂNG NHẬP SOCIAL (Google/Facebook) ============
+class DangNhapSocialForm(BaseModel):
+    provider: str  # 'google' hoặc 'facebook'
+    provider_id: str  # UID từ Firebase
+    email: Optional[str] = None
+    full_name: Optional[str] = None
+    avatar_url: Optional[str] = None
+
+@bo_dinh_tuyen.post("/dang_nhap_social", response_model=Token)
+def dang_nhap_social(du_lieu: DangNhapSocialForm, csdl: Session = Depends(lay_csdl)):
+    """Đăng nhập bằng Google hoặc Facebook"""
+    try:
+        # Tạo username từ provider và provider_id
+        username = f"{du_lieu.provider}_{du_lieu.provider_id}"
+        
+        # Kiểm tra xem user đã tồn tại chưa
+        user = csdl.query(NguoiDungDB).filter(NguoiDungDB.username == username).first()
+        
+        if not user:
+            # Kiểm tra email đã tồn tại chưa (nếu có)
+            if du_lieu.email:
+                existing_email = csdl.query(NguoiDungDB).filter(NguoiDungDB.email == du_lieu.email).first()
+                if existing_email:
+                    # Liên kết tài khoản social với tài khoản email đã có
+                    # Cập nhật username để có thể đăng nhập bằng social
+                    existing_email.username = username
+                    csdl.commit()
+                    user = existing_email
+            
+            if not user:
+                # Tạo user mới
+                import secrets
+                random_password = secrets.token_urlsafe(32)
+                mat_khau_ma_hoa = bam_mat_khau(random_password)
+                
+                user = NguoiDungDB(
+                    username=username,
+                    email=du_lieu.email,
+                    full_name=du_lieu.full_name or f"User {du_lieu.provider.title()}",
+                    hashed_password=mat_khau_ma_hoa,
+                    is_active=True
+                )
+                csdl.add(user)
+                csdl.commit()
+                csdl.refresh(user)
+        else:
+            # Cập nhật thông tin nếu có thay đổi
+            if du_lieu.full_name and not user.full_name:
+                user.full_name = du_lieu.full_name
+            if du_lieu.email and not user.email:
+                user.email = du_lieu.email
+            csdl.commit()
+            csdl.refresh(user)
+        
+        # Tạo token
+        access_token = tao_token_truy_cap(du_lieu={"sub": user.username})
+        
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": user
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        csdl.rollback()
+        print(f"Lỗi đăng nhập social: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Lỗi server: {str(e)}")
