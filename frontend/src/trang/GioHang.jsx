@@ -14,7 +14,8 @@ const GioHang = () => {
         name: '',
         phone: '',
         email: '',
-        address: ''
+        address: '',
+        weddingDate: ''
     });
     const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -28,7 +29,8 @@ const GioHang = () => {
                 name: user.full_name || '',
                 phone: user.phone || '',
                 email: user.email || '',
-                address: user.address || ''
+                address: user.address || '',
+                weddingDate: user.wedding_date || ''
             });
         }
     }, []);
@@ -92,7 +94,7 @@ const GioHang = () => {
                 })),
                 payment_method: paymentMethod,
                 delivery_type: deliveryType,
-                note: `Hình thức: ${deliveryType === 'delivery' ? 'Giao tận nơi' : 'Nhận tại studio'} | Thanh toán: ${paymentMethod === 'cod' ? 'COD' : 'Chuyển khoản'}`,
+                note: `Hình thức: ${deliveryType === 'delivery' ? 'Giao tận nơi' : 'Nhận tại studio'} | Thanh toán: ${paymentMethod === 'cod' ? 'COD' : 'Chuyển khoản'}${customerInfo.weddingDate ? ` | Ngày cưới: ${customerInfo.weddingDate}` : ''}`,
                 user_id: user?.id || null
             };
             
@@ -163,6 +165,7 @@ const GioHang = () => {
                                 <input type="tel" placeholder="Số điện thoại *" value={customerInfo.phone} onChange={e => setCustomerInfo({...customerInfo, phone: e.target.value})} required />
                             </div>
                             <input type="text" placeholder="Địa chỉ nhận hàng *" value={customerInfo.address} onChange={e => setCustomerInfo({...customerInfo, address: e.target.value})} required />
+                            <input type="date" placeholder="Ngày cưới dự kiến" value={customerInfo.weddingDate || ''} onChange={e => setCustomerInfo({...customerInfo, weddingDate: e.target.value})} style={{marginTop: '10px'}} />
                         </div>
                     </div>
                 )}
