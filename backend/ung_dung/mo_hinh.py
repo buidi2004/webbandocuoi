@@ -58,9 +58,9 @@ class ChuyenGiaCoBan(BaseModel):
     name: str
     title: str
     bio: str | None = None
-    years_experience: int
-    brides_count: int
-    specialties: list[str]
+    years_experience: int | None = 3
+    brides_count: int | None = 150
+    specialties: list[str] | None = []
     image_url: str | None = None
     social_facebook: str | None = None
     social_instagram: str | None = None
