@@ -18,7 +18,12 @@ def lay_danh_sach_chuyen_gia(csdl: Session = Depends(lay_csdl)):
     # Deserialize JSON strings
     for cg in chuyen_gia:
         if isinstance(cg.specialties, str):
-            cg.specialties = json.loads(cg.specialties)
+            try:
+                cg.specialties = json.loads(cg.specialties)
+            except (json.JSONDecodeError, TypeError):
+                cg.specialties = []
+        elif cg.specialties is None:
+            cg.specialties = []
     return chuyen_gia
 
 @bo_dinh_tuyen.get("/chuyen_gia/{id_chuyen_gia}", response_model=ChuyenGia)
@@ -30,7 +35,12 @@ def lay_chuyen_gia(id_chuyen_gia: int, csdl: Session = Depends(lay_csdl)):
         raise HTTPException(status_code=404, detail="Không tìm thấy chuyên gia")
     # Deserialize JSON string
     if isinstance(chuyen_gia.specialties, str):
-        chuyen_gia.specialties = json.loads(chuyen_gia.specialties)
+        try:
+            chuyen_gia.specialties = json.loads(chuyen_gia.specialties)
+        except (json.JSONDecodeError, TypeError):
+            chuyen_gia.specialties = []
+    elif chuyen_gia.specialties is None:
+        chuyen_gia.specialties = []
     return chuyen_gia
 
 @bo_dinh_tuyen.post("/chuyen_gia", response_model=ChuyenGia)
