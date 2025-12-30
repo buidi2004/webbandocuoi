@@ -7,11 +7,26 @@ from PIL import Image
 import io
 from datetime import datetime
 
+# Import authentication module
+from auth import (
+    init_session, is_authenticated, show_login_page, 
+    show_user_info_sidebar, get_allowed_menu_items,
+    has_permission, MENU_PERMISSIONS
+)
+
 load_dotenv()
 
 API_URL = os.getenv("API_BASE_URL", os.getenv("VITE_API_BASE_URL", "http://localhost:8000"))
 
 st.set_page_config(page_title="IVIE Wedding Admin", layout="wide", page_icon="🏯")
+
+# Khởi tạo session
+init_session()
+
+# Kiểm tra authentication
+if not is_authenticated():
+    show_login_page()
+    st.stop()  # Dừng execution nếu chưa đăng nhập
 
 # CSS custom for minimalist B&W Dark Theme
 st.markdown("""
@@ -77,21 +92,13 @@ st.markdown("""
 st.title("IVIE STUDIO ADMIN")
 
 with st.sidebar:
-    choice = st.selectbox("MENU QUẢN TRỊ", [
-        "📊 Tổng quan",
-        "🛒 Quản lý Đơn hàng",
-        "📞 Liên hệ khách hàng",
-        "💬 Tư vấn khách hàng",
-        "⏳ Duyệt Đánh Giá",
-        "🖼️ Quản lý Banner",
-        "👗 Quản lý Sản phẩm",
-        "🎁 Quản lý Combo",
-        "🤝 Đối tác & Khiếu nại",
-        "📁 Thư viện ảnh mẫu",
-        "✨ Dịch vụ Chuyên gia",
-        "📰 Blog & Tin tức",
-        "🏠 Nội dung Trang chủ"
-    ])
+    # Hiển thị thông tin user
+    show_user_info_sidebar()
+    
+    # Lấy menu items theo quyền của user
+    allowed_menu_items = get_allowed_menu_items()
+    
+    choice = st.selectbox("MENU QUẢN TRỊ", allowed_menu_items)
 
 
 
@@ -249,6 +256,11 @@ def ui_banner():
                                 st.rerun()
 
 def ui_san_pham():
+    # Kiểm tra quyền truy cập
+    if not has_permission("products"):
+        st.error("⛔ Bạn không có quyền truy cập chức năng này. Vui lòng liên hệ quản trị viên.")
+        return
+    
     st.header("Quản lý Sản phẩm")
     t1, t2 = st.tabs(["DANH SÁCH", "THÊM MỚI"])
     
@@ -862,6 +874,11 @@ def ui_tu_van_khach_hang():
                         st.toast("Đã gửi"); st.rerun()
 
 def ui_duyet_danh_gia():
+    # Kiểm tra quyền truy cập
+    if not has_permission("reviews"):
+        st.error("⛔ Bạn không có quyền truy cập chức năng này. Vui lòng liên hệ quản trị viên.")
+        return
+    
     st.header("⏳ Quản lý Đánh giá chờ duyệt")
     
     # Nút refresh
