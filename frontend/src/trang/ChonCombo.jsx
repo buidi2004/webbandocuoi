@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { sanPhamAPI, lienHeAPI, layUrlHinhAnh } from '../api/khach_hang';
 import NutBam from '../thanh_phan/NutBam';
 import { useToast } from '../thanh_phan/Toast';
-import { useGioHang } from '../thanh_phan/GioHangContext';
 import '../styles/combo.css';
 
 export const DANH_SACH_GOI = [
@@ -104,11 +103,20 @@ const ChonCombo = () => {
             rental_price_day: goi.gia,
             rental_price_week: goi.gia,
             purchase_price: goi.gia,
+            price_to_use: goi.gia,
             image_url: goi.hinh_anh,
-            is_combo: true
+            is_combo: true,
+            quantity: 1,
+            loai: 'mua'
         };
         
-        themVaoGio(comboProduct, 1, 'mua');
+        // Lấy giỏ hàng hiện tại từ localStorage
+        const currentCart = JSON.parse(localStorage.getItem('ivie_cart') || '[]');
+        
+        // Thêm combo vào giỏ
+        currentCart.push(comboProduct);
+        localStorage.setItem('ivie_cart', JSON.stringify(currentCart));
+        
         addToast({ 
             message: `Đã thêm ${goi.ten} vào giỏ hàng!`, 
             type: 'success' 
