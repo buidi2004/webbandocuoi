@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { sanPhamAPI, lienHeAPI, layUrlHinhAnh } from '../api/khach_hang';
 import NutBam from '../thanh_phan/NutBam';
 import { useToast } from '../thanh_phan/Toast';
+import { useGioHang } from '../thanh_phan/GioHangContext';
 import '../styles/combo.css';
 
 export const DANH_SACH_GOI = [
@@ -53,6 +55,9 @@ export const DANH_SACH_GOI = [
 ];
 
 const ChonCombo = () => {
+    const navigate = useNavigate();
+    const { themVaoGio } = useGioHang();
+    const { addToast } = useToast();
     const [buoc, setBuoc] = useState(1);
     const [goiDaChon, setGoiDaChon] = useState(null);
     const [vayNu, setVayNu] = useState([]);
@@ -60,7 +65,6 @@ const ChonCombo = () => {
     const [chonNu, setChonNu] = useState([]);
     const [chonNam, setChonNam] = useState([]);
     const [dangTai, setDangTai] = useState(false);
-    const { addToast } = useToast();
 
     // Form state
     const [thongTin, setThongTin] = useState({
@@ -89,11 +93,31 @@ const ChonCombo = () => {
     };
 
     const chonGoiDichVu = (goi) => {
-        setGoiDaChon(goi);
-        setChonNu([]); // Reset selection when changing package
-        setChonNam([]);
-        setBuoc(2);
-        window.scrollTo(0, 0);
+        // Thêm combo vào giỏ hàng như một sản phẩm đặc biệt
+        const comboProduct = {
+            id: `combo-${goi.id}`,
+            name: goi.ten,
+            code: `COMBO-${goi.id}`,
+            category: 'combo',
+            gender: 'unisex',
+            description: goi.mo_ta,
+            rental_price_day: goi.gia,
+            rental_price_week: goi.gia,
+            purchase_price: goi.gia,
+            image_url: goi.hinh_anh,
+            is_combo: true
+        };
+        
+        themVaoGio(comboProduct, 1, 'mua');
+        addToast({ 
+            message: `Đã thêm ${goi.ten} vào giỏ hàng!`, 
+            type: 'success' 
+        });
+        
+        // Chuyển đến giỏ hàng
+        setTimeout(() => {
+            navigate('/gio-hang');
+        }, 500);
     };
 
     const xuLyChon = (item, danhSachDaChon, setDanhSachDaChon) => {
