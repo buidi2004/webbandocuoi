@@ -386,7 +386,13 @@ def lay_combo(combo_id: int, phien: Session = Depends(lay_phien)):
 
 @bo_dinh_tuyen.post("/combo", response_model=ComboPhanHoi, summary="Tạo combo mới")
 def tao_combo(du_lieu: ComboTao, phien: Session = Depends(lay_phien)):
-    combo = Combo(**du_lieu.model_dump())
+    import json
+    # Convert list to JSON string for database
+    combo_dict = du_lieu.model_dump()
+    if 'quyen_loi' in combo_dict and isinstance(combo_dict['quyen_loi'], list):
+        combo_dict['quyen_loi'] = json.dumps(combo_dict['quyen_loi'], ensure_ascii=False)
+    
+    combo = Combo(**combo_dict)
     phien.add(combo)
     phien.commit()
     phien.refresh(combo)
@@ -395,11 +401,17 @@ def tao_combo(du_lieu: ComboTao, phien: Session = Depends(lay_phien)):
 
 @bo_dinh_tuyen.put("/combo/{combo_id}", response_model=ComboPhanHoi, summary="Cập nhật combo")
 def cap_nhat_combo(combo_id: int, du_lieu: ComboCapNhat, phien: Session = Depends(lay_phien)):
+    import json
     combo = phien.query(Combo).filter(Combo.id == combo_id).first()
     if not combo:
         raise HTTPException(status_code=404, detail="Không tìm thấy combo")
     
-    for truong, gia_tri in du_lieu.model_dump(exclude_unset=True).items():
+    update_data = du_lieu.model_dump(exclude_unset=True)
+    # Convert list to JSON string for database
+    if 'quyen_loi' in update_data and isinstance(update_data['quyen_loi'], list):
+        update_data['quyen_loi'] = json.dumps(update_data['quyen_loi'], ensure_ascii=False)
+    
+    for truong, gia_tri in update_data.items():
         setattr(combo, truong, gia_tri)
     
     phien.commit()

@@ -216,3 +216,14 @@ class ComboPhanHoi(ComboCoSo):
 
     class Config:
         from_attributes = True
+        
+    @classmethod
+    def from_orm(cls, obj):
+        import json
+        # Convert JSON string to list if needed
+        if hasattr(obj, 'quyen_loi') and isinstance(obj.quyen_loi, str):
+            try:
+                obj.quyen_loi = json.loads(obj.quyen_loi)
+            except:
+                obj.quyen_loi = []
+        return super().from_orm(obj)
