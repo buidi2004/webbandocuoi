@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { sanPhamAPI, layUrlHinhAnh } from '../api/khach_hang';
-import { DANH_SACH_GOI } from '../trang/ChonCombo';
+import { sanPhamAPI, layUrlHinhAnh, comboAPI } from '../api/khach_hang';
 import '../styles/search.css';
 
 const ThanhTimKiem = ({ isOpen, onClose }) => {
     const [tuKhoa, setTuKhoa] = useState('');
     const [sanPham, setSanPham] = useState([]);
+    const [danhSachCombo, setDanhSachCombo] = useState([]);
     const [ketQua, setKetQua] = useState({ sanPham: [], combo: [] });
     const [dangTai, setDangTai] = useState(false);
     const inputRef = useRef(null);
@@ -15,6 +15,7 @@ const ThanhTimKiem = ({ isOpen, onClose }) => {
     useEffect(() => {
         if (isOpen && sanPham.length === 0) {
             taiSanPham();
+            taiCombo();
         }
         if (isOpen) {
             setTimeout(() => {
@@ -38,6 +39,39 @@ const ThanhTimKiem = ({ isOpen, onClose }) => {
         }
     };
 
+    const taiCombo = async () => {
+        try {
+            const res = await comboAPI.layTatCa();
+            if (res.data) setDanhSachCombo(res.data);
+        } catch (error) {
+            console.error("Lỗi tải combo:", error);
+            // Fallback to default combos
+            setDanhSachCombo([
+                {
+                    id: 1,
+                    ten: 'COMBO KHỞI ĐẦU',
+                    gia: 2000000,
+                    mo_ta: 'Gói cơ bản cho các cặp đôi',
+                    hinh_anh: 'https://images.unsplash.com/photo-1594552072238-b8a33785b261?auto=format&fit=crop&q=80&w=600'
+                },
+                {
+                    id: 2,
+                    ten: 'COMBO TIẾT KIỆM',
+                    gia: 5000000,
+                    mo_ta: 'Sự lựa chọn phổ biến nhất',
+                    hinh_anh: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=600'
+                },
+                {
+                    id: 3,
+                    ten: 'COMBO VIP TOÀN NĂNG',
+                    gia: 15000000,
+                    mo_ta: 'Trọn gói ngày cưới hoàn hảo',
+                    hinh_anh: 'https://images.unsplash.com/photo-1511285560982-1351cdeb9821?auto=format&fit=crop&q=80&w=600'
+                }
+            ]);
+        }
+    };
+
     useEffect(() => {
         if (!tuKhoa.trim()) {
             setKetQua({ sanPham: [], combo: [] });
@@ -51,13 +85,13 @@ const ThanhTimKiem = ({ isOpen, onClose }) => {
             sp.code.toLowerCase().includes(tuKhoaThuong)
         ).slice(0, 10);
 
-        const cbTimThay = DANH_SACH_GOI.filter(cb =>
+        const cbTimThay = danhSachCombo.filter(cb =>
             cb.ten.toLowerCase().includes(tuKhoaThuong) ||
             cb.mo_ta.toLowerCase().includes(tuKhoaThuong)
         ).slice(0, 5);
 
         setKetQua({ sanPham: spTimThay, combo: cbTimThay });
-    }, [tuKhoa, sanPham]);
+    }, [tuKhoa, sanPham, danhSachCombo]);
 
     const dinhDangGia = (gia) => {
         return new Intl.NumberFormat('vi-VN').format(gia) + 'đ';
