@@ -74,6 +74,26 @@ const ChonCombo = () => {
                         'Miễn phí chỉnh sửa ảnh & dựng phim'
                     ],
                     hinh_anh: 'https://images.unsplash.com/photo-1511285560982-1351cdeb9821?auto=format&fit=crop&q=80&w=600'
+                },
+                {
+                    id: 4,
+                    ten: 'COMBO PREMIUM LUXURY',
+                    gia: 25000000,
+                    gioi_han: 10,
+                    mo_ta: 'Gói cao cấp với đội ngũ chuyên gia hàng đầu - Dành cho đám cưới hoàn hảo',
+                    quyen_loi: [
+                        '10 Váy Cưới cao cấp tùy chọn (bao gồm dòng Luxury & Designer)',
+                        '10 Bộ Vest Nam cao cấp',
+                        '🌟 Chuyên gia chụp ảnh HÀNG ĐẦU - Kinh nghiệm 10+ năm',
+                        '🌟 Chuyên gia quay phim cinematic HÀNG ĐẦU',
+                        '🌟 Dựng & chỉnh sửa ảnh bởi chuyên gia HÀNG ĐẦU',
+                        '🌟 Dựng phim cưới điện ảnh (10-15 phút) - Đạo diễn chuyên nghiệp',
+                        '🌟 Trang điểm cô dâu & gia đình bởi chuyên gia makeup HÀNG ĐẦU',
+                        '🌟 Album ảnh cao cấp 40x60cm (50 trang) - Thiết kế độc quyền',
+                        'Phụ kiện & trang sức đi kèm',
+                        'Hỗ trợ tư vấn concept & styling bởi chuyên gia'
+                    ],
+                    hinh_anh: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=600'
                 }
             ]);
         }
