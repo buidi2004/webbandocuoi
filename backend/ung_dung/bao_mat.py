@@ -3,6 +3,7 @@ from typing import Any, Union
 from jose import jwt
 from passlib.context import CryptContext
 import os
+import hashlib
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -16,14 +17,15 @@ ngu_canh_mat_khau = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def xac_minh_mat_khau(mat_khau_tho: str, mat_khau_bam: str) -> bool:
     """Kiểm tra mật khẩu khớp với mã băm"""
-    return ngu_canh_mat_khau.verify(mat_khau_tho, mat_khau_bam)
+    # Hash password with SHA256 first to ensure it's within bcrypt's 72 byte limit
+    mat_khau_sha = hashlib.sha256(mat_khau_tho.encode('utf-8')).hexdigest()
+    return ngu_canh_mat_khau.verify(mat_khau_sha, mat_khau_bam)
 
 def bam_mat_khau(mat_khau: str) -> str:
     """Tạo mã băm cho mật khẩu"""
-    # Bcrypt has a 72 byte limit, truncate if needed
-    if len(mat_khau.encode('utf-8')) > 72:
-        mat_khau = mat_khau[:72]
-    return ngu_canh_mat_khau.hash(mat_khau)
+    # Hash password with SHA256 first to ensure it's within bcrypt's 72 byte limit
+    mat_khau_sha = hashlib.sha256(mat_khau.encode('utf-8')).hexdigest()
+    return ngu_canh_mat_khau.hash(mat_khau_sha)
 
 def tao_token_truy_cap(du_lieu: dict, het_han_sau: Union[timedelta, None] = None) -> str:
     """Tạo JWT Token"""
