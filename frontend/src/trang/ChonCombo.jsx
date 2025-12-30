@@ -55,7 +55,6 @@ export const DANH_SACH_GOI = [
 
 const ChonCombo = () => {
     const navigate = useNavigate();
-    const { themVaoGio } = useGioHang();
     const { addToast } = useToast();
     const [buoc, setBuoc] = useState(1);
     const [goiDaChon, setGoiDaChon] = useState(null);
