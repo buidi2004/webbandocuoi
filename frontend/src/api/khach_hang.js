@@ -88,3 +88,10 @@ export const layUrlHinhAnh = (duongDan) => {
 };
 
 export default api;
+
+
+// Combo API (API Combo)
+export const comboAPI = {
+    layTatCa: () => api.get('/pg/combo', { params: { hoat_dong: true } }),
+    layTheoId: (id) => api.get(`/pg/combo/${id}`),
+};

@@ -279,6 +279,20 @@ class YeuThich(CoSo):
     user = relationship("NguoiDung")
     product = relationship("SanPham")
 
+# Combo packages
+class Combo(CoSo):
+    __tablename__ = "combos"
+    id = Column(Integer, primary_key=True, index=True)
+    ten = Column(String, nullable=False)
+    gia = Column(Float, nullable=False)
+    gioi_han = Column(Integer, nullable=False)
+    mo_ta = Column(Text)
+    quyen_loi = Column(Text)  # JSON string
+    hinh_anh = Column(String)
+    noi_bat = Column(Boolean, default=False)
+    hoat_dong = Column(Boolean, default=True)
+    ngay_tao = Column(DateTime, default=datetime.utcnow)
+
 
 # Dependency
 def lay_csdl():

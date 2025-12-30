@@ -85,6 +85,7 @@ with st.sidebar:
         "⏳ Duyệt Đánh Giá",
         "🖼️ Quản lý Banner",
         "👗 Quản lý Sản phẩm",
+        "🎁 Quản lý Combo",
         "🤝 Đối tác & Khiếu nại",
         "📁 Thư viện ảnh mẫu",
         "✨ Dịch vụ Chuyên gia",
@@ -1311,3 +1312,198 @@ elif "Nội dung Trang chủ" in choice:
                                 st.rerun()
         else:
             st.info("Chưa có điểm nhấn nào")
+
+
+# ============ QUẢN LÝ COMBO ============
+if choice == "🎁 Quản lý Combo":
+    st.header("🎁 Quản lý Combo")
+    
+    tab1, tab2 = st.tabs(["DANH SÁCH COMBO", "THÊM/SỬA COMBO"])
+    
+    with tab1:
+        st.subheader("📋 Danh sách Combo hiện có")
+        combos = call_api("GET", "/pg/combo", clear_cache=True)
+        
+        if combos:
+            for combo in combos:
+                with st.container(border=True):
+                    col1, col2, col3 = st.columns([1, 3, 1])
+                    
+                    with col1:
+                        if combo.get('hinh_anh'):
+                            st.image(lay_url_anh(combo['hinh_anh']), use_container_width=True)
+                        else:
+                            st.info("Chưa có ảnh")
+                    
+                    with col2:
+                        st.markdown(f"### {combo.get('ten', 'Không có tên')}")
+                        st.write(f"**Giá:** {combo.get('gia', 0):,.0f}đ")
+                        st.write(f"**Giới hạn:** {combo.get('gioi_han', 0)} sản phẩm/loại")
+                        st.write(f"**Mô tả:** {combo.get('mo_ta', '')}")
+                        
+                        # Hiển thị quyền lợi
+                        quyen_loi = combo.get('quyen_loi', [])
+                        if isinstance(quyen_loi, str):
+                            import json
+                            try:
+                                quyen_loi = json.loads(quyen_loi)
+                            except:
+                                quyen_loi = []
+                        
+                        if quyen_loi:
+                            st.write("**Quyền lợi:**")
+                            for ql in quyen_loi:
+                                st.write(f"✓ {ql}")
+                        
+                        # Badges
+                        badges = []
+                        if combo.get('noi_bat'):
+                            badges.append("🌟 NỔI BẬT")
+                        if combo.get('hoat_dong'):
+                            badges.append("✅ HOẠT ĐỘNG")
+                        else:
+                            badges.append("❌ TẠM DỪNG")
+                        
+                        st.write(" | ".join(badges))
+                    
+                    with col3:
+                        if st.button("✏️ SỬA", key=f"edit_combo_{combo['id']}"):
+                            st.session_state['editing_combo'] = combo
+                            st.rerun()
+                        
+                        if st.button("🗑️ XÓA", key=f"del_combo_{combo['id']}"):
+                            if call_api("DELETE", f"/pg/combo/{combo['id']}"):
+                                st.success("✅ Đã xóa combo!")
+                                st.rerun()
+        else:
+            st.info("Chưa có combo nào. Hãy thêm combo mới!")
+    
+    with tab2:
+        # Kiểm tra xem có đang sửa combo không
+        editing_combo = st.session_state.get('editing_combo', None)
+        
+        if editing_combo:
+            st.subheader(f"✏️ Sửa Combo: {editing_combo.get('ten', '')}")
+        else:
+            st.subheader("➕ Thêm Combo Mới")
+        
+        with st.form("combo_form"):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                ten = st.text_input("Tên Combo *", 
+                                   value=editing_combo.get('ten', '') if editing_combo else '',
+                                   placeholder="VD: COMBO TIẾT KIỆM")
+                
+                gia = st.number_input("Giá Combo (VNĐ) *", 
+                                     min_value=0, 
+                                     value=int(editing_combo.get('gia', 5000000)) if editing_combo else 5000000,
+                                     step=100000)
+                
+                gioi_han = st.number_input("Giới hạn sản phẩm/loại *", 
+                                          min_value=1, 
+                                          value=editing_combo.get('gioi_han', 5) if editing_combo else 5,
+                                          step=1,
+                                          help="Số lượng váy và vest tối đa khách có thể chọn")
+            
+            with col2:
+                noi_bat = st.checkbox("🌟 Đánh dấu NỔI BẬT", 
+                                     value=editing_combo.get('noi_bat', False) if editing_combo else False)
+                
+                hoat_dong = st.checkbox("✅ HOẠT ĐỘNG", 
+                                       value=editing_combo.get('hoat_dong', True) if editing_combo else True)
+            
+            mo_ta = st.text_area("Mô tả Combo", 
+                                value=editing_combo.get('mo_ta', '') if editing_combo else '',
+                                placeholder="VD: Sự lựa chọn phổ biến nhất",
+                                height=80)
+            
+            # Quyền lợi
+            st.markdown("### 🎁 Quyền lợi của Combo")
+            
+            # Lấy quyền lợi hiện tại nếu đang sửa
+            current_quyen_loi = []
+            if editing_combo:
+                quyen_loi_data = editing_combo.get('quyen_loi', [])
+                if isinstance(quyen_loi_data, str):
+                    import json
+                    try:
+                        current_quyen_loi = json.loads(quyen_loi_data)
+                    except:
+                        current_quyen_loi = []
+                else:
+                    current_quyen_loi = quyen_loi_data
+            
+            # Đảm bảo có ít nhất 5 ô input
+            while len(current_quyen_loi) < 5:
+                current_quyen_loi.append("")
+            
+            quyen_loi_list = []
+            for i in range(5):
+                ql = st.text_input(f"Quyền lợi {i+1}", 
+                                  value=current_quyen_loi[i] if i < len(current_quyen_loi) else '',
+                                  placeholder=f"VD: {i+1} Váy Cưới tùy chọn",
+                                  key=f"quyen_loi_{i}")
+                if ql.strip():
+                    quyen_loi_list.append(ql.strip())
+            
+            # Hình ảnh
+            st.markdown("### 📸 Hình ảnh đại diện Combo")
+            
+            if editing_combo and editing_combo.get('hinh_anh'):
+                st.image(lay_url_anh(editing_combo['hinh_anh']), caption="Ảnh hiện tại", width=300)
+            
+            img_file = st.file_uploader("Tải ảnh mới", type=["jpg", "png", "jpeg", "webp"])
+            
+            if img_file:
+                st.image(img_file, caption="Xem trước", width=300)
+            
+            # Buttons
+            col_btn1, col_btn2, col_btn3 = st.columns([2, 1, 1])
+            
+            with col_btn2:
+                if editing_combo:
+                    cancel = st.form_submit_button("❌ HỦY", use_container_width=True)
+                    if cancel:
+                        st.session_state.pop('editing_combo', None)
+                        st.rerun()
+            
+            with col_btn3:
+                submitted = st.form_submit_button("💾 LƯU COMBO", use_container_width=True, type="primary")
+            
+            if submitted:
+                if not ten or not gia or not gioi_han:
+                    st.error("⚠️ Vui lòng điền đầy đủ các trường bắt buộc (*)")
+                else:
+                    with st.spinner("Đang xử lý..."):
+                        # Upload ảnh nếu có
+                        hinh_anh_url = editing_combo.get('hinh_anh', '') if editing_combo else ''
+                        if img_file:
+                            uploaded = upload_image(img_file)
+                            if uploaded:
+                                hinh_anh_url = uploaded
+                        
+                        # Chuẩn bị dữ liệu
+                        import json
+                        combo_data = {
+                            "ten": ten,
+                            "gia": gia,
+                            "gioi_han": gioi_han,
+                            "mo_ta": mo_ta,
+                            "quyen_loi": quyen_loi_list,
+                            "hinh_anh": hinh_anh_url,
+                            "noi_bat": noi_bat,
+                            "hoat_dong": hoat_dong
+                        }
+                        
+                        if editing_combo:
+                            # Cập nhật
+                            if call_api("PUT", f"/pg/combo/{editing_combo['id']}", data=combo_data):
+                                st.success("✅ Đã cập nhật combo!")
+                                st.session_state.pop('editing_combo', None)
+                                st.rerun()
+                        else:
+                            # Thêm mới
+                            if call_api("POST", "/pg/combo", data=combo_data):
+                                st.success("✅ Đã thêm combo mới!")
+                                st.rerun()

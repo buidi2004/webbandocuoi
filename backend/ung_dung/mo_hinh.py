@@ -343,3 +343,32 @@ class HoSoDoiTac(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
+# Mô hình Combo (Combo Package Schemas)
+class ComboCoBan(BaseModel):
+    ten: str
+    gia: float
+    gioi_han: int
+    mo_ta: str | None = None
+    quyen_loi: list[str] = []
+    hinh_anh: str | None = None
+    noi_bat: bool = False
+    is_active: bool = True
+
+class ComboTao(ComboCoBan):
+    pass
+
+class ComboCapNhat(BaseModel):
+    ten: str | None = None
+    gia: float | None = None
+    gioi_han: int | None = None
+    mo_ta: str | None = None
+    quyen_loi: list[str] | None = None
+    hinh_anh: str | None = None
+    noi_bat: bool | None = None
+    is_active: bool | None = None
+
+class Combo(ComboCoBan):
+    id: int
+    
+    model_config = ConfigDict(from_attributes=True)

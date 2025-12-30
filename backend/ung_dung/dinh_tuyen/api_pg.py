@@ -18,7 +18,8 @@ from ung_dung.luoc_do_pg import (
     DonHangTao, DonHangCapNhat, DonHangPhanHoi,
     ChiTietDonHangTao, ChiTietDonHangPhanHoi,
     LienHeTao, LienHeCapNhat, LienHePhanHoi,
-    ThuVienAnhTao, ThuVienAnhCapNhat, ThuVienAnhPhanHoi
+    ThuVienAnhTao, ThuVienAnhCapNhat, ThuVienAnhPhanHoi,
+    ComboTao, ComboCapNhat, ComboPhanHoi
 )
 from passlib.context import CryptContext
 
@@ -358,3 +359,65 @@ def tao_chuyen_gia(
     """), {"ten": ten, "chuc_vu": chuc_vu, "mo_ta": mo_ta, "anh_url": anh_url})
     phien.commit()
     return {"thong_bao": "Đã thêm chuyên gia thành công"}
+
+
+
+# ============ COMBO API ============
+@bo_dinh_tuyen.get("/combo", response_model=List[ComboPhanHoi], summary="Lấy danh sách combo")
+def lay_danh_sach_combo(
+    bo_qua: int = Query(0, ge=0),
+    gioi_han: int = Query(100, ge=1, le=1000),
+    hoat_dong: Optional[bool] = None,
+    phien: Session = Depends(lay_phien)
+):
+    from ung_dung.co_so_du_lieu import Combo
+    truy_van = phien.query(Combo)
+    if hoat_dong is not None:
+        truy_van = truy_van.filter(Combo.hoat_dong == hoat_dong)
+    return truy_van.order_by(Combo.id).offset(bo_qua).limit(gioi_han).all()
+
+
+@bo_dinh_tuyen.get("/combo/{combo_id}", response_model=ComboPhanHoi, summary="Lấy chi tiết combo")
+def lay_combo(combo_id: int, phien: Session = Depends(lay_phien)):
+    from ung_dung.co_so_du_lieu import Combo
+    combo = phien.query(Combo).filter(Combo.id == combo_id).first()
+    if not combo:
+        raise HTTPException(status_code=404, detail="Không tìm thấy combo")
+    return combo
+
+
+@bo_dinh_tuyen.post("/combo", response_model=ComboPhanHoi, summary="Tạo combo mới")
+def tao_combo(du_lieu: ComboTao, phien: Session = Depends(lay_phien)):
+    from ung_dung.co_so_du_lieu import Combo
+    combo = Combo(**du_lieu.model_dump())
+    phien.add(combo)
+    phien.commit()
+    phien.refresh(combo)
+    return combo
+
+
+@bo_dinh_tuyen.put("/combo/{combo_id}", response_model=ComboPhanHoi, summary="Cập nhật combo")
+def cap_nhat_combo(combo_id: int, du_lieu: ComboCapNhat, phien: Session = Depends(lay_phien)):
+    from ung_dung.co_so_du_lieu import Combo
+    combo = phien.query(Combo).filter(Combo.id == combo_id).first()
+    if not combo:
+        raise HTTPException(status_code=404, detail="Không tìm thấy combo")
+    
+    for truong, gia_tri in du_lieu.model_dump(exclude_unset=True).items():
+        setattr(combo, truong, gia_tri)
+    
+    phien.commit()
+    phien.refresh(combo)
+    return combo
+
+
+@bo_dinh_tuyen.delete("/combo/{combo_id}", summary="Xóa combo")
+def xoa_combo(combo_id: int, phien: Session = Depends(lay_phien)):
+    from ung_dung.co_so_du_lieu import Combo
+    combo = phien.query(Combo).filter(Combo.id == combo_id).first()
+    if not combo:
+        raise HTTPException(status_code=404, detail="Không tìm thấy combo")
+    
+    phien.delete(combo)
+    phien.commit()
+    return {"thong_bao": "Đã xóa combo thành công"}

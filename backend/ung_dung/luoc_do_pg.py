@@ -181,3 +181,38 @@ class ThuVienAnhPhanHoi(ThuVienAnhCoSo):
 
     class Config:
         from_attributes = True
+
+
+# ============ COMBO ============
+class ComboCoSo(BaseModel):
+    ten: str
+    gia: float
+    gioi_han: int
+    mo_ta: Optional[str] = None
+    quyen_loi: Optional[List[str]] = []
+    hinh_anh: Optional[str] = None
+    noi_bat: bool = False
+    hoat_dong: bool = True
+
+
+class ComboTao(ComboCoSo):
+    pass
+
+
+class ComboCapNhat(BaseModel):
+    ten: Optional[str] = None
+    gia: Optional[float] = None
+    gioi_han: Optional[int] = None
+    mo_ta: Optional[str] = None
+    quyen_loi: Optional[List[str]] = None
+    hinh_anh: Optional[str] = None
+    noi_bat: Optional[bool] = None
+    hoat_dong: Optional[bool] = None
+
+
+class ComboPhanHoi(ComboCoSo):
+    id: int
+    ngay_tao: datetime
+
+    class Config:
+        from_attributes = True
