@@ -1,7 +1,169 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { layUrlHinhAnh, donHangAPI } from '../api/khach_hang';
+import { layUrlHinhAnh, donHangAPI, sanPhamAPI } from '../api/khach_hang';
 import '../styles/cart.css';
+
+// Component hiển thị item trong giỏ hàng
+const CartItem = ({ item, onRemove, onUpdateQuantity, formatPrice }) => {
+    const [showComboDetails, setShowComboDetails] = useState(false);
+    const [comboImages, setComboImages] = useState({ vay: [], vest: [] });
+    const [loadingImages, setLoadingImages] = useState(false);
+
+    // Load hình ảnh cho các item trong combo
+    useEffect(() => {
+        if (item.is_combo && showComboDetails && item.selected_items) {
+            loadComboImages();
+        }
+    }, [showComboDetails, item.is_combo]);
+
+    const loadComboImages = async () => {
+        setLoadingImages(true);
+        try {
+            const vayIds = item.selected_items.vay?.map(v => v.id) || [];
+            const vestIds = item.selected_items.vest?.map(v => v.id) || [];
+            
+            const vayPromises = vayIds.map(id => sanPhamAPI.layTheoId(id).catch(() => null));
+            const vestPromises = vestIds.map(id => sanPhamAPI.layTheoId(id).catch(() => null));
+            
+            const [vayResults, vestResults] = await Promise.all([
+                Promise.all(vayPromises),
+                Promise.all(vestPromises)
+            ]);
+            
+            setComboImages({
+                vay: vayResults.filter(r => r).map(r => r.data),
+                vest: vestResults.filter(r => r).map(r => r.data)
+            });
+        } catch (error) {
+            console.error('Lỗi tải hình combo:', error);
+        } finally {
+            setLoadingImages(false);
+        }
+    };
+
+    // Nếu là combo
+    if (item.is_combo) {
+        return (
+            <div className="cart-item-tgdd combo-item">
+                <div 
+                    className="combo-image-wrapper"
+                    onClick={() => setShowComboDetails(!showComboDetails)}
+                    style={{ cursor: 'pointer' }}
+                >
+                    <img 
+                        src={layUrlHinhAnh(item.image_url)} 
+                        alt={item.name} 
+                        onError={(e) => e.target.src = 'https://placehold.co/80x100/f5f5f5/333?text=IVIE'} 
+                    />
+                    <div className="combo-badge">COMBO</div>
+                </div>
+                <div className="item-info">
+                    <h3>{item.name}</h3>
+                    <p className="item-variant">
+                        {item.selected_items?.vay?.length || 0} váy + {item.selected_items?.vest?.length || 0} vest
+                    </p>
+                    <button 
+                        className="btn-view-combo-details"
+                        onClick={() => setShowComboDetails(!showComboDetails)}
+                    >
+                        {showComboDetails ? '▲ Thu gọn' : '▼ Xem chi tiết'}
+                    </button>
+                    
+                    {/* Chi tiết combo */}
+                    {showComboDetails && (
+                        <div className="combo-details">
+                            {loadingImages ? (
+                                <p style={{ fontSize: '13px', color: '#999' }}>Đang tải...</p>
+                            ) : (
+                                <>
+                                    {comboImages.vay.length > 0 && (
+                                        <div className="combo-section">
+                                            <h4>Váy cưới đã chọn:</h4>
+                                            <div className="combo-items-grid">
+                                                {comboImages.vay.map(vay => (
+                                                    <div key={vay.id} className="combo-mini-item">
+                                                        <img 
+                                                            src={layUrlHinhAnh(vay.image_url)} 
+                                                            alt={vay.name}
+                                                            onError={(e) => e.target.src = 'https://placehold.co/60x80/f5f5f5/333?text=IVIE'}
+                                                        />
+                                                        <span>{vay.name}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    
+                                    {comboImages.vest.length > 0 && (
+                                        <div className="combo-section">
+                                            <h4>Vest nam đã chọn:</h4>
+                                            <div className="combo-items-grid">
+                                                {comboImages.vest.map(vest => (
+                                                    <div key={vest.id} className="combo-mini-item">
+                                                        <img 
+                                                            src={layUrlHinhAnh(vest.image_url)} 
+                                                            alt={vest.name}
+                                                            onError={(e) => e.target.src = 'https://placehold.co/60x80/f5f5f5/333?text=IVIE'}
+                                                        />
+                                                        <span>{vest.name}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    )}
+                </div>
+                <div className="item-price">
+                    {formatPrice(item.price_to_use || item.purchase_price || item.rental_price_day)}
+                </div>
+                <div className="item-actions">
+                    <button className="btn-remove" onClick={() => onRemove(item.id, item.loai)}>Xoá</button>
+                    <div className="qty-control">
+                        <button onClick={() => onUpdateQuantity(item.id, -1, item.loai)}>−</button>
+                        <span>{item.quantity || 1}</span>
+                        <button onClick={() => onUpdateQuantity(item.id, 1, item.loai)} disabled={(item.quantity || 1) >= (item.so_luong || 10)}>+</button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Nếu là sản phẩm thường
+    return (
+        <div className="cart-item-tgdd">
+            <Link to={`/san-pham/${item.id}`} className="item-image-link">
+                <img 
+                    src={layUrlHinhAnh(item.image_url)} 
+                    alt={item.name} 
+                    onError={(e) => e.target.src = 'https://placehold.co/80x100/f5f5f5/333?text=IVIE'} 
+                />
+            </Link>
+            <div className="item-info">
+                <h3>{item.name}</h3>
+                <p className="item-variant">
+                    {item.loai === 'thue' ? `Thuê ${item.rental_days} ngày` : 'Mua'}
+                </p>
+                {item.so_luong && item.so_luong <= 3 && (
+                    <p className="item-stock-warning">⚠️ Chỉ còn {item.so_luong} sản phẩm</p>
+                )}
+            </div>
+            <div className="item-price">
+                {formatPrice(item.price_to_use || item.purchase_price || item.rental_price_day)}
+            </div>
+            <div className="item-actions">
+                <button className="btn-remove" onClick={() => onRemove(item.id, item.loai)}>Xoá</button>
+                <div className="qty-control">
+                    <button onClick={() => onUpdateQuantity(item.id, -1, item.loai)}>−</button>
+                    <span>{item.quantity || 1}</span>
+                    <button onClick={() => onUpdateQuantity(item.id, 1, item.loai)} disabled={(item.quantity || 1) >= (item.so_luong || 10)}>+</button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const GioHang = () => {
     const [cartItems, setCartItems] = useState([]);
@@ -173,29 +335,13 @@ const GioHang = () => {
                 {/* Cart Items */}
                 <div className="cart-items-list">
                     {cartItems.map(item => (
-                        <div key={`${item.id}-${item.loai || 'mua'}`} className="cart-item-tgdd">
-                            <img src={layUrlHinhAnh(item.image_url)} alt={item.name} onError={(e) => e.target.src = 'https://placehold.co/80x100/f5f5f5/333?text=IVIE'} />
-                            <div className="item-info">
-                                <h3>{item.name}</h3>
-                                <p className="item-variant">
-                                    {item.loai === 'thue' ? `Thuê ${item.rental_days} ngày` : 'Mua'}
-                                </p>
-                                {item.so_luong && item.so_luong <= 3 && (
-                                    <p className="item-stock-warning">⚠️ Chỉ còn {item.so_luong} sản phẩm</p>
-                                )}
-                            </div>
-                            <div className="item-price">
-                                {formatPrice(item.price_to_use || item.purchase_price || item.rental_price_day)}
-                            </div>
-                            <div className="item-actions">
-                                <button className="btn-remove" onClick={() => removeItem(item.id, item.loai)}>Xoá</button>
-                                <div className="qty-control">
-                                    <button onClick={() => updateQuantity(item.id, -1, item.loai)}>−</button>
-                                    <span>{item.quantity || 1}</span>
-                                    <button onClick={() => updateQuantity(item.id, 1, item.loai)} disabled={(item.quantity || 1) >= (item.so_luong || 10)}>+</button>
-                                </div>
-                            </div>
-                        </div>
+                        <CartItem 
+                            key={`${item.id}-${item.loai || 'mua'}`}
+                            item={item}
+                            onRemove={removeItem}
+                            onUpdateQuantity={updateQuantity}
+                            formatPrice={formatPrice}
+                        />
                     ))}
                 </div>
 
