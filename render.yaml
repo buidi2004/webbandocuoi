@@ -28,7 +28,7 @@ services:
       - key: PYTHON_VERSION
         value: "3.12"
       - key: IMGBB_API_KEY
-        value: d3db3b8c68d7e0b5e5c5f5e5c5f5e5c5
+        value: c525fc0204b449b541b0f0a5a4f5d9c4
 
   # Frontend - React + Vite + Nginx
   - type: web

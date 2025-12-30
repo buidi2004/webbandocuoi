@@ -9,7 +9,7 @@ bo_dinh_tuyen = APIRouter(
 )
 
 # ImgBB API Key - Lấy từ biến môi trường hoặc dùng key demo
-IMGBB_API_KEY = os.getenv("IMGBB_API_KEY", "d3db3b8c68d7e0b5e5c5f5e5c5f5e5c5")
+IMGBB_API_KEY = os.getenv("IMGBB_API_KEY", "c525fc0204b449b541b0f0a5a4f5d9c4")
 
 @bo_dinh_tuyen.post("/upload")
 async def tai_len_anh(file: UploadFile = File(...)):
