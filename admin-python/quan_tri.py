@@ -103,68 +103,91 @@ with st.sidebar:
 
 
 # --- Helpers ---
-@st.cache_data(show_spinner=False, ttl=300)  # Cache 5 phút
+@st.cache_data(show_spinner=False, ttl=120)  # Cache 2 phút - nhanh hơn
 def fetch_api_data(endpoint):
-    """Cached version for GET requests with 5min TTL"""
+    """Cached version for GET requests with 2min TTL"""
     url = f"{API_URL}{endpoint}"
     try:
-        res = requests.get(url, timeout=10)  # Thêm timeout
+        res = requests.get(url, timeout=8)  # Timeout ngắn hơn
         if res.status_code == 200:
             return res.json()
         return None
     except Exception:
         return None
 
+# Session state để tránh rerun không cần thiết
+if "last_action" not in st.session_state:
+    st.session_state.last_action = None
+
 def call_api(method, endpoint, data=None, files=None, clear_cache=True):
     url = f"{API_URL}{endpoint}"
     try:
         # Không hiển thị spinner cho GET requests (mượt hơn)
-        show_spinner = method != "GET"
+        if method == "GET":
+            if not clear_cache:
+                return fetch_api_data(endpoint)
+            res = requests.get(url, timeout=8)
+        elif method == "POST":
+            with st.spinner("Đang xử lý..."):
+                res = requests.post(url, json=data, files=files, timeout=25)
+        elif method == "PUT":
+            with st.spinner("Đang cập nhật..."):
+                res = requests.put(url, json=data, timeout=25)
+        elif method == "PATCH":
+            res = requests.patch(url, json=data, timeout=15)
+        elif method == "DELETE":
+            res = requests.delete(url, timeout=8)
         
-        with st.spinner("Đang xử lý...") if show_spinner else st.empty():
-            if method == "GET":
-                if not clear_cache: # If we explicitly want cached data
-                    return fetch_api_data(endpoint)
-                res = requests.get(url, timeout=10)
-            elif method == "POST":
-                res = requests.post(url, json=data, files=files, timeout=30)
-            elif method == "PUT":
-                res = requests.put(url, json=data, timeout=30)
-            elif method == "PATCH":
-                res = requests.patch(url, json=data, timeout=30)
-            elif method == "DELETE":
-                res = requests.delete(url, timeout=10)
-            
-            if res.status_code in [200, 201]:
-                if method != "GET" and clear_cache:
-                    st.cache_data.clear() # Invalidate cache on mutations
-                return res.json()
-            else:
-                st.error(f"Lỗi API ({res.status_code}): {res.text}")
-                return None
+        if res.status_code in [200, 201]:
+            if method != "GET" and clear_cache:
+                st.cache_data.clear()
+            return res.json()
+        else:
+            st.error(f"Lỗi API ({res.status_code})")
+            return None
     except requests.Timeout:
-        st.error("⏱️ Timeout: Server phản hồi quá lâu")
+        st.error("⏱️ Server phản hồi chậm, thử lại sau")
         return None
     except Exception as e:
-        st.error(f"Lỗi kết nối: {e}")
+        st.error(f"Lỗi kết nối")
         return None
 
 def upload_image(uploaded_file):
     if uploaded_file is not None:
-        files = {"file": (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}
+        # Compress image trước khi upload
+        try:
+            img = Image.open(uploaded_file)
+            # Resize nếu quá lớn
+            max_size = (1200, 1200)
+            img.thumbnail(max_size, Image.Resampling.LANCZOS)
+            
+            # Convert to RGB if needed
+            if img.mode in ('RGBA', 'P'):
+                img = img.convert('RGB')
+            
+            # Save to buffer với quality thấp hơn
+            buffer = io.BytesIO()
+            img.save(buffer, format='JPEG', quality=85, optimize=True)
+            buffer.seek(0)
+            
+            files = {"file": (uploaded_file.name.rsplit('.', 1)[0] + '.jpg', buffer, 'image/jpeg')}
+        except:
+            # Fallback nếu không compress được
+            files = {"file": (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}
+        
         url = f"{API_URL}/api/tap_tin/upload"
         try:
-            res = requests.post(url, files=files, timeout=60)  # Timeout dài hơn cho upload
+            res = requests.post(url, files=files, timeout=45)
             if res.status_code == 200:
                 return res.json().get("url")
-            st.error("Lỗi tải ảnh lên")
+            st.error("Lỗi tải ảnh")
         except requests.Timeout:
-            st.error("⏱️ Timeout: Upload ảnh quá lâu")
+            st.error("⏱️ Upload ảnh quá lâu")
         except Exception as e:
-            st.error(f"Lỗi kết nối tải ảnh: {e}")
+            st.error(f"Lỗi upload")
     return None
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, ttl=600)  # Cache URL ảnh 10 phút
 def lay_url_anh(path):
     """Cached image URL generation"""
     if not path: return "https://placehold.co/400x300/000000/ffffff?text=No+Image"
@@ -174,49 +197,59 @@ def lay_url_anh(path):
     return f"{API_URL}{path}"
 
 def paginate_list(items, page_size=20):
-    """Helper function for pagination"""
-    if "current_page" not in st.session_state:
-        st.session_state.current_page = 1
+    """Helper function for pagination - optimized"""
+    if not items:
+        return [], 1, 1
+    
+    page_key = f"page_{hash(str(type(items[0])))}"
+    if page_key not in st.session_state:
+        st.session_state[page_key] = 1
     
     total_pages = max(1, (len(items) + page_size - 1) // page_size)
     
     # Ensure current page is valid
-    if st.session_state.current_page > total_pages:
-        st.session_state.current_page = total_pages
+    if st.session_state[page_key] > total_pages:
+        st.session_state[page_key] = total_pages
     
-    start_idx = (st.session_state.current_page - 1) * page_size
+    start_idx = (st.session_state[page_key] - 1) * page_size
     end_idx = start_idx + page_size
     
-    return items[start_idx:end_idx], st.session_state.current_page, total_pages
+    return items[start_idx:end_idx], st.session_state[page_key], total_pages
 
-def show_pagination(current_page, total_pages):
-    """Display pagination controls"""
+def show_pagination(current_page, total_pages, key_prefix=""):
+    """Display pagination controls - compact version"""
     if total_pages <= 1:
         return
     
-    col1, col2, col3, col4, col5 = st.columns([1, 1, 2, 1, 1])
+    cols = st.columns([1, 1, 2, 1, 1])
     
-    with col1:
-        if st.button("⏮️ Đầu", disabled=current_page == 1, use_container_width=True):
-            st.session_state.current_page = 1
+    with cols[0]:
+        if st.button("⏮️", disabled=current_page == 1, key=f"{key_prefix}first", help="Trang đầu"):
+            st.session_state[f"page_{key_prefix}"] = 1
             st.rerun()
     
-    with col2:
-        if st.button("◀️ Trước", disabled=current_page == 1, use_container_width=True):
-            st.session_state.current_page -= 1
+    with cols[1]:
+        if st.button("◀️", disabled=current_page == 1, key=f"{key_prefix}prev", help="Trang trước"):
+            for k in st.session_state:
+                if k.startswith("page_"):
+                    st.session_state[k] = max(1, st.session_state[k] - 1)
             st.rerun()
     
-    with col3:
-        st.markdown(f"<div style='text-align: center; padding: 8px;'>Trang {current_page} / {total_pages}</div>", unsafe_allow_html=True)
+    with cols[2]:
+        st.markdown(f"<p style='text-align:center;padding:8px;'>{current_page}/{total_pages}</p>", unsafe_allow_html=True)
     
-    with col4:
-        if st.button("Sau ▶️", disabled=current_page == total_pages, use_container_width=True):
-            st.session_state.current_page += 1
+    with cols[3]:
+        if st.button("▶️", disabled=current_page == total_pages, key=f"{key_prefix}next", help="Trang sau"):
+            for k in st.session_state:
+                if k.startswith("page_"):
+                    st.session_state[k] = min(total_pages, st.session_state[k] + 1)
             st.rerun()
     
-    with col5:
-        if st.button("Cuối ⏭️", disabled=current_page == total_pages, use_container_width=True):
-            st.session_state.current_page = total_pages
+    with cols[4]:
+        if st.button("⏭️", disabled=current_page == total_pages, key=f"{key_prefix}last", help="Trang cuối"):
+            for k in st.session_state:
+                if k.startswith("page_"):
+                    st.session_state[k] = total_pages
             st.rerun()
 
 def cap_nhat_trang_thai_lien_he(id_lien_he, status):
