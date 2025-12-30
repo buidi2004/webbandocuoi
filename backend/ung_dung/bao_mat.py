@@ -4,6 +4,7 @@ from jose import jwt
 from passlib.context import CryptContext
 import os
 import hashlib
+import base64
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -22,15 +23,17 @@ ngu_canh_mat_khau = CryptContext(
 
 def xac_minh_mat_khau(mat_khau_tho: str, mat_khau_bam: str) -> bool:
     """Kiểm tra mật khẩu khớp với mã băm"""
-    # Hash password with SHA256 first to ensure it's within bcrypt's 72 byte limit
-    mat_khau_sha = hashlib.sha256(mat_khau_tho.encode('utf-8')).hexdigest()
-    return ngu_canh_mat_khau.verify(mat_khau_sha, mat_khau_bam)
+    # Hash password with SHA256 and encode to base64 to ensure it's within bcrypt's 72 byte limit
+    mat_khau_sha = hashlib.sha256(mat_khau_tho.encode('utf-8')).digest()
+    mat_khau_b64 = base64.b64encode(mat_khau_sha).decode('utf-8')
+    return ngu_canh_mat_khau.verify(mat_khau_b64, mat_khau_bam)
 
 def bam_mat_khau(mat_khau: str) -> str:
     """Tạo mã băm cho mật khẩu"""
-    # Hash password with SHA256 first to ensure it's within bcrypt's 72 byte limit
-    mat_khau_sha = hashlib.sha256(mat_khau.encode('utf-8')).hexdigest()
-    return ngu_canh_mat_khau.hash(mat_khau_sha)
+    # Hash password with SHA256 and encode to base64 to ensure it's within bcrypt's 72 byte limit
+    mat_khau_sha = hashlib.sha256(mat_khau.encode('utf-8')).digest()
+    mat_khau_b64 = base64.b64encode(mat_khau_sha).decode('utf-8')
+    return ngu_canh_mat_khau.hash(mat_khau_b64)
 
 def tao_token_truy_cap(du_lieu: dict, het_han_sau: Union[timedelta, None] = None) -> str:
     """Tạo JWT Token"""
