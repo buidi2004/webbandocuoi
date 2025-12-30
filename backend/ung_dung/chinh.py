@@ -79,3 +79,8 @@ def doc_goc():
 @ung_dung.get("/suckhoe")
 def kiem_tra_suc_khoe():
     return {"trang_thai": "khoe_manh"}
+
+@ung_dung.get("/api/health")
+def health_check():
+    """Health check endpoint for Render"""
+    return {"status": "healthy"}
