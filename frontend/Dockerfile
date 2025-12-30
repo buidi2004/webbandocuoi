@@ -3,6 +3,10 @@ FROM node:20-alpine as build
 
 WORKDIR /app
 
+# Build argument for API URL
+ARG VITE_API_BASE_URL=https://ivie-backend.onrender.com
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+
 # Copy package files first for better caching
 COPY package.json package-lock.json ./
 
@@ -12,7 +16,7 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build the application
+# Build the application with env
 RUN npm run build
 
 # Production Stage (Nginx)
