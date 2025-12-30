@@ -13,7 +13,12 @@ bi_mat = os.getenv("SECRET_KEY", "ivie_wedding_secret_key_super_secure_123")
 thuat_toan = "HS256"
 thoi_gian_het_han_phut = 60 * 24 * 7 # 7 ngày
 
-ngu_canh_mat_khau = CryptContext(schemes=["bcrypt"], deprecated="auto")
+ngu_canh_mat_khau = CryptContext(
+    schemes=["bcrypt"], 
+    deprecated="auto",
+    bcrypt__rounds=12,
+    bcrypt__ident="2b"
+)
 
 def xac_minh_mat_khau(mat_khau_tho: str, mat_khau_bam: str) -> bool:
     """Kiểm tra mật khẩu khớp với mã băm"""
