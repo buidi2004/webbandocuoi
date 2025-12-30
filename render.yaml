@@ -24,7 +24,7 @@ services:
       - key: CORS_ORIGINS
         value: https://ivie-frontend.onrender.com,https://ivie-admin.onrender.com
       - key: SECRET_KEY
-        generateValue: true
+        value: ivie_wedding_secret_key_2024_secure_random_string_xyz
       - key: PYTHON_VERSION
         value: "3.12"
       - key: IMGBB_API_KEY

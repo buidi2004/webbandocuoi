@@ -20,6 +20,9 @@ def xac_minh_mat_khau(mat_khau_tho: str, mat_khau_bam: str) -> bool:
 
 def bam_mat_khau(mat_khau: str) -> str:
     """Tạo mã băm cho mật khẩu"""
+    # Bcrypt has a 72 byte limit, truncate if needed
+    if len(mat_khau.encode('utf-8')) > 72:
+        mat_khau = mat_khau[:72]
     return ngu_canh_mat_khau.hash(mat_khau)
 
 def tao_token_truy_cap(du_lieu: dict, het_han_sau: Union[timedelta, None] = None) -> str:
