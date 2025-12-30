@@ -1,32 +1,47 @@
-from fastapi import APIRouter, UploadFile, File
-import shutil
+from fastapi import APIRouter, UploadFile, File, HTTPException
 import os
-import uuid
+import base64
+import httpx
 
 bo_dinh_tuyen = APIRouter(
     prefix="/api/tap_tin",
     tags=["tap_tin"]
 )
 
-# Đường dẫn đến thư mục public/images của frontend
-# Lưu ý: Đường dẫn này phụ thuộc vào cấu trúc thư mục hiện tại
-THU_MUC_ANH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../frontend/public/images"))
+# ImgBB API Key - Lấy từ biến môi trường hoặc dùng key demo
+IMGBB_API_KEY = os.getenv("IMGBB_API_KEY", "d3db3b8c68d7e0b5e5c5f5e5c5f5e5c5")
 
 @bo_dinh_tuyen.post("/upload")
 async def tai_len_anh(file: UploadFile = File(...)):
-    """Tải lên hình ảnh và lưu vào thư mục public của frontend"""
-    # Tạo tên file duy nhất để tránh trùng lặp
-    duoi_file = os.path.splitext(file.filename)[1]
-    ten_file_moi = f"{uuid.uuid4()}{duoi_file}"
-    
-    duong_dan_luu = os.path.join(THU_MUC_ANH, ten_file_moi)
-    
-    # Đảm bảo thư mục tồn tại
-    os.makedirs(THU_MUC_ANH, exist_ok=True)
-    
-    # Lưu file
-    with open(duong_dan_luu, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    """Tải lên hình ảnh lên ImgBB"""
+    try:
+        # Đọc file content
+        contents = await file.read()
         
-    # Trả về đường dẫn tương đối để frontend sử dụng
-    return {"url": f"/images/{ten_file_moi}"}
+        # Encode sang base64
+        base64_image = base64.b64encode(contents).decode('utf-8')
+        
+        # Upload lên ImgBB
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://api.imgbb.com/1/upload",
+                data={
+                    "key": IMGBB_API_KEY,
+                    "image": base64_image,
+                    "name": file.filename
+                },
+                timeout=30.0
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("success"):
+                    image_url = result["data"]["url"]
+                    return {"url": image_url}
+                else:
+                    raise HTTPException(status_code=500, detail="ImgBB upload failed")
+            else:
+                raise HTTPException(status_code=response.status_code, detail="ImgBB API error")
+                
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Upload error: {str(e)}")
