@@ -11,7 +11,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from ket_noi_postgresql import PhienLamViec, dong_co, CoSo
-from ung_dung.co_so_du_lieu import SanPham, NguoiDung, DonHang, ChiTietDonHang, LienHeGui as LienHe, ThuVien as ThuVienAnh
+from ung_dung.co_so_du_lieu import SanPham, NguoiDung, DonHang, ChiTietDonHang, LienHeGui as LienHe, ThuVien as ThuVienAnh, Combo
 from ung_dung.luoc_do_pg import (
     SanPhamTao, SanPhamCapNhat, SanPhamPhanHoi,
     NguoiDungTao, NguoiDungCapNhat, NguoiDungPhanHoi,
@@ -370,7 +370,6 @@ def lay_danh_sach_combo(
     hoat_dong: Optional[bool] = None,
     phien: Session = Depends(lay_phien)
 ):
-    from ung_dung.co_so_du_lieu import Combo
     truy_van = phien.query(Combo)
     if hoat_dong is not None:
         truy_van = truy_van.filter(Combo.hoat_dong == hoat_dong)
@@ -379,7 +378,6 @@ def lay_danh_sach_combo(
 
 @bo_dinh_tuyen.get("/combo/{combo_id}", response_model=ComboPhanHoi, summary="Lấy chi tiết combo")
 def lay_combo(combo_id: int, phien: Session = Depends(lay_phien)):
-    from ung_dung.co_so_du_lieu import Combo
     combo = phien.query(Combo).filter(Combo.id == combo_id).first()
     if not combo:
         raise HTTPException(status_code=404, detail="Không tìm thấy combo")
@@ -388,7 +386,6 @@ def lay_combo(combo_id: int, phien: Session = Depends(lay_phien)):
 
 @bo_dinh_tuyen.post("/combo", response_model=ComboPhanHoi, summary="Tạo combo mới")
 def tao_combo(du_lieu: ComboTao, phien: Session = Depends(lay_phien)):
-    from ung_dung.co_so_du_lieu import Combo
     combo = Combo(**du_lieu.model_dump())
     phien.add(combo)
     phien.commit()
@@ -398,7 +395,6 @@ def tao_combo(du_lieu: ComboTao, phien: Session = Depends(lay_phien)):
 
 @bo_dinh_tuyen.put("/combo/{combo_id}", response_model=ComboPhanHoi, summary="Cập nhật combo")
 def cap_nhat_combo(combo_id: int, du_lieu: ComboCapNhat, phien: Session = Depends(lay_phien)):
-    from ung_dung.co_so_du_lieu import Combo
     combo = phien.query(Combo).filter(Combo.id == combo_id).first()
     if not combo:
         raise HTTPException(status_code=404, detail="Không tìm thấy combo")
@@ -413,7 +409,6 @@ def cap_nhat_combo(combo_id: int, du_lieu: ComboCapNhat, phien: Session = Depend
 
 @bo_dinh_tuyen.delete("/combo/{combo_id}", summary="Xóa combo")
 def xoa_combo(combo_id: int, phien: Session = Depends(lay_phien)):
-    from ung_dung.co_so_du_lieu import Combo
     combo = phien.query(Combo).filter(Combo.id == combo_id).first()
     if not combo:
         raise HTTPException(status_code=404, detail="Không tìm thấy combo")
