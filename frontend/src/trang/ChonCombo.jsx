@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { sanPhamAPI, lienHeAPI, layUrlHinhAnh } from '../api/khach_hang';
+import { sanPhamAPI, layUrlHinhAnh } from '../api/khach_hang';
 import NutBam from '../thanh_phan/NutBam';
 import { useToast } from '../thanh_phan/Toast';
 import '../styles/combo.css';
@@ -64,12 +64,6 @@ const ChonCombo = () => {
     const [chonNam, setChonNam] = useState([]);
     const [dangTai, setDangTai] = useState(false);
 
-    // Form state
-    const [thongTin, setThongTin] = useState({
-        ten: '', email: '', sdt: '', ngayCuoi: '', ghiChu: ''
-    });
-    const [trangThaiGui, setTrangThaiGui] = useState('idle');
-
     useEffect(() => {
         taiDuLieu();
     }, []);
@@ -108,108 +102,18 @@ const ChonCombo = () => {
         }
     };
 
-    const xuLyGui = async (e) => {
-        e.preventDefault();
-        setTrangThaiGui('sending');
-
-        const sanPhamChon = [
-            ...chonNu.map(i => `[Nữ] ${i.name} (#${i.code})`),
-            ...chonNam.map(i => `[Nam] ${i.name} (#${i.code})`)
-        ].join('\n');
-
-        const noiDungTinNhan = `
-YÊU CẦU ĐẶT COMBO: ${goiDaChon.ten.toUpperCase()}
-Giá trị gói: ${new Intl.NumberFormat('vi-VN').format(goiDaChon.gia)}đ
----------------------------
-Ngày cưới dự kiến: ${thongTin.ngayCuoi}
-
-DANH SÁCH SẢN PHẨM ĐÃ CHỌN (${chonNu.length} Váy + ${chonNam.length} Vest):
-${sanPhamChon}
-
-Ghi chú thêm: ${thongTin.ghiChu}
-        `.trim();
-
-        try {
-            await lienHeAPI.gui({
-                name: thongTin.ten,
-                email: thongTin.email,
-                phone: thongTin.sdt,
-                message: noiDungTinNhan
-            });
-            
-            // Thêm combo vào giỏ hàng sau khi gửi form thành công
-            const comboProduct = {
-                id: `combo-${goiDaChon.id}`,
-                name: goiDaChon.ten,
-                code: `COMBO-${goiDaChon.id}`,
-                category: 'combo',
-                gender: 'unisex',
-                description: goiDaChon.mo_ta,
-                rental_price_day: goiDaChon.gia,
-                rental_price_week: goiDaChon.gia,
-                purchase_price: goiDaChon.gia,
-                price_to_use: goiDaChon.gia,
-                image_url: goiDaChon.hinh_anh,
-                is_combo: true,
-                quantity: 1,
-                loai: 'mua',
-                // Lưu thông tin sản phẩm đã chọn
-                selected_items: {
-                    vay: chonNu.map(i => ({ id: i.id, name: i.name, code: i.code })),
-                    vest: chonNam.map(i => ({ id: i.id, name: i.name, code: i.code }))
-                }
-            };
-            
-            // Lấy giỏ hàng hiện tại từ localStorage
-            const currentCart = JSON.parse(localStorage.getItem('ivie_cart') || '[]');
-            
-            // Thêm combo vào giỏ
-            currentCart.push(comboProduct);
-            localStorage.setItem('ivie_cart', JSON.stringify(currentCart));
-            
-            setTrangThaiGui('success');
-            
-            addToast({ 
-                message: `Đã thêm ${goiDaChon.ten} vào giỏ hàng!`, 
-                type: 'success' 
-            });
-        } catch (error) {
-            console.error(error);
-            setTrangThaiGui('error');
-        }
-    };
-
     const StepIndicator = () => (
         <div className="combo-steps">
-            {[1, 2, 3, 4].map(s => (
+            {[1, 2, 3].map(s => (
                 <div key={s} className={`step-indicator ${buoc === s ? 'active' : ''} ${buoc > s ? 'completed' : ''}`}>
                     <div className="step-number">{s}</div>
                     <span className="step-text">
-                        {s === 1 ? 'Chọn Gói' : s === 2 ? 'Chọn Váy' : s === 3 ? 'Chọn Vest' : 'Xác nhận'}
+                        {s === 1 ? 'Chọn Gói' : s === 2 ? 'Chọn Váy' : 'Chọn Vest'}
                     </span>
                 </div>
             ))}
         </div>
     );
-
-    if (trangThaiGui === 'success') {
-        return (
-            <div className="combo-page">
-                <div className="container" style={{ textAlign: 'center', paddingTop: '100px' }}>
-                    <h2 style={{ color: 'green' }}>Đăng Ký Thành Công!</h2>
-                    <p>Cảm ơn bạn đã lựa chọn gói <strong>{goiDaChon?.ten}</strong>.</p>
-                    <p>Chúng tôi sẽ sớm liên hệ lại để xác nhận lịch thử đồ.</p>
-                    <p style={{ marginTop: '20px', fontSize: '16px' }}>
-                        ✅ Gói combo đã được thêm vào giỏ hàng của bạn!
-                    </p>
-                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '30px' }}>
-                        <NutBam onClick={() => navigate('/gio-hang')}>Xem Giỏ Hàng</NutBam>
-                        <NutBam variant="outline" onClick={() => window.location.href = '/'}>Về Trang Chủ</NutBam>
-                    </div>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className="combo-page">
@@ -318,103 +222,42 @@ Ghi chú thêm: ${thongTin.ghiChu}
                         )}
                         <div className="combo-actions">
                             <NutBam variant="outline" onClick={() => setBuoc(2)}>QUAY LẠI</NutBam>
-                            <NutBam onClick={() => setBuoc(4)}>XEM LẠI & GỬI YÊU CẦU</NutBam>
-                        </div>
-                    </div>
-                )}
-
-                {/* BƯỚC 4: XÁC NHẬN */}
-                {buoc === 4 && (
-                    <div className="confirmation-step fade-in">
-                        <div className="summary-container">
-                            <div className="summary-list">
-                                <div className="selected-package-summary">
-                                    <h3>{goiDaChon.ten}</h3>
-                                    <div className="package-price">{new Intl.NumberFormat('vi-VN').format(goiDaChon.gia)}đ</div>
-                                    <ul>
-                                        {goiDaChon.quyen_loi.map((ql, idx) => (
-                                            <li key={idx}>{ql}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-
-                                <h4 style={{ marginTop: '20px' }}>Váy Cưới Đã Chọn ({chonNu.length})</h4>
-                                <div className="selected-items-review">
-                                    {chonNu.map(i => (
-                                        <div key={i.id} className="review-item">
-                                            <img src={layUrlHinhAnh(i.image_url)} alt={i.name} />
-                                        </div>
-                                    ))}
-                                </div>
-                                <hr style={{ margin: '20px 0', border: '0', borderTop: '1px solid #eee' }} />
-                                <h4>Vest Nam Đã Chọn ({chonNam.length})</h4>
-                                <div className="selected-items-review">
-                                    {chonNam.map(i => (
-                                        <div key={i.id} className="review-item">
-                                            <img src={layUrlHinhAnh(i.image_url)} alt={i.name} />
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="combo-form">
-                                <h3>Thông Tin Của Bạn</h3>
-                                <form onSubmit={xuLyGui}>
-                                    <div className="form-group">
-                                        <label>Họ và Tên</label>
-                                        <input
-                                            required
-                                            value={thongTin.ten}
-                                            onChange={e => setThongTin({ ...thongTin, ten: e.target.value })}
-                                            placeholder="Nhập họ tên của bạn"
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Số Điện Thoại</label>
-                                        <input
-                                            required
-                                            value={thongTin.sdt}
-                                            onChange={e => setThongTin({ ...thongTin, sdt: e.target.value })}
-                                            placeholder="Số điện thoại liên hệ"
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Email</label>
-                                        <input
-                                            type="email"
-                                            required
-                                            value={thongTin.email}
-                                            onChange={e => setThongTin({ ...thongTin, email: e.target.value })}
-                                            placeholder="Email nhận báo giá"
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Ngày Cưới Dự Kiến</label>
-                                        <input
-                                            type="date"
-                                            value={thongTin.ngayCuoi}
-                                            onChange={e => setThongTin({ ...thongTin, ngayCuoi: e.target.value })}
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Ghi Chú Thêm</label>
-                                        <textarea
-                                            rows="3"
-                                            value={thongTin.ghiChu}
-                                            onChange={e => setThongTin({ ...thongTin, ghiChu: e.target.value })}
-                                            placeholder="Bạn có yêu cầu gì đặc biệt không?"
-                                        ></textarea>
-                                    </div>
-
-                                    <NutBam type="submit" disabled={trangThaiGui === 'sending'} className="btn-block">
-                                        {trangThaiGui === 'sending' ? 'ĐANG GỬI...' : 'HOÀN TẤT ĐĂNG KÝ'}
-                                    </NutBam>
-                                    {trangThaiGui === 'error' && <p style={{ color: 'red', marginTop: '10px' }}>Có lỗi xảy ra, vui lòng thử lại sau.</p>}
-                                </form>
-                            </div>
-                        </div>
-                        <div className="combo-actions">
-                            <NutBam variant="outline" onClick={() => setBuoc(3)}>QUAY LẠI</NutBam>
+                            <NutBam onClick={() => {
+                                // Thêm combo vào giỏ hàng
+                                const comboProduct = {
+                                    id: `combo-${goiDaChon.id}`,
+                                    name: goiDaChon.ten,
+                                    code: `COMBO-${goiDaChon.id}`,
+                                    category: 'combo',
+                                    gender: 'unisex',
+                                    description: goiDaChon.mo_ta,
+                                    rental_price_day: goiDaChon.gia,
+                                    rental_price_week: goiDaChon.gia,
+                                    purchase_price: goiDaChon.gia,
+                                    price_to_use: goiDaChon.gia,
+                                    image_url: goiDaChon.hinh_anh,
+                                    is_combo: true,
+                                    quantity: 1,
+                                    loai: 'mua',
+                                    selected_items: {
+                                        vay: chonNu.map(i => ({ id: i.id, name: i.name, code: i.code })),
+                                        vest: chonNam.map(i => ({ id: i.id, name: i.name, code: i.code }))
+                                    }
+                                };
+                                
+                                const currentCart = JSON.parse(localStorage.getItem('ivie_cart') || '[]');
+                                currentCart.push(comboProduct);
+                                localStorage.setItem('ivie_cart', JSON.stringify(currentCart));
+                                
+                                addToast({ 
+                                    message: `Đã thêm ${goiDaChon.ten} vào giỏ hàng!`, 
+                                    type: 'success' 
+                                });
+                                
+                                setTimeout(() => {
+                                    navigate('/gio-hang');
+                                }, 500);
+                            }}>THÊM VÀO GIỎ HÀNG</NutBam>
                         </div>
                     </div>
                 )}
