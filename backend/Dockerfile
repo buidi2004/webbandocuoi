@@ -14,5 +14,9 @@ COPY . .
 # Mở port 8000
 EXPOSE 8000
 
-# Lệnh chạy ứng dụng
-CMD ["uvicorn", "ung_dung.chinh:ung_dung", "--host", "0.0.0.0", "--port", "8000"]
+# Copy và cấp quyền thực thi cho script khởi động
+COPY start.sh .
+RUN chmod +x start.sh
+
+# Lệnh chạy ứng dụng (chạy migration trước)
+CMD ["./start.sh"]
