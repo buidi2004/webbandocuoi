@@ -102,3 +102,27 @@
     animation: twinkle 2s ease-in-out infinite;
 }
 
+/* Hiệu ứng cành mai slide từ 2 bên */
+.canh-mai-footer {
+    opacity: 0;
+    transition: transform 1s ease-out, opacity 1s ease-out;
+}
+
+.canh-mai-footer.left {
+    transform: translateY(-50%) translateX(-100%);
+}
+
+.canh-mai-footer.right {
+    transform: translateY(-50%) scaleX(-1) translateX(-100%);
+}
+
+.canh-mai-footer.left.visible {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+}
+
+.canh-mai-footer.right.visible {
+    opacity: 1;
+    transform: translateY(-50%) scaleX(-1) translateX(0);
+}
+

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import './Footer.css';
 
 // Component hạt vàng lấp lánh - 25 hạt như ban đầu
@@ -55,17 +55,17 @@ const HatVangLapLanh = ({ side }) => {
     );
 };
 
-// Component cành mai nằm ngang cho footer - không animation
-const CanhMaiNgang = ({ side }) => (
+// Component cành mai nằm ngang cho footer - slide từ 2 bên
+const CanhMaiNgang = ({ side, isVisible }) => (
     <svg 
         width="220" 
         height="120" 
         viewBox="0 0 220 120"
+        className={`canh-mai-footer ${side} ${isVisible ? 'visible' : ''}`}
         style={{
             position: 'absolute',
             [side]: 0,
             top: '50%',
-            transform: `translateY(-50%) ${side === 'right' ? 'scaleX(-1)' : ''}`,
             pointerEvents: 'none',
             zIndex: 1
         }}
@@ -181,15 +181,35 @@ const CanhMaiNgang = ({ side }) => (
 );
 
 const ChanTrang = () => {
+    const footerRef = useRef(null);
+    const [isVisible, setIsVisible] = useState(false);
+    
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                }
+            },
+            { threshold: 0.2 }
+        );
+        
+        if (footerRef.current) {
+            observer.observe(footerRef.current);
+        }
+        
+        return () => observer.disconnect();
+    }, []);
+    
     return (
-        <footer className="footer" style={{ position: 'relative', overflow: 'hidden' }}>
+        <footer ref={footerRef} className="footer" style={{ position: 'relative', overflow: 'hidden' }}>
             {/* Hiệu ứng hạt vàng lấp lánh */}
             <HatVangLapLanh side="left" />
             <HatVangLapLanh side="right" />
             
-            {/* Cành mai 2 bên */}
-            <CanhMaiNgang side="left" />
-            <CanhMaiNgang side="right" />
+            {/* Cành mai 2 bên - slide từ từ */}
+            <CanhMaiNgang side="left" isVisible={isVisible} />
+            <CanhMaiNgang side="right" isVisible={isVisible} />
             
             <div className="container" style={{ position: 'relative', zIndex: 1 }}>
                 <div className="footer-content">
