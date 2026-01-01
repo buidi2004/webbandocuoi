@@ -9,12 +9,35 @@ from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
 import functools
 
+# CRITICAL: Set page config FIRST before any other st commands
+st.set_page_config(page_title="IVIE Wedding Admin", layout="wide", page_icon="🏯")
+
+# Show loading indicator immediately for FCP
+loading_placeholder = st.empty()
+loading_placeholder.markdown("""
+<div style='text-align: center; padding: 100px 0;'>
+    <h1 style='font-size: 3em; margin-bottom: 20px;'>🏯 IVIE WEDDING STUDIO</h1>
+    <p style='color: #999; font-size: 1.2em;'>Đang tải hệ thống quản trị...</p>
+    <div style='margin-top: 30px;'>
+        <div style='display: inline-block; width: 40px; height: 40px; border: 3px solid #333; border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite;'></div>
+    </div>
+    <style>
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</div>
+""", unsafe_allow_html=True)
+
 # Import authentication module
-from auth import (
-    init_session, is_authenticated, show_login_page, 
-    show_user_info_sidebar, get_allowed_menu_items,
-    has_permission, MENU_PERMISSIONS
-)
+try:
+    from auth import (
+        init_session, is_authenticated, show_login_page, 
+        show_user_info_sidebar, get_allowed_menu_items,
+        has_permission, MENU_PERMISSIONS
+    )
+except ImportError as e:
+    loading_placeholder.empty()
+    st.error(f"❌ Lỗi import auth module: {e}")
+    st.stop()
 
 # Import analytics module
 try:
@@ -35,7 +58,8 @@ API_URL = os.getenv("API_BASE_URL", os.getenv("VITE_API_BASE_URL", "http://local
 # Thread pool cho parallel requests
 executor = ThreadPoolExecutor(max_workers=4)
 
-st.set_page_config(page_title="IVIE Wedding Admin", layout="wide", page_icon="🏯")
+# Clear loading placeholder
+loading_placeholder.empty()
 
 # Khởi tạo session
 init_session()

@@ -48,6 +48,7 @@ services:
     dockerfilePath: ./admin-python/Dockerfile
     dockerContext: ./admin-python
     plan: free
+    healthCheckPath: /_stcore/health
     envVars:
       - key: API_BASE_URL
         value: https://ivie-backend.onrender.com
