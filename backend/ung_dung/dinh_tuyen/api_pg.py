@@ -121,6 +121,45 @@ def xoa_san_pham(san_pham_id: int, phien: Session = Depends(lay_phien)):
     return {"thong_bao": "Đã xóa sản phẩm thành công"}
 
 
+@bo_dinh_tuyen.get("/san-pham/{san_pham_id}/lien-quan", response_model=List[SanPhamPhanHoi], summary="Lấy sản phẩm liên quan")
+def lay_san_pham_lien_quan(
+    san_pham_id: int,
+    gioi_han: int = Query(8, ge=1, le=20),
+    phien: Session = Depends(lay_phien)
+):
+    """
+    Lấy danh sách sản phẩm liên quan dựa trên:
+    - Cùng danh mục (category)
+    - Cùng giới tính (gender)
+    - Ưu tiên sản phẩm hot (is_hot=True)
+    - Loại trừ sản phẩm hiện tại
+    """
+    # Lấy sản phẩm hiện tại
+    san_pham = phien.query(SanPham).filter(SanPham.id == san_pham_id).first()
+    if not san_pham:
+        raise HTTPException(status_code=404, detail="Không tìm thấy sản phẩm")
+    
+    # Query sản phẩm liên quan
+    truy_van = phien.query(SanPham).filter(SanPham.id != san_pham_id)
+    
+    # Ưu tiên cùng danh mục
+    if san_pham.danh_muc:
+        truy_van = truy_van.filter(SanPham.danh_muc == san_pham.danh_muc)
+    
+    # Ưu tiên cùng giới tính
+    if san_pham.gioi_tinh:
+        truy_van = truy_van.filter(SanPham.gioi_tinh == san_pham.gioi_tinh)
+    
+    # Sắp xếp: is_hot trước, sau đó theo id mới nhất
+    from sqlalchemy import desc, case
+    truy_van = truy_van.order_by(
+        desc(case((SanPham.la_hot == True, 1), else_=0)),
+        desc(SanPham.id)
+    )
+    
+    return truy_van.limit(gioi_han).all()
+
+
 
 # ============ NGƯỜI DÙNG API ============
 @bo_dinh_tuyen.get("/nguoi-dung", response_model=List[NguoiDungPhanHoi], summary="Lấy danh sách người dùng")
