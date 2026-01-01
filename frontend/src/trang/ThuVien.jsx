@@ -67,9 +67,9 @@ const ThuVien = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
-            {/* Khung hiệu ứng hạt ở đầu trang */}
+            {/* Khung hiệu ứng hạt ở đầu trang - responsive */}
             <section style={{ 
-                padding: '120px 20px 40px',
+                padding: '100px 15px 30px',
                 background: '#fff',
                 position: 'relative',
                 overflow: 'hidden'
@@ -78,7 +78,7 @@ const ThuVien = () => {
                     position: 'relative',
                     width: '100%',
                     maxWidth: '100%',
-                    height: '700px',
+                    height: 'min(500px, 70vh)',
                     margin: '0 auto',
                     background: '#fff',
                     display: 'flex',
@@ -87,7 +87,7 @@ const ThuVien = () => {
                 }}>
                     <HieuUngHat particleCount={800} nenTrang={true} />
                     
-                    {/* Content overlay căn giữa */}
+                    {/* Content overlay căn giữa - responsive mobile */}
                     <div style={{
                         position: 'absolute',
                         top: 0,
@@ -99,34 +99,34 @@ const ThuVien = () => {
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        padding: '50px',
+                        padding: '20px',
                         pointerEvents: 'none',
                         textAlign: 'center'
                     }}>
                         <h1 style={{
                             color: '#1a1a1a',
-                            fontSize: '52px',
+                            fontSize: 'clamp(1.5rem, 6vw, 3.2rem)',
                             fontWeight: 700,
                             lineHeight: 1.2,
-                            marginBottom: '16px',
+                            marginBottom: '12px',
                             fontFamily: 'system-ui, -apple-system, sans-serif'
                         }}>
                             Thư Viện Ảnh IVIE
                         </h1>
                         <p style={{
                             color: '#666',
-                            fontSize: '18px',
-                            maxWidth: '400px',
-                            marginBottom: '30px'
+                            fontSize: 'clamp(0.9rem, 3vw, 1.1rem)',
+                            maxWidth: '90%',
+                            marginBottom: '20px'
                         }}>
                             Khoảnh khắc hạnh phúc của các cặp đôi
                         </p>
-                        <div style={{ display: 'flex', gap: '16px', pointerEvents: 'auto' }}>
+                        <div style={{ display: 'flex', gap: '10px', pointerEvents: 'auto', flexWrap: 'wrap', justifyContent: 'center' }}>
                             <a href="/lien-he" style={{
-                                padding: '14px 28px',
+                                padding: '12px 20px',
                                 background: '#1a1a1a',
                                 color: '#fff',
-                                fontSize: '14px',
+                                fontSize: '0.85rem',
                                 fontWeight: 600,
                                 borderRadius: '8px',
                                 border: 'none',
@@ -136,10 +136,10 @@ const ThuVien = () => {
                                 Đặt Lịch Chụp
                             </a>
                             <a href="/san-pham" style={{
-                                padding: '14px 28px',
+                                padding: '12px 20px',
                                 background: 'transparent',
                                 color: '#1a1a1a',
-                                fontSize: '14px',
+                                fontSize: '0.85rem',
                                 fontWeight: 600,
                                 borderRadius: '8px',
                                 border: 'none',
@@ -153,9 +153,9 @@ const ThuVien = () => {
                 </div>
             </section>
 
-            {/* Phần Gallery */}
-            <div className="py-12" style={{ marginTop: '80px' }}>
-                <div className="container mx-auto px-4">
+            {/* Phần Gallery - responsive */}
+            <div className="py-8 sm:py-12" style={{ marginTop: '40px' }}>
+                <div className="container mx-auto px-3 sm:px-4">
                 {/* Phần đầu với hiệu ứng chữ */}
                 <div className="text-center mb-12 relative">
                     {/* Ảnh nền cho hiệu ứng chữ */}
@@ -168,12 +168,13 @@ const ThuVien = () => {
                         />
                     </div>
 
-                    {/* Tiêu đề với hiệu ứng */}
+                    {/* Tiêu đề với hiệu ứng - responsive */}
                     <motion.h1
-                        className="text-4xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-[#b59410] to-gray-900"
+                        className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-[#b59410] to-gray-900 px-4"
                         variants={hieuUngTieuDe}
                         initial="anDi"
                         animate="hienThi"
+                        style={{ wordBreak: 'break-word' }}
                     >
                         {tieuDe.split('').map((kyTu, viTri) => (
                             <motion.span key={viTri} variants={hieuUngChuCai}>
@@ -182,22 +183,22 @@ const ThuVien = () => {
                         ))}
                     </motion.h1>
 
-                    {/* Phụ đề với hiệu ứng fade-in */}
+                    {/* Phụ đề với hiệu ứng fade-in - responsive */}
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.5 }}
-                        className="text-lg text-gray-600 max-w-2xl mx-auto"
+                        className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto px-4"
                     >
                         Khoảnh khắc hạnh phúc của các cặp đôi - Nơi lưu giữ những kỷ niệm đẹp nhất
                     </motion.p>
 
-                    {/* Các nhãn với hiệu ứng lần lượt */}
+                    {/* Các nhãn với hiệu ứng lần lượt - responsive */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.7 }}
-                        className="mt-6 flex items-center justify-center gap-3 flex-wrap text-sm text-gray-500"
+                        className="mt-4 sm:mt-6 flex items-center justify-center gap-2 sm:gap-3 flex-wrap text-xs sm:text-sm text-gray-500 px-4"
                     >
                         {[
                             { bieuTuong: '📸', noiDung: `${danhSachAnh.length} ảnh` },
@@ -210,7 +211,7 @@ const ThuVien = () => {
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ duration: 0.5, delay: 0.9 + viTri * 0.1 }}
                                 whileHover={{ scale: 1.05, y: -2 }}
-                                className="px-4 py-2 bg-white rounded-full shadow-sm hover:shadow-md transition-all cursor-pointer"
+                                className="px-3 py-1.5 sm:px-4 sm:py-2 bg-white rounded-full shadow-sm hover:shadow-md transition-all cursor-pointer text-xs sm:text-sm"
                             >
                                 {nhan.bieuTuong} {nhan.noiDung}
                             </motion.span>
@@ -286,8 +287,8 @@ const ThuVien = () => {
             </div>
         </div>
 
-            {/* Phần Hero với hiệu ứng cuộn phóng to - đã dời xuống cuối */}
-            <div ref={phanHeroRef} className="relative h-[200vh]">
+            {/* Phần Hero với hiệu ứng cuộn phóng to - ẩn trên mobile */}
+            <div ref={phanHeroRef} className="relative h-[200vh] hidden md:block">
                 <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#f8f6f3] to-[#e8e4df]">
                     
                     {/* Nền trang trí */}
@@ -299,7 +300,7 @@ const ThuVien = () => {
                         <div className="absolute bottom-20 right-20 w-96 h-96 bg-[#d4af37] rounded-full blur-3xl" />
                     </motion.div>
 
-                    {/* Ảnh Hero chính với hiệu ứng phóng to */}
+                    {/* Ảnh Hero chính với hiệu ứng phóng to - responsive */}
                     {danhSachAnh.length > 0 && (
                         <motion.div
                             style={{ scale: tiLe, opacity: doMo }}
@@ -308,21 +309,21 @@ const ThuVien = () => {
                             <img
                                 src={layUrlHinhAnh(danhSachAnh[0].image_url)}
                                 alt="Thư viện IVIE Studio"
-                                className="w-[500px] h-[700px] object-cover rounded-lg shadow-2xl"
+                                className="w-[300px] md:w-[400px] lg:w-[500px] h-[400px] md:h-[550px] lg:h-[700px] object-cover rounded-lg shadow-2xl"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent rounded-lg" />
                         </motion.div>
                     )}
 
-                    {/* Chữ tiêu đề */}
+                    {/* Chữ tiêu đề - responsive */}
                     <motion.div
                         style={{ opacity: doMoChu }}
-                        className="absolute top-1/4 left-1/2 transform -translate-x-1/2 text-center z-20"
+                        className="absolute top-1/4 left-1/2 transform -translate-x-1/2 text-center z-20 px-4 w-full"
                     >
-                        <h1 className="text-6xl md:text-8xl font-serif text-[#2c2c2c] mb-4 tracking-wider">
+                        <h1 className="text-4xl md:text-6xl lg:text-8xl font-serif text-[#2c2c2c] mb-4 tracking-wider">
                             IVIE STUDIO
                         </h1>
-                        <p className="text-xl md:text-2xl text-[#6b6b6b] font-light tracking-widest">
+                        <p className="text-lg md:text-xl lg:text-2xl text-[#6b6b6b] font-light tracking-widest">
                             Thư Viện Khoảnh Khắc Hạnh Phúc
                         </p>
                     </motion.div>

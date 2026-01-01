@@ -955,4 +955,118 @@
         font-size: 0.75rem;
         border-radius: 8px;
     }
+
+    /* Fix filter section mobile */
+    .filter-section {
+        top: 56px;
+        padding: 6px 0;
+    }
+
+    .filter-section .container {
+        padding: 0 8px;
+    }
+
+    .category-tabs {
+        margin-bottom: 8px;
+    }
+
+    .cat-tab {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+        gap: 4px;
+    }
+
+    .cat-icon {
+        font-size: 0.9rem;
+    }
+
+    .sub-category-tabs {
+        margin-bottom: 8px;
+        padding-left: 6px;
+        border-left-width: 2px;
+    }
+
+    .sub-cat-tab {
+        padding: 4px 10px;
+        font-size: 0.75rem;
+    }
+
+    /* Viewed section mobile */
+    .viewed-section {
+        padding: 12px 0;
+    }
+
+    .viewed-header h3 {
+        font-size: 0.95rem;
+    }
+
+    .viewed-item {
+        min-width: 120px;
+        max-width: 120px;
+        padding: 8px;
+    }
+
+    .viewed-item img {
+        height: 90px;
+    }
+
+    .viewed-name {
+        font-size: 0.75rem;
+    }
+
+    .viewed-price {
+        font-size: 0.85rem;
+    }
+
+    /* Banner mobile */
+    .promo-banners {
+        padding: 8px 0;
+    }
+
+    .banner-grid {
+        display: flex;
+        overflow-x: auto;
+        gap: 8px;
+        padding: 0 8px 8px;
+    }
+
+    .banner-item {
+        min-width: 150px;
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    .banner-content h4 {
+        font-size: 0.8rem;
+    }
+
+    .banner-content p {
+        font-size: 0.9rem;
+    }
+
+    .banner-content strong {
+        font-size: 1rem;
+    }
+
+    .banner-tag {
+        font-size: 0.65rem;
+        padding: 2px 6px;
+    }
+
+    /* Product meta mobile */
+    .product-meta {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .rating, .reviews {
+        font-size: 0.7rem;
+    }
+
+    .stock-warning {
+        font-size: 0.65rem;
+        width: 100%;
+        margin-top: 4px;
+        margin-left: 0;
+    }
 }

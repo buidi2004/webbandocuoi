@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, field_serializer, ConfigDict
+from pydantic import BaseModel, field_serializer, ConfigDict
 from datetime import datetime
 
 # Mô hình Sản phẩm (Product Schemas)
@@ -98,7 +98,7 @@ class DichVu(DichVuCoBan):
 # Mô hình Liên hệ (Contact Schemas)
 class LienHeTao(BaseModel):
     name: str
-    email: EmailStr
+    email: str
     phone: str | None = None
     address: str | None = None # New field
     message: str
@@ -183,7 +183,7 @@ class ThuVien(ThuVienCoBan):
 # Mô hình Người dùng (User Schemas)
 class NguoiDungCoBan(BaseModel):
     username: str # New field
-    email: EmailStr | None = None # Now optional
+    email: str | None = None # Now optional
     full_name: str | None = None
     phone: str | None = None # New field
     address: str | None = None # New field
@@ -234,7 +234,7 @@ class ChiTietDonHang(ChiTietDonHangCoBan):
 class DonHangCoBan(BaseModel):
     user_id: int | None = None
     customer_name: str
-    customer_email: EmailStr
+    customer_email: str
     customer_phone: str
     shipping_address: str
     total_amount: float
@@ -267,7 +267,7 @@ class DanhGia(DanhGiaCoBan):
 
 class NguoiDungCapNhat(BaseModel):
     full_name: str | None = None
-    email: EmailStr | None = None
+    email: str | None = None
     phone: str | None = None
     address: str | None = None
     password: str | None = None
