@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import pandas as pd
 from PIL import Image
 import io
-from datetime import datetime
+from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
 import functools
 
@@ -15,6 +15,18 @@ from auth import (
     show_user_info_sidebar, get_allowed_menu_items,
     has_permission, MENU_PERMISSIONS
 )
+
+# Import analytics module
+try:
+    from analytics import (
+        tinh_doanh_thu_theo_thang, du_bao_moving_average, tinh_tang_truong,
+        phan_tich_rfm, thong_ke_rfm,
+        phan_tich_ket_hop, goi_y_san_pham,
+        phan_tich_cam_xuc, phan_tich_danh_gia_list, thong_ke_cam_xuc
+    )
+    HAS_ANALYTICS = True
+except ImportError:
+    HAS_ANALYTICS = False
 
 load_dotenv()
 
