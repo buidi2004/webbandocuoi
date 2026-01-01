@@ -50,7 +50,7 @@
     font-size: 1.8rem;
     font-weight: 700;
     color: #fff;
-    font-family: var(--font-serif);
+    font-family: var(--font-heading-vn);
 }
 
 .stat-badge.hot .stat-num { color: #e74c3c; }
@@ -78,7 +78,8 @@
 .calendar-nav h3 {
     color: #fff;
     font-size: 1.3rem;
-    font-family: var(--font-serif);
+    font-family: var(--font-heading-vn);
+    font-weight: 600;
 }
 
 .nav-btn {

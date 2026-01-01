@@ -64,10 +64,11 @@
 }
 
 .service-makeup-card h3 {
-    font-family: var(--font-serif);
+    font-family: var(--font-heading-vn);
     font-size: 1.8rem;
     margin-bottom: 0.5rem;
     color: var(--dark);
+    font-weight: 600;
 }
 
 .service-makeup-card>p {
@@ -99,7 +100,7 @@
 }
 
 .service-price {
-    font-family: var(--font-serif);
+    font-family: var(--font-heading-vn);
     font-size: 2rem;
     font-weight: 700;
     color: var(--primary);
@@ -136,6 +137,37 @@
     overflow: hidden;
 }
 
+/* Expert Badge - TOP ARTIST, MASTER */
+.expert-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 6px 14px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    z-index: 10;
+    font-family: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+    white-space: nowrap;
+    line-height: 1.2;
+}
+
+.expert-badge.top {
+    background: linear-gradient(135deg, #c9a86c 0%, #d4b896 100%);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(201, 168, 108, 0.4);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.expert-badge.master {
+    background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
 .expert-image img {
     width: 100%;
     height: 100%;
@@ -152,7 +184,7 @@
 }
 
 .expert-name {
-    font-family: var(--font-serif);
+    font-family: var(--font-heading-vn);
     font-size: 1.8rem;
     font-weight: 700;
     margin-bottom: 0.3rem;
@@ -181,7 +213,7 @@
 
 .stat-number {
     display: block;
-    font-family: var(--font-serif);
+    font-family: var(--font-heading-vn);
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--primary);
@@ -304,7 +336,8 @@
     color: #fff;
     font-size: 1.2rem;
     margin: 0 0 5px;
-    font-family: var(--font-serif);
+    font-family: var(--font-heading-vn);
+    font-weight: 600;
 }
 
 .video-info-overlay p {
@@ -321,7 +354,8 @@
     font-size: 2rem;
     color: #c9a86c;
     margin-bottom: 1rem;
-    font-family: var(--font-serif);
+    font-family: var(--font-heading-vn);
+    font-weight: 600;
 }
 
 .video-description > p {
@@ -429,7 +463,8 @@
     font-size: 1.3rem;
     color: #333;
     margin: 0 0 5px;
-    font-family: var(--font-serif);
+    font-family: var(--font-heading-vn);
+    font-weight: 600;
 }
 
 .ba-info p {

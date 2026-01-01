@@ -73,7 +73,7 @@
     font-size: 1.1rem;
     font-weight: 400;
     outline: none;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
     padding: 10px 0;
 }
 

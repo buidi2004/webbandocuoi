@@ -124,10 +124,11 @@
 }
 
 .info-item h3 {
-    font-family: var(--font-serif);
+    font-family: var(--font-heading-vn);
     font-size: 1.2rem;
     margin-bottom: 0.5rem;
     color: #c09a6a;
+    font-weight: 600;
 }
 
 .info-item p {
@@ -166,11 +167,12 @@
 }
 
 .form-title {
-    font-family: var(--font-serif);
+    font-family: var(--font-heading-vn);
     font-size: 2rem;
     text-align: center;
     margin-bottom: 2rem;
     color: #c09a6a;
+    font-weight: 600;
 }
 
 
@@ -352,7 +354,8 @@ textarea {
 .action-box h3 {
     margin-bottom: 25px;
     font-size: 1.8rem;
-    font-family: var(--font-serif);
+    font-family: var(--font-heading-vn);
+    font-weight: 600;
 }
 
 .complaint-container {

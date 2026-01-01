@@ -191,7 +191,7 @@
     display: inline-block;
     position: relative;
     color: var(--primary);
-    font-family: 'Great Vibes', cursive;
+    font-family: var(--font-cursive);
     margin-top: 0.5rem;
 }
 
@@ -274,7 +274,7 @@
     font-size: 2rem;
     font-weight: 700;
     color: var(--primary);
-    font-family: var(--font-serif);
+    font-family: var(--font-heading-vn);
 }
 
 .stat-label {
@@ -318,7 +318,8 @@
 .service-title {
     font-size: 1.5rem;
     margin-bottom: 1rem;
-    font-family: var(--font-serif);
+    font-family: var(--font-heading-vn);
+    font-weight: 600;
 }
 
 /* Featured Products Grid */
@@ -589,7 +590,7 @@
     display: block;
     font-size: 2.5rem;
     font-weight: 700;
-    font-family: var(--font-serif);
+    font-family: var(--font-heading-vn);
     margin-bottom: 0.5rem;
 }
 

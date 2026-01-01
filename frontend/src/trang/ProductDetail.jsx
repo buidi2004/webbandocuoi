@@ -504,7 +504,7 @@ export default function ProductDetail() {
       
       {/* Phần đánh giá sản phẩm */}
       <section className="reviews-section" style={{marginTop:'30px', padding:'24px', background:'#fff', borderRadius:'12px', border:'1px solid #eee'}}>
-        <h3 style={{margin:'0 0 20px', fontFamily:'Playfair Display, serif', fontSize:'1.3rem'}}>
+        <h3 style={{margin:'0 0 20px', fontFamily:"'Be Vietnam Pro', system-ui, sans-serif", fontSize:'1.3rem', fontWeight: 600}}>
           Đánh giá {sanPham.name}
         </h3>
         

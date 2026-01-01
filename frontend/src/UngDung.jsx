@@ -38,6 +38,7 @@ const AntiGravityLanding = lazy(() => import('./trang/AntiGravityLanding'));
 const GalleryDemo = lazy(() => import('./trang/GalleryDemo'));
 const CuonPhongTo = lazy(() => import('./trang/CuonPhongTo'));
 const DemoHieuUng = lazy(() => import('./trang/DemoHieuUng'));
+const DemoCuonDinh = lazy(() => import('./trang/DemoCuonDinh'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -113,6 +114,8 @@ function UngDung() {
               <Route path="/gallery-demo" element={<GalleryDemo />} />
               <Route path="/cuon-phong-to" element={<CuonPhongTo />} />
               <Route path="/demo-hieu-ung" element={<DemoHieuUng />} />
+              <Route path="/demo-cuon-dinh" element={<DemoCuonDinh />} />
+              <Route path="/demo-cuon-din" element={<DemoCuonDinh />} />
               <Route path="/cam-on" element={<CamOn />} />
             </Routes>
           </Suspense>

@@ -1,27 +1,19 @@
-import { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { thuVienAPI, layUrlHinhAnh } from '../api/khach_hang';
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { thuVienAPI, sanPhamAPI, layUrlHinhAnh } from '../api/khach_hang';
 import BoSuuTapGach from '../thanh_phan/BoSuuTapGach';
 import HieuUngHat from '../thanh_phan/HieuUngHat';
-import LazyImage from '../thanh_phan/LazyImage';
+import ScrollLinkedGallery from '../thanh_phan/ScrollLinkedGallery';
+import CardCarousel from '../thanh_phan/CardCarousel';
 
 const ThuVien = () => {
     const [danhSachAnh, setDanhSachAnh] = useState([]);
+    const [danhSachSanPham, setDanhSachSanPham] = useState([]);
     const [dangTai, setDangTai] = useState(true);
-    const phanHeroRef = useRef(null);
-
-    // Hiệu ứng cuộn cho phần hero
-    const { scrollYProgress: tienTrinhCuon } = useScroll({
-        target: phanHeroRef,
-        offset: ["start start", "end start"]
-    });
-
-    const tiLe = useTransform(tienTrinhCuon, [0, 1], [1, 1.5]);
-    const doMo = useTransform(tienTrinhCuon, [0, 0.5, 1], [1, 1, 0.3]);
-    const doMoChu = useTransform(tienTrinhCuon, [0, 0.3, 0.6], [1, 1, 0]);
 
     useEffect(() => {
         layDuLieuThuVien();
+        layDuLieuSanPham();
     }, []);
 
     const layDuLieuThuVien = async () => {
@@ -32,6 +24,15 @@ const ThuVien = () => {
             console.error('Lỗi tải thư viện:', loi);
         } finally {
             setDangTai(false);
+        }
+    };
+
+    const layDuLieuSanPham = async () => {
+        try {
+            const phanHoi = await sanPhamAPI.layTatCa();
+            setDanhSachSanPham(phanHoi.data || []);
+        } catch (loi) {
+            console.error('Lỗi tải sản phẩm:', loi);
         }
     };
 
@@ -64,6 +65,77 @@ const ThuVien = () => {
     };
 
     const tieuDe = "Thư Viện Ảnh IVIE STUDIO";
+
+    // Dữ liệu mặc định cho scroll sections
+    const defaultSectionData = [
+        {
+            title: "Chụp Ảnh Cưới Chuyên Nghiệp",
+            description: "Lưu giữ khoảnh khắc hạnh phúc nhất của bạn với đội ngũ nhiếp ảnh gia giàu kinh nghiệm.",
+            highlight: "500+ cặp đôi tin tưởng"
+        },
+        {
+            title: "Studio Hiện Đại",
+            description: "Không gian chụp ảnh sang trọng với ánh sáng tự nhiên và thiết bị cao cấp.",
+            highlight: "3 studio tại Hà Nội"
+        },
+        {
+            title: "Trang Điểm Cô Dâu",
+            description: "Makeup artist chuyên nghiệp giúp bạn tỏa sáng trong ngày trọng đại.",
+            highlight: "Top Artist được yêu thích"
+        },
+        {
+            title: "Album & In Ấn Cao Cấp",
+            description: "Album cưới cao cấp với chất liệu nhập khẩu, bền đẹp theo thời gian.",
+            highlight: "Bảo hành trọn đời"
+        }
+    ];
+
+    // Chuẩn bị dữ liệu cho scroll-linked animation - dùng 4 ảnh đầu từ thư viện
+    const scrollSections = defaultSectionData.map((section, index) => ({
+        id: index + 1,
+        title: section.title,
+        description: section.description,
+        highlight: section.highlight,
+        // Dùng ảnh từ thư viện nếu có, fallback về picsum
+        image: danhSachAnh[index] 
+            ? layUrlHinhAnh(danhSachAnh[index].image_url)
+            : `https://picsum.photos/id/${1015 + index}/800/600`
+    }));
+
+    // Chuẩn bị dữ liệu cho CardCarousel - dùng 3 sản phẩm đầu hoặc fallback
+    const defaultCarouselData = [
+        {
+            id: 1,
+            title: "Gói Chụp Ảnh Cưới Premium",
+            description: "Trọn gói chụp ảnh cưới cao cấp với 200+ ảnh đã chỉnh sửa",
+            image: "https://picsum.photos/id/1011/800/600",
+            price: "15.000.000đ"
+        },
+        {
+            id: 2,
+            title: "Gói Chụp Ảnh Gia Đình",
+            description: "Lưu giữ khoảnh khắc hạnh phúc bên gia đình thân yêu",
+            image: "https://picsum.photos/id/1012/800/600",
+            price: "5.000.000đ"
+        },
+        {
+            id: 3,
+            title: "Gói Chụp Ảnh Kỷ Yếu",
+            description: "Kỷ niệm tuổi học trò với bộ ảnh kỷ yếu độc đáo",
+            image: "https://picsum.photos/id/1013/800/600",
+            price: "3.000.000đ"
+        }
+    ];
+
+    const carouselItems = danhSachSanPham.length >= 3 
+        ? danhSachSanPham.slice(0, 3).map((sp, index) => ({
+            id: sp.id || index + 1,
+            title: sp.ten || sp.name || `Gói ${index + 1}`,
+            description: sp.mo_ta || sp.description || 'Dịch vụ chụp ảnh chuyên nghiệp',
+            image: layUrlHinhAnh(sp.hinh_anh || sp.image_url),
+            price: sp.gia ? `${Number(sp.gia).toLocaleString('vi-VN')}đ` : null
+        }))
+        : defaultCarouselData;
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
@@ -109,7 +181,7 @@ const ThuVien = () => {
                             fontWeight: 700,
                             lineHeight: 1.2,
                             marginBottom: '12px',
-                            fontFamily: 'system-ui, -apple-system, sans-serif'
+                            fontFamily: "'Be Vietnam Pro', system-ui, sans-serif"
                         }}>
                             Thư Viện Ảnh IVIE
                         </h1>
@@ -152,6 +224,12 @@ const ThuVien = () => {
                     </div>
                 </div>
             </section>
+
+            {/* Scroll-linked Animation Section - 4 ảnh local */}
+            <ScrollLinkedGallery sections={scrollSections} />
+
+            {/* Card Carousel Section - 3 sản phẩm đầu */}
+            <CardCarousel items={carouselItems} />
 
             {/* Phần Gallery - responsive */}
             <div className="py-8 sm:py-12" style={{ marginTop: '40px' }}>
@@ -286,72 +364,6 @@ const ThuVien = () => {
                 </motion.div>
             </div>
         </div>
-
-            {/* Phần Hero với hiệu ứng cuộn phóng to - ẩn trên mobile */}
-            <div ref={phanHeroRef} className="relative h-[200vh] hidden md:block">
-                <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#f8f6f3] to-[#e8e4df]">
-                    
-                    {/* Nền trang trí */}
-                    <motion.div 
-                        className="absolute inset-0 opacity-10"
-                        style={{ opacity: useTransform(tienTrinhCuon, [0, 0.5], [0.1, 0.3]) }}
-                    >
-                        <div className="absolute top-20 left-20 w-64 h-64 bg-[#b59410] rounded-full blur-3xl" />
-                        <div className="absolute bottom-20 right-20 w-96 h-96 bg-[#d4af37] rounded-full blur-3xl" />
-                    </motion.div>
-
-                    {/* Ảnh Hero chính với hiệu ứng phóng to - responsive */}
-                    {danhSachAnh.length > 0 && (
-                        <motion.div
-                            style={{ scale: tiLe, opacity: doMo }}
-                            className="relative z-10"
-                        >
-                            <img
-                                src={layUrlHinhAnh(danhSachAnh[0].image_url)}
-                                alt="Thư viện IVIE Studio"
-                                className="w-[300px] md:w-[400px] lg:w-[500px] h-[400px] md:h-[550px] lg:h-[700px] object-cover rounded-lg shadow-2xl"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent rounded-lg" />
-                        </motion.div>
-                    )}
-
-                    {/* Chữ tiêu đề - responsive */}
-                    <motion.div
-                        style={{ opacity: doMoChu }}
-                        className="absolute top-1/4 left-1/2 transform -translate-x-1/2 text-center z-20 px-4 w-full"
-                    >
-                        <h1 className="text-4xl md:text-6xl lg:text-8xl font-serif text-[#2c2c2c] mb-4 tracking-wider">
-                            IVIE STUDIO
-                        </h1>
-                        <p className="text-lg md:text-xl lg:text-2xl text-[#6b6b6b] font-light tracking-widest">
-                            Thư Viện Khoảnh Khắc Hạnh Phúc
-                        </p>
-                    </motion.div>
-
-                    {/* Chỉ báo cuộn */}
-                    <motion.div
-                        style={{ opacity: useTransform(tienTrinhCuon, [0, 0.2], [1, 0]) }}
-                        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-20"
-                    >
-                        <motion.div
-                            animate={{ y: [0, 10, 0] }}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                            className="flex flex-col items-center"
-                        >
-                            <span className="text-[#6b6b6b] text-sm mb-2 tracking-widest">CUỘN XUỐNG</span>
-                            <svg className="w-6 h-6 text-[#b59410]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                            </svg>
-                        </motion.div>
-                    </motion.div>
-
-                    {/* Thanh tiến trình */}
-                    <motion.div
-                        className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#b59410] to-[#d4af37] origin-left z-30"
-                        style={{ scaleX: tienTrinhCuon }}
-                    />
-                </div>
-            </div>
         </div>
     );
 };

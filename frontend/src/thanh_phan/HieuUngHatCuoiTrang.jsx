@@ -36,7 +36,7 @@ export default function HieuUngHatCuoiTrang() {
                     fontWeight: 700,
                     lineHeight: 1.2,
                     marginBottom: '16px',
-                    fontFamily: 'Playfair Display, serif',
+                    fontFamily: "'Be Vietnam Pro', system-ui, sans-serif",
                     textShadow: '0 1px 2px rgba(255,255,255,0.8)'
                 }}>
                     Khám Phá Thêm

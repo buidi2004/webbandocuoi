@@ -217,10 +217,10 @@ const TrangChu = () => {
                         <h2 style={{
                             color: '#fff',
                             fontSize: 'clamp(24px, 5vw, 36px)',
-                            fontWeight: 400,
+                            fontWeight: 600,
                             lineHeight: 1.3,
                             marginBottom: '20px',
-                            fontFamily: 'Playfair Display, serif',
+                            fontFamily: "'Be Vietnam Pro', system-ui, sans-serif",
                             textShadow: '0 2px 4px rgba(0,0,0,0.5)'
                         }}>
                             Khám Phá<br/>

@@ -92,7 +92,7 @@ export default function HieuUngChuyenTrang() {
                                 fontSize: '20px',
                                 fontWeight: 700,
                                 color: '#fff',
-                                fontFamily: 'Playfair Display, serif',
+                                fontFamily: "'Be Vietnam Pro', system-ui, sans-serif",
                                 letterSpacing: '2px'
                             }}
                         >
@@ -107,7 +107,7 @@ export default function HieuUngChuyenTrang() {
                         fontSize: '32px',
                         fontWeight: 700,
                         color: '#c9a86c',
-                        fontFamily: 'Playfair Display, serif',
+                        fontFamily: "'Be Vietnam Pro', system-ui, sans-serif",
                         letterSpacing: '6px'
                     }}
                 >

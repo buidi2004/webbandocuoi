@@ -4,8 +4,8 @@
     background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
     color: #ffffff;
     padding: 3rem 1rem 2rem;
-    overflow: hidden;
-    min-height: 200px;
+    overflow: visible;
+    min-height: 280px;
 }
 
 /* ===== NỘI DUNG TRUNG TÂM ===== */
@@ -98,10 +98,11 @@
 .trang-tri-phai {
     position: absolute;
     bottom: 0;
-    width: 200px;
-    height: 100px;
+    width: 400px;
+    height: 280px;
     pointer-events: none;
     z-index: 1;
+    overflow: visible;
 }
 
 .trang-tri-trai {
@@ -115,17 +116,18 @@
 /* Cành mai nằm ngang */
 .canh-mai-ngang {
     position: absolute;
-    bottom: 10px;
-    width: 180px;
-    height: 60px;
+    bottom: 0;
+    width: 400px;
+    height: 280px;
+    overflow: visible;
 }
 
 .canh-mai-ngang-trai {
-    left: 10px;
+    left: 0;
 }
 
 .canh-mai-ngang-phai {
-    right: 10px;
+    right: 0;
     transform: scaleX(-1);
 }
 
@@ -167,13 +169,14 @@
     .footer-nav { gap: 0.3rem; }
     .footer-nav a { font-size: 0.8rem; }
     .trang-tri-trai,
-    .trang-tri-phai { width: 120px; height: 70px; opacity: 0.7; }
-    .canh-mai-ngang { width: 100px; height: 40px; }
+    .trang-tri-phai { width: 280px; height: 200px; opacity: 0.8; }
+    .canh-mai-ngang { width: 280px; height: 200px; }
 }
 
 @media (max-width: 480px) {
     .footer-nav .nav-divider { display: none; }
     .footer-nav { flex-direction: column; gap: 0.5rem; }
     .trang-tri-trai,
-    .trang-tri-phai { display: none; }
+    .trang-tri-phai { width: 180px; height: 140px; opacity: 0.6; }
+    .canh-mai-ngang { width: 180px; height: 140px; }
 }

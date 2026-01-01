@@ -14,9 +14,10 @@
 
 .policy-hero h1 {
     font-size: 2.5rem;
-    font-family: var(--font-serif);
+    font-family: var(--font-heading-vn);
     color: #c9a86c;
     margin-bottom: 1rem;
+    font-weight: 600;
 }
 
 .policy-hero p {
@@ -72,7 +73,8 @@
     font-size: 2rem;
     color: #333;
     margin-bottom: 0.5rem;
-    font-family: var(--font-serif);
+    font-family: var(--font-heading-vn);
+    font-weight: 600;
 }
 
 .policy-update {

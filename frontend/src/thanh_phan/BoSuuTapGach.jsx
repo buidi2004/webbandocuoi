@@ -30,9 +30,9 @@ const BoSuuTapGach = ({ danhSachAnh }) => {
 
   return (
     <>
-      {/* Lưới Masonry với hiệu ứng xuất hiện lần lượt */}
+      {/* Lưới Masonry với hiệu ứng xuất hiện lần lượt - responsive mobile */}
       <motion.div
-        className="columns-3 sm:columns-4 md:columns-6 lg:columns-8 xl:columns-10 gap-2 space-y-2"
+        className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 xl:columns-6 gap-2 sm:gap-3 space-y-2 sm:space-y-3"
         variants={hieuUngContainer}
         initial="anDi"
         whileInView="hienThi"
@@ -49,13 +49,15 @@ const BoSuuTapGach = ({ danhSachAnh }) => {
               onClick={() => setAnhDuocChon(anh)}
               data-cursor="view"
             >
-              {/* Ảnh với hiệu ứng phóng to */}
+              {/* Ảnh với hiệu ứng phóng to - giữ tỷ lệ gốc */}
               <motion.img
                 src={anh.url}
                 alt={anh.moTa || `Ảnh ${viTri + 1}`}
                 className="w-full h-auto object-cover"
+                style={{ maxHeight: '400px', minHeight: '120px' }}
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
+                loading="lazy"
               />
 
               {/* Lớp phủ khi hover */}
