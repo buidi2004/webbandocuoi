@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NutBam from '../thanh_phan/NutBam';
 import The from '../thanh_phan/The';
-import { doiTacAPI } from '../api/khach_hang';
+import { doiTacAPI, API_BASE_URL } from '../api/khach_hang';
 import { useToast } from '../thanh_phan/Toast';
 import axios from 'axios';
 
@@ -57,7 +57,7 @@ const DoiTacPortal = () => {
 
         try {
             // Reusing upload endpoint
-            const res = await axios.post('http://localhost:8000/api/tap_tin/upload', formData, {
+            const res = await axios.post(`${API_BASE_URL}/api/tap_tin/upload`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             setForm({ ...form, cv_url: res.data.url });

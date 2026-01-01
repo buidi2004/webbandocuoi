@@ -1167,7 +1167,8 @@ def ui_doi_tac_khieu_nai():
                         st.write(f"💼 Kinh nghiệm: {app['experience']}")
                         if app['portfolio_url']: st.write(f"🔗 [Portfolio]({app['portfolio_url']})")
                         if app['cv_url']:
-                            st.image(f"http://localhost:8000{app['cv_url']}", caption="Ảnh CV / Portfolio", width=300)
+                            cv_url = app['cv_url'] if app['cv_url'].startswith('http') else f"{API_URL}{app['cv_url']}"
+                            st.image(cv_url, caption="Ảnh CV / Portfolio", width=300)
                     with c2:
                         curr_status = app['status']
                         st.write(f"Trạng thái hiện tại: **{curr_status}**")

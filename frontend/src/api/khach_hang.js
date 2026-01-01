@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -85,6 +85,19 @@ export const layUrlHinhAnh = (duongDan) => {
     if (duongDan.startsWith('/images')) return duongDan;
     // Ngược lại, giả định là ảnh từ backend api
     return `${API_BASE_URL}${duongDan}`;
+};
+
+// Lấy sản phẩm liên quan
+export const laySanPhamLienQuan = async (productId, limit = 8) => {
+    try {
+        const response = await api.get(`/pg/san-pham/${productId}/lien-quan`, {
+            params: { gioi_han: limit }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching related products:', error);
+        return [];
+    }
 };
 
 export default api;
