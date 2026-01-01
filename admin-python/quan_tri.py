@@ -6,6 +6,8 @@ import pandas as pd
 from PIL import Image
 import io
 from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor
+import functools
 
 # Import authentication module
 from auth import (
@@ -17,6 +19,9 @@ from auth import (
 load_dotenv()
 
 API_URL = os.getenv("API_BASE_URL", os.getenv("VITE_API_BASE_URL", "http://localhost:8000"))
+
+# Thread pool cho parallel requests
+executor = ThreadPoolExecutor(max_workers=4)
 
 st.set_page_config(page_title="IVIE Wedding Admin", layout="wide", page_icon="🏯")
 
@@ -103,17 +108,42 @@ with st.sidebar:
 
 
 # --- Helpers ---
-@st.cache_data(show_spinner=False, ttl=120)  # Cache 2 phút - nhanh hơn
+# Session cho requests - tái sử dụng connection
+@st.cache_resource
+def get_session():
+    """Tạo session requests để tái sử dụng connection"""
+    session = requests.Session()
+    session.headers.update({'Connection': 'keep-alive'})
+    return session
+
+@st.cache_data(show_spinner=False, ttl=90)  # Cache 90 giây
 def fetch_api_data(endpoint):
-    """Cached version for GET requests with 2min TTL"""
+    """Cached version for GET requests with 90s TTL"""
     url = f"{API_URL}{endpoint}"
     try:
-        res = requests.get(url, timeout=8)  # Timeout ngắn hơn
+        session = get_session()
+        res = session.get(url, timeout=6)  # Timeout ngắn hơn
         if res.status_code == 200:
             return res.json()
         return None
     except Exception:
         return None
+
+# Batch fetch - lấy nhiều endpoint cùng lúc
+def fetch_multiple_endpoints(endpoints):
+    """Fetch nhiều endpoints song song"""
+    def fetch_one(endpoint):
+        return endpoint, fetch_api_data(endpoint)
+    
+    results = {}
+    futures = [executor.submit(fetch_one, ep) for ep in endpoints]
+    for future in futures:
+        try:
+            ep, data = future.result(timeout=8)
+            results[ep] = data
+        except:
+            pass
+    return results
 
 # Session state để tránh rerun không cần thiết
 if "last_action" not in st.session_state:
@@ -121,22 +151,21 @@ if "last_action" not in st.session_state:
 
 def call_api(method, endpoint, data=None, files=None, clear_cache=True):
     url = f"{API_URL}{endpoint}"
+    session = get_session()
     try:
         # Không hiển thị spinner cho GET requests (mượt hơn)
         if method == "GET":
             if not clear_cache:
                 return fetch_api_data(endpoint)
-            res = requests.get(url, timeout=8)
+            res = session.get(url, timeout=6)
         elif method == "POST":
-            with st.spinner("Đang xử lý..."):
-                res = requests.post(url, json=data, files=files, timeout=25)
+            res = session.post(url, json=data, files=files, timeout=20)
         elif method == "PUT":
-            with st.spinner("Đang cập nhật..."):
-                res = requests.put(url, json=data, timeout=25)
+            res = session.put(url, json=data, timeout=20)
         elif method == "PATCH":
-            res = requests.patch(url, json=data, timeout=15)
+            res = session.patch(url, json=data, timeout=12)
         elif method == "DELETE":
-            res = requests.delete(url, timeout=8)
+            res = session.delete(url, timeout=6)
         
         if res.status_code in [200, 201]:
             if method != "GET" and clear_cache:
@@ -146,7 +175,7 @@ def call_api(method, endpoint, data=None, files=None, clear_cache=True):
             st.error(f"Lỗi API ({res.status_code})")
             return None
     except requests.Timeout:
-        st.error("⏱️ Server phản hồi chậm, thử lại sau")
+        st.error("⏱️ Server phản hồi chậm")
         return None
     except Exception as e:
         st.error(f"Lỗi kết nối")
@@ -154,20 +183,20 @@ def call_api(method, endpoint, data=None, files=None, clear_cache=True):
 
 def upload_image(uploaded_file):
     if uploaded_file is not None:
-        # Compress image trước khi upload
+        # Compress image trước khi upload - tối ưu hơn
         try:
             img = Image.open(uploaded_file)
-            # Resize nếu quá lớn
-            max_size = (1200, 1200)
+            # Resize nhỏ hơn để upload nhanh
+            max_size = (1000, 1000)
             img.thumbnail(max_size, Image.Resampling.LANCZOS)
             
             # Convert to RGB if needed
             if img.mode in ('RGBA', 'P'):
                 img = img.convert('RGB')
             
-            # Save to buffer với quality thấp hơn
+            # Save to buffer với quality thấp hơn nữa
             buffer = io.BytesIO()
-            img.save(buffer, format='JPEG', quality=85, optimize=True)
+            img.save(buffer, format='JPEG', quality=80, optimize=True)
             buffer.seek(0)
             
             files = {"file": (uploaded_file.name.rsplit('.', 1)[0] + '.jpg', buffer, 'image/jpeg')}
@@ -177,7 +206,8 @@ def upload_image(uploaded_file):
         
         url = f"{API_URL}/api/tap_tin/upload"
         try:
-            res = requests.post(url, files=files, timeout=45)
+            session = get_session()
+            res = session.post(url, files=files, timeout=30)
             if res.status_code == 200:
                 return res.json().get("url")
             st.error("Lỗi tải ảnh")
@@ -187,7 +217,27 @@ def upload_image(uploaded_file):
             st.error(f"Lỗi upload")
     return None
 
-@st.cache_data(show_spinner=False, ttl=600)  # Cache URL ảnh 10 phút
+# Upload nhiều ảnh song song
+def upload_images_parallel(files_list):
+    """Upload nhiều ảnh cùng lúc"""
+    if not files_list:
+        return []
+    
+    def upload_one(f):
+        return upload_image(f)
+    
+    results = []
+    futures = [executor.submit(upload_one, f) for f in files_list]
+    for future in futures:
+        try:
+            url = future.result(timeout=35)
+            if url:
+                results.append(url)
+        except:
+            pass
+    return results
+
+@st.cache_data(show_spinner=False, ttl=900)  # Cache URL ảnh 15 phút
 def lay_url_anh(path):
     """Cached image URL generation"""
     if not path: return "https://placehold.co/400x300/000000/ffffff?text=No+Image"
@@ -196,58 +246,68 @@ def lay_url_anh(path):
         path = "/" + path
     return f"{API_URL}{path}"
 
+# Lazy load image - chỉ load khi cần
+@st.cache_data(show_spinner=False, ttl=300)
+def get_image_placeholder():
+    return "https://placehold.co/200x200/111/333?text=Loading..."
+
 def paginate_list(items, page_size=20):
     """Helper function for pagination - optimized"""
     if not items:
         return [], 1, 1
     
-    page_key = f"page_{hash(str(type(items[0])))}"
+    # Sử dụng hash đơn giản hơn
+    page_key = f"page_{id(items)}"
     if page_key not in st.session_state:
         st.session_state[page_key] = 1
     
-    total_pages = max(1, (len(items) + page_size - 1) // page_size)
+    total_pages = max(1, -(-len(items) // page_size))  # Ceiling division
     
     # Ensure current page is valid
-    if st.session_state[page_key] > total_pages:
+    current = st.session_state[page_key]
+    if current > total_pages:
         st.session_state[page_key] = total_pages
+        current = total_pages
     
-    start_idx = (st.session_state[page_key] - 1) * page_size
-    end_idx = start_idx + page_size
+    start_idx = (current - 1) * page_size
     
-    return items[start_idx:end_idx], st.session_state[page_key], total_pages
+    return items[start_idx:start_idx + page_size], current, total_pages
 
 def show_pagination(current_page, total_pages, key_prefix=""):
     """Display pagination controls - compact version"""
     if total_pages <= 1:
         return
     
-    cols = st.columns([1, 1, 2, 1, 1])
+    # Sử dụng columns nhỏ gọn hơn
+    c1, c2, c3, c4, c5 = st.columns([1, 1, 3, 1, 1])
     
-    with cols[0]:
-        if st.button("⏮️", disabled=current_page == 1, key=f"{key_prefix}first", help="Trang đầu"):
-            st.session_state[f"page_{key_prefix}"] = 1
+    with c1:
+        if st.button("⏮", disabled=current_page == 1, key=f"{key_prefix}first"):
+            for k in list(st.session_state.keys()):
+                if k.startswith("page_"):
+                    st.session_state[k] = 1
             st.rerun()
     
-    with cols[1]:
-        if st.button("◀️", disabled=current_page == 1, key=f"{key_prefix}prev", help="Trang trước"):
-            for k in st.session_state:
+    with c2:
+        if st.button("◀", disabled=current_page == 1, key=f"{key_prefix}prev"):
+            for k in list(st.session_state.keys()):
                 if k.startswith("page_"):
                     st.session_state[k] = max(1, st.session_state[k] - 1)
             st.rerun()
     
-    with cols[2]:
-        st.markdown(f"<p style='text-align:center;padding:8px;'>{current_page}/{total_pages}</p>", unsafe_allow_html=True)
+    with c3:
+        st.markdown(f"<p style='text-align:center;margin:8px 0;'>{current_page}/{total_pages}</p>", unsafe_allow_html=True)
     
-    with cols[3]:
-        if st.button("▶️", disabled=current_page == total_pages, key=f"{key_prefix}next", help="Trang sau"):
-            for k in st.session_state:
+    with c4:
+        if st.button("▶", disabled=current_page == total_pages, key=f"{key_prefix}next"):
+            for k in list(st.session_state.keys()):
                 if k.startswith("page_"):
                     st.session_state[k] = min(total_pages, st.session_state[k] + 1)
             st.rerun()
     
-    with cols[4]:
-        if st.button("⏭️", disabled=current_page == total_pages, key=f"{key_prefix}last", help="Trang cuối"):
-            for k in st.session_state:
+    with c5:
+        if st.button("⏭", disabled=current_page == total_pages, key=f"{key_prefix}last"):
+            for k in list(st.session_state.keys()):
                 if k.startswith("page_"):
                     st.session_state[k] = total_pages
             st.rerun()
@@ -255,14 +315,15 @@ def show_pagination(current_page, total_pages, key_prefix=""):
 def cap_nhat_trang_thai_lien_he(id_lien_he, status):
     url = f"{API_URL}/api/lien_he/{id_lien_he}/status"
     try:
-        res = requests.patch(url, json={"status": status})
+        session = get_session()
+        res = session.patch(url, json={"status": status}, timeout=8)
         if res.status_code == 200:
             return res.json()
         else:
             st.error(f"Lỗi: {res.text}")
             return None
     except Exception as e:
-        st.error(f"Lỗi kết nối: {e}")
+        st.error(f"Lỗi kết nối")
         return None
 
 # --- UI Sections ---
@@ -502,26 +563,20 @@ def ui_san_pham():
                         # Upload ảnh đại diện (Váy Mẫu 1)
                         url = upload_image(img_file)
                         
-                        # Upload 3 ảnh mẫu còn lại (Mẫu 2, 3, 4)
-                        # Gallery sẽ bao gồm: [ảnh đại diện, mẫu 2, mẫu 3, mẫu 4]
-                        gallery_urls = [url] if url else []  # Mẫu 1 = ảnh đại diện
-                        mau_images = [img_mau_2, img_mau_3, img_mau_4]
+                        # Upload 3 ảnh mẫu còn lại SONG SONG
+                        gallery_urls = [url] if url else []
+                        mau_images = [m for m in [img_mau_2, img_mau_3, img_mau_4] if m]
                         
-                        for idx, mau_img in enumerate(mau_images):
-                            if mau_img:
-                                u = upload_image(mau_img)
-                                if u: 
-                                    gallery_urls.append(u)
-                                    st.success(f"✅ Đã tải Váy Mẫu {idx+2}")
+                        if mau_images:
+                            mau_urls = upload_images_parallel(mau_images)
+                            gallery_urls.extend(mau_urls)
+                            st.success(f"✅ Đã tải {len(mau_urls)} ảnh mẫu")
                         
-                        # Upload các ảnh bổ sung từ gallery
+                        # Upload các ảnh bổ sung SONG SONG
                         if gallery_files:
-                            progress_bar = st.progress(0)
-                            for idx, f in enumerate(gallery_files):
-                                u = upload_image(f)
-                                if u: gallery_urls.append(u)
-                                progress_bar.progress((idx + 1) / len(gallery_files))
-                            progress_bar.empty()
+                            extra_urls = upload_images_parallel(gallery_files)
+                            gallery_urls.extend(extra_urls)
+                            st.success(f"✅ Đã tải {len(extra_urls)} ảnh bổ sung")
                     
                     if url:
                         # Prepare accessories data
@@ -1237,8 +1292,8 @@ def ui_don_hang():
 # --- Main Layout ---
 if "Tổng quan" in choice:
     st.header("Tổng quan")
-    # Fetch statistics from new API
-    stats = call_api("GET", "/api/thong_ke/tong_quan", clear_cache=False)
+    # Fetch statistics from new API - với cache
+    stats = fetch_api_data("/api/thong_ke/tong_quan")
     if stats:
         c1, c2, c3, c4 = st.columns(4)
         with c1: st.metric("🛍️ SẢN PHẨM", stats.get('tong_san_pham', 0))
@@ -1253,8 +1308,10 @@ if "Tổng quan" in choice:
         with c2:
             st.metric("⏳ ĐƠN CHỜ XỬ LÝ", stats.get('don_hang_cho_xu_ly', 0))
     else:
-        products = call_api("GET", "/api/san_pham/", clear_cache=False)
-        contacts = call_api("GET", "/api/lien_he/", clear_cache=False)
+        # Fallback - fetch song song
+        data = fetch_multiple_endpoints(["/api/san_pham/", "/api/lien_he/"])
+        products = data.get("/api/san_pham/", [])
+        contacts = data.get("/api/lien_he/", [])
         c1, c2 = st.columns(2)
         with c1: st.metric("TỔNG SẢN PHẨM", len(products) if products else 0)
         with c2: st.metric("LIÊN HỆ MỚI", len([c for c in (contacts or []) if c.get('status') == 'pending']))
