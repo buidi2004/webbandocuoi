@@ -57,19 +57,20 @@
     perspective: 1000px;
 }
 
-.hero-slide.active~.hero-content .hero-subtitle {
+/* Animation khi hero-content có class animate */
+.hero-content.animate .hero-subtitle {
     animation: reveal-up 0.8s cubic-bezier(0.2, 1, 0.3, 1) forwards;
 }
 
-.hero-slide.active~.hero-content .hero-title {
+.hero-content.animate .hero-title {
     animation: reveal-up 1s cubic-bezier(0.2, 1, 0.3, 1) 0.2s forwards;
 }
 
-.hero-slide.active~.hero-content .hero-description {
+.hero-content.animate .hero-description {
     animation: reveal-up 1s cubic-bezier(0.2, 1, 0.3, 1) 0.4s forwards;
 }
 
-.hero-slide.active~.hero-content .hero-buttons {
+.hero-content.animate .hero-buttons {
     animation: reveal-up 1s cubic-bezier(0.2, 1, 0.3, 1) 0.6s forwards;
 }
 
