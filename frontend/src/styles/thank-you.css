@@ -1,0 +1,252 @@
+/* thank-you.css - Trang cảm ơn */
+
+.thank-you-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #faf9f7 0%, #f5f0eb 100%);
+}
+
+.thank-you-container {
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+    background: #fff;
+    padding: 50px 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* Success Checkmark Animation */
+.success-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 30px;
+}
+
+.checkmark {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: block;
+    stroke-width: 2;
+    stroke: #22c55e;
+    stroke-miterlimit: 10;
+    animation: fill 0.4s ease-in-out 0.4s forwards, scale 0.3s ease-in-out 0.9s both;
+}
+
+.checkmark-circle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 2;
+    stroke-miterlimit: 10;
+    stroke: #22c55e;
+    fill: none;
+    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark-check {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    stroke-width: 3;
+    animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+@keyframes stroke {
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes scale {
+    0%, 100% {
+        transform: none;
+    }
+    50% {
+        transform: scale3d(1.1, 1.1, 1);
+    }
+}
+
+@keyframes fill {
+    100% {
+        box-shadow: inset 0px 0px 0px 40px rgba(34, 197, 94, 0.1);
+    }
+}
+
+/* Typography */
+.thank-you-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: #1a1a1a;
+    margin: 0 0 12px;
+}
+
+.thank-you-subtitle {
+    font-size: 1.1rem;
+    color: #666;
+    margin: 0 0 30px;
+}
+
+/* Response Info Box */
+.response-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.response-icon {
+    font-size: 2rem;
+}
+
+.response-text h3 {
+    margin: 0 0 4px;
+    font-size: 1rem;
+    color: #333;
+}
+
+.response-text p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.response-text strong {
+    color: #c9a86c;
+}
+
+/* Quick Contact */
+.quick-contact {
+    margin-bottom: 30px;
+}
+
+.quick-contact > p {
+    font-size: 0.9rem;
+    color: #888;
+    margin-bottom: 12px;
+}
+
+.contact-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.contact-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.contact-btn.phone {
+    background: #22c55e;
+    color: #fff;
+}
+
+.contact-btn.phone:hover {
+    background: #16a34a;
+}
+
+.contact-btn.zalo {
+    background: #0068ff;
+    color: #fff;
+}
+
+.contact-btn.zalo:hover {
+    background: #0052cc;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.btn-primary {
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #c9a86c 0%, #b8956a 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(201, 168, 108, 0.4);
+}
+
+.btn-secondary {
+    padding: 14px 28px;
+    background: #fff;
+    color: #333;
+    border: 2px solid #e5e5e5;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    border-color: #c9a86c;
+    color: #c9a86c;
+}
+
+/* Social Proof */
+.social-proof {
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.social-proof p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.social-proof strong {
+    color: #c9a86c;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .thank-you-container {
+        padding: 40px 24px;
+    }
+
+    .thank-you-title {
+        font-size: 2rem;
+    }
+
+    .contact-buttons {
+        flex-direction: column;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+    }
+}
