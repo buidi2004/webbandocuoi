@@ -378,6 +378,74 @@ const TrangChu = () => {
                     </div>
                 </div>
             </section>
+
+            {/* Social Proof - Đánh giá khách hàng */}
+            <section className="section testimonials-section" style={{ background: '#faf8f5' }}>
+                <div className="container">
+                    <div className="section-header fade-in-section">
+                        <h2 className="section-title">Khách Hàng Nói Gì Về IVIE</h2>
+                        <p className="section-subtitle">Hơn 500+ cặp đôi đã tin tưởng lựa chọn chúng tôi</p>
+                    </div>
+                    
+                    <div className="testimonials-grid fade-in-section">
+                        <div className="testimonial-card">
+                            <div className="testimonial-rating">⭐⭐⭐⭐⭐</div>
+                            <p className="testimonial-text">"Mình rất hài lòng với dịch vụ của IVIE. Váy cưới đẹp, makeup tự nhiên, và đặc biệt là ekip rất nhiệt tình. Cảm ơn IVIE đã giúp ngày cưới của mình thật hoàn hảo!"</p>
+                            <div className="testimonial-author">
+                                <div className="author-avatar">👰</div>
+                                <div className="author-info">
+                                    <h4>Ngọc Trinh & Minh Khang</h4>
+                                    <span>Cưới tháng 12/2025</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="testimonial-card">
+                            <div className="testimonial-rating">⭐⭐⭐⭐⭐</div>
+                            <p className="testimonial-text">"Chất lượng váy cưới tuyệt vời, nhiều mẫu đẹp để lựa chọn. Giá cả hợp lý so với chất lượng. Nhân viên tư vấn rất tận tâm và chuyên nghiệp."</p>
+                            <div className="testimonial-author">
+                                <div className="author-avatar">💑</div>
+                                <div className="author-info">
+                                    <h4>Thu Hà & Văn Đức</h4>
+                                    <span>Cưới tháng 11/2025</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="testimonial-card">
+                            <div className="testimonial-rating">⭐⭐⭐⭐⭐</div>
+                            <p className="testimonial-text">"Album cưới của mình được chụp rất đẹp, góc máy sáng tạo và blend màu rất nghệ thuật. Mình đã giới thiệu IVIE cho nhiều bạn bè rồi!"</p>
+                            <div className="testimonial-author">
+                                <div className="author-avatar">📸</div>
+                                <div className="author-info">
+                                    <h4>Thanh Tâm & Hoàng Long</h4>
+                                    <span>Cưới tháng 10/2025</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Stats bar */}
+                    <div className="social-proof-stats fade-in-section">
+                        <div className="proof-stat">
+                            <span className="proof-number">500+</span>
+                            <span className="proof-label">Cặp đôi hạnh phúc</span>
+                        </div>
+                        <div className="proof-stat">
+                            <span className="proof-number">4.9/5</span>
+                            <span className="proof-label">Đánh giá trung bình</span>
+                        </div>
+                        <div className="proof-stat">
+                            <span className="proof-number">98%</span>
+                            <span className="proof-label">Khách hàng giới thiệu</span>
+                        </div>
+                        <div className="proof-stat">
+                            <span className="proof-number">10+</span>
+                            <span className="proof-label">Năm kinh nghiệm</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     );
 };

@@ -10,6 +10,8 @@ const SanPham = () => {
     const [loi, setLoi] = useState(null);
     const [boLoc, setBoLoc] = useState('all');
     const [tieuMuc, setTieuMuc] = useState('all');
+    const [phongCach, setPhongCach] = useState('all');
+    const [khoangGia, setKhoangGia] = useState('all');
     const [sapXep, setSapXep] = useState('hot');
     const [sanPhamDaXem, setSanPhamDaXem] = useState([]);
 
@@ -24,7 +26,7 @@ const SanPham = () => {
 
     useEffect(() => {
         laySanPham();
-    }, [boLoc, tieuMuc, sapXep]);
+    }, [boLoc, tieuMuc, phongCach, khoangGia, sapXep]);
 
     const laySanPham = async () => {
         setDangTai(true);
@@ -33,6 +35,8 @@ const SanPham = () => {
             const thamSo = { sort_by: sapXep };
             if (boLoc !== 'all') thamSo.danh_muc = boLoc;
             if (tieuMuc !== 'all') thamSo.sub_category = tieuMuc;
+            if (phongCach !== 'all') thamSo.style = phongCach;
+            if (khoangGia !== 'all') thamSo.price_range = khoangGia;
             const phanHoi = await sanPhamAPI.layTatCa(thamSo);
             setDanhSachSanPham(Array.isArray(phanHoi.data) ? phanHoi.data : []);
         } catch (err) {
@@ -90,6 +94,23 @@ const SanPham = () => {
         { id: 'new', nhan: 'Mới' },
         { id: 'price_asc', nhan: 'Giá thấp' },
         { id: 'price_desc', nhan: 'Giá cao' },
+    ];
+
+    const phongCachOptions = [
+        { id: 'all', nhan: 'Tất cả', icon: '✨' },
+        { id: 'minimalist', nhan: 'Minimalist', icon: '🤍' },
+        { id: 'princess', nhan: 'Công chúa', icon: '👑' },
+        { id: 'vintage', nhan: 'Vintage', icon: '🌸' },
+        { id: 'sexy', nhan: 'Quyến rũ', icon: '💃' },
+        { id: 'classic', nhan: 'Cổ điển', icon: '🎀' },
+    ];
+
+    const khoangGiaOptions = [
+        { id: 'all', nhan: 'Tất cả giá' },
+        { id: 'duoi_500k', nhan: 'Dưới 500K' },
+        { id: '500k_1tr', nhan: '500K - 1 triệu' },
+        { id: '1tr_2tr', nhan: '1 - 2 triệu' },
+        { id: 'tren_2tr', nhan: 'Trên 2 triệu' },
     ];
 
     return (
@@ -170,7 +191,7 @@ const SanPham = () => {
                             <button
                                 key={dm.id}
                                 className={`cat-tab ${boLoc === dm.id ? 'active' : ''}`}
-                                onClick={() => { setBoLoc(dm.id); setTieuMuc('all'); }}
+                                onClick={() => { setBoLoc(dm.id); setTieuMuc('all'); setPhongCach('all'); }}
                             >
                                 <span className="cat-icon">{dm.icon}</span>
                                 <span>{dm.nhan}</span>
@@ -192,6 +213,39 @@ const SanPham = () => {
                             ))}
                         </div>
                     )}
+                    
+                    {/* Bộ lọc phong cách */}
+                    <div className="style-filter-section">
+                        <span className="filter-label">Phong cách:</span>
+                        <div className="style-tabs">
+                            {phongCachOptions.map(pc => (
+                                <button
+                                    key={pc.id}
+                                    className={`style-tab ${phongCach === pc.id ? 'active' : ''}`}
+                                    onClick={() => setPhongCach(pc.id)}
+                                >
+                                    <span className="style-icon">{pc.icon}</span>
+                                    <span>{pc.nhan}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Bộ lọc khoảng giá */}
+                    <div className="price-filter-section">
+                        <span className="filter-label">Khoảng giá:</span>
+                        <div className="price-tabs">
+                            {khoangGiaOptions.map(kg => (
+                                <button
+                                    key={kg.id}
+                                    className={`price-tab ${khoangGia === kg.id ? 'active' : ''}`}
+                                    onClick={() => setKhoangGia(kg.id)}
+                                >
+                                    {kg.nhan}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                     
                     <div className="sort-tabs">
                         <span className="sort-label">Sắp xếp theo:</span>

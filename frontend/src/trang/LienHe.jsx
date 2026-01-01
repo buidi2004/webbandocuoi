@@ -20,7 +20,8 @@ const LienHe = () => {
 
     // Form Tư vấn
     const [duLieuConsult, setDuLieuConsult] = useState({
-        name: '', phone: '', email: '', service: 'wedding_photo', address: '', message: '', date: ''
+        name: '', phone: '', email: '', service: 'wedding_photo', address: '', message: '', date: '',
+        chi_nhanh: 'cao_lanh', ngan_sach: ''
     });
     const [loadingConsult, setLoadingConsult] = useState(false);
 
@@ -37,16 +38,18 @@ const LienHe = () => {
         e.preventDefault();
         setLoadingConsult(true);
         try {
+            const tenChiNhanh = { cao_lanh: 'Cao Lãnh', sa_dec: 'Sa Đéc', can_tho: 'Cần Thơ' };
+            const tenNganSach = { duoi_5tr: 'Dưới 5 triệu', '5_10tr': '5-10 triệu', '10_20tr': '10-20 triệu', '20_50tr': '20-50 triệu', tren_50tr: 'Trên 50 triệu' };
             const payload = {
                 name: duLieuConsult.name,
                 phone: duLieuConsult.phone,
                 email: duLieuConsult.email,
                 address: duLieuConsult.address,
-                message: `[Dịch vụ: ${duLieuConsult.service}] [Ngày: ${duLieuConsult.date}] ${duLieuConsult.message}`
+                message: `[Dịch vụ: ${duLieuConsult.service}] [Chi nhánh: ${tenChiNhanh[duLieuConsult.chi_nhanh] || duLieuConsult.chi_nhanh}] [Ngân sách: ${tenNganSach[duLieuConsult.ngan_sach] || 'Chưa chọn'}] [Ngày: ${duLieuConsult.date}] ${duLieuConsult.message}`
             };
             await lienHeAPI.datLich(payload);
             addToast({ message: 'Đã gửi yêu cầu tư vấn!', type: 'success' });
-            setDuLieuConsult({ name: '', phone: '', email: '', address: '', service: 'wedding_photo', message: '', date: '' });
+            setDuLieuConsult({ name: '', phone: '', email: '', address: '', service: 'wedding_photo', message: '', date: '', chi_nhanh: 'cao_lanh', ngan_sach: '' });
         } catch (loi) {
             addToast({ message: 'Không thể gửi yêu cầu.', type: 'error' });
         } finally {
@@ -103,10 +106,14 @@ const LienHe = () => {
                                     </div>
                                     <div className="form-group"><label>Địa Chỉ *</label><input name="address" value={duLieuConsult.address} onChange={xuLyThayDoiConsult} required /></div>
                                     <div className="form-row">
-                                        <div className="form-group"><label>Dịch Vụ</label><select name="service" value={duLieuConsult.service} onChange={xuLyThayDoiConsult}><option value="wedding_photo">Chụp Ảnh</option><option value="makeup">Trang Điểm</option><option value="dress">Thuê Váy</option></select></div>
+                                        <div className="form-group"><label>Dịch Vụ</label><select name="service" value={duLieuConsult.service} onChange={xuLyThayDoiConsult}><option value="wedding_photo">Chụp Ảnh</option><option value="makeup">Trang Điểm</option><option value="dress">Thuê Váy</option><option value="combo">Combo Trọn Gói</option></select></div>
                                         <div className="form-group"><label>Ngày Dự Kiến</label><input type="date" name="date" value={duLieuConsult.date} onChange={xuLyThayDoiConsult} /></div>
                                     </div>
-                                    <div className="form-group"><label>Nội dung</label><textarea name="message" value={duLieuConsult.message} onChange={xuLyThayDoiConsult} rows="3" /></div>
+                                    <div className="form-row">
+                                        <div className="form-group"><label>Chi Nhánh</label><select name="chi_nhanh" value={duLieuConsult.chi_nhanh} onChange={xuLyThayDoiConsult}><option value="cao_lanh">Cao Lãnh - Đồng Tháp</option><option value="sa_dec">Sa Đéc - Đồng Tháp</option><option value="can_tho">Cần Thơ</option></select></div>
+                                        <div className="form-group"><label>Ngân Sách Dự Kiến</label><select name="ngan_sach" value={duLieuConsult.ngan_sach} onChange={xuLyThayDoiConsult}><option value="">-- Chọn ngân sách --</option><option value="duoi_5tr">Dưới 5 triệu</option><option value="5_10tr">5 - 10 triệu</option><option value="10_20tr">10 - 20 triệu</option><option value="20_50tr">20 - 50 triệu</option><option value="tren_50tr">Trên 50 triệu</option></select></div>
+                                    </div>
+                                    <div className="form-group"><label>Nội dung</label><textarea name="message" value={duLieuConsult.message} onChange={xuLyThayDoiConsult} rows="3" placeholder="Mô tả yêu cầu của bạn..." /></div>
                                     <NutBam type="submit" variant="primary" disabled={loadingConsult}>{loadingConsult ? 'Đang gửi...' : 'GỬI YÊU CẦU'}</NutBam>
                                 </form>
                             </The>
