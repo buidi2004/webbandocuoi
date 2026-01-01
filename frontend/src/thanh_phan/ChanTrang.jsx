@@ -1,47 +1,71 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import './Footer.css';
 
-// Component hạt vàng lấp lánh - tối ưu performance
-const HatVangLapLanh = ({ side, isVisible }) => {
-    // Vị trí cố định cho 10 hạt - không cần useState/useEffect
-    const particles = [
-        { id: 0, x: 30, y: 25, cls: 'hat-sm' },
-        { id: 1, x: 80, y: 45, cls: 'hat-md' },
-        { id: 2, x: 140, y: 20, cls: 'hat-lg' },
-        { id: 3, x: 180, y: 60, cls: 'hat-sm' },
-        { id: 4, x: 50, y: 80, cls: 'hat-md' },
-        { id: 5, x: 120, y: 90, cls: 'hat-sm' },
-        { id: 6, x: 200, y: 35, cls: 'hat-md' },
-        { id: 7, x: 65, y: 55, cls: 'hat-lg' },
-        { id: 8, x: 160, y: 75, cls: 'hat-sm' },
-        { id: 9, x: 100, y: 15, cls: 'hat-md' }
-    ];
+// Component hạt vàng lấp lánh - 25 hạt như ban đầu
+const HatVangLapLanh = ({ side }) => {
+    const [particles, setParticles] = useState([]);
+    
+    useEffect(() => {
+        const newParticles = [];
+        for (let i = 0; i < 25; i++) {
+            newParticles.push({
+                id: i,
+                x: Math.random() * 220,
+                y: Math.random() * 120,
+                size: Math.random() * 2 + 1,
+                delay: Math.random() * 3,
+                duration: Math.random() * 2 + 2
+            });
+        }
+        setParticles(newParticles);
+    }, []);
     
     return (
-        <div className={`hat-vang-container ${side} ${isVisible ? 'visible' : ''}`}>
+        <div 
+            className="hat-vang-container"
+            style={{
+                position: 'absolute',
+                [side]: 0,
+                top: '50%',
+                transform: `translateY(-50%) ${side === 'right' ? 'scaleX(-1)' : ''}`,
+                width: '220px',
+                height: '120px',
+                pointerEvents: 'none',
+                zIndex: 0
+            }}
+        >
             {particles.map(p => (
-                <span
+                <div
                     key={p.id}
-                    className={`hat-vang ${p.cls}`}
-                    style={{ left: p.x, top: p.y }}
+                    className="hat-vang-lap-lanh"
+                    style={{
+                        position: 'absolute',
+                        left: `${p.x}px`,
+                        top: `${p.y}px`,
+                        width: `${p.size}px`,
+                        height: `${p.size}px`,
+                        background: '#FFD700',
+                        borderRadius: '50%',
+                        animation: `twinkle ${p.duration}s ease-in-out ${p.delay}s infinite`
+                    }}
                 />
             ))}
         </div>
     );
 };
 
-// Component cành mai nằm ngang cho footer với hiệu ứng
-const CanhMaiNgang = ({ side, isVisible }) => (
+// Component cành mai nằm ngang cho footer - không animation
+const CanhMaiNgang = ({ side }) => (
     <svg 
         width="220" 
         height="120" 
         viewBox="0 0 220 120"
-        className={`canh-mai-svg ${side} ${isVisible ? 'visible' : ''}`}
         style={{
             position: 'absolute',
             [side]: 0,
             top: '50%',
+            transform: `translateY(-50%) ${side === 'right' ? 'scaleX(-1)' : ''}`,
             pointerEvents: 'none',
             zIndex: 1
         }}
@@ -157,43 +181,15 @@ const CanhMaiNgang = ({ side, isVisible }) => (
 );
 
 const ChanTrang = () => {
-    const footerRef = useRef(null);
-    const [isVisible, setIsVisible] = useState(false);
-    
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                // Khi footer xuất hiện trong viewport
-                if (entry.isIntersecting) {
-                    setIsVisible(true);
-                }
-            },
-            {
-                threshold: 0.2, // Kích hoạt khi 20% footer visible
-                rootMargin: '50px' // Kích hoạt sớm hơn 50px
-            }
-        );
-        
-        if (footerRef.current) {
-            observer.observe(footerRef.current);
-        }
-        
-        return () => {
-            if (footerRef.current) {
-                observer.unobserve(footerRef.current);
-            }
-        };
-    }, []);
-    
     return (
-        <footer ref={footerRef} className="footer" style={{ position: 'relative', overflow: 'hidden' }}>
+        <footer className="footer" style={{ position: 'relative', overflow: 'hidden' }}>
             {/* Hiệu ứng hạt vàng lấp lánh */}
-            <HatVangLapLanh side="left" isVisible={isVisible} />
-            <HatVangLapLanh side="right" isVisible={isVisible} />
+            <HatVangLapLanh side="left" />
+            <HatVangLapLanh side="right" />
             
             {/* Cành mai 2 bên */}
-            <CanhMaiNgang side="left" isVisible={isVisible} />
-            <CanhMaiNgang side="right" isVisible={isVisible} />
+            <CanhMaiNgang side="left" />
+            <CanhMaiNgang side="right" />
             
             <div className="container" style={{ position: 'relative', zIndex: 1 }}>
                 <div className="footer-content">
