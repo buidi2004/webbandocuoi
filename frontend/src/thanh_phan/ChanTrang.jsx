@@ -1,10 +1,139 @@
 import { Link } from 'react-router-dom';
 import './Footer.css';
 
+// Component cành mai nằm ngang cho footer
+const CanhMaiNgang = ({ side }) => (
+    <svg 
+        width="220" 
+        height="120" 
+        viewBox="0 0 220 120"
+        style={{
+            position: 'absolute',
+            [side]: 0,
+            top: '50%',
+            transform: `translateY(-50%) ${side === 'right' ? 'scaleX(-1)' : ''}`,
+            opacity: 0.85,
+            pointerEvents: 'none'
+        }}
+    >
+        {/* Cành chính nằm ngang */}
+        <path 
+            d="M0 70 Q50 65 100 55 Q150 45 200 30" 
+            stroke="#4A3728" 
+            strokeWidth="4" 
+            fill="none"
+        />
+        {/* Cành phụ 1 */}
+        <path 
+            d="M60 62 Q80 45 100 35" 
+            stroke="#4A3728" 
+            strokeWidth="2.5" 
+            fill="none"
+        />
+        {/* Cành phụ 2 */}
+        <path 
+            d="M120 50 Q140 35 165 25" 
+            stroke="#4A3728" 
+            strokeWidth="2" 
+            fill="none"
+        />
+        {/* Cành phụ 3 - hướng xuống */}
+        <path 
+            d="M40 68 Q55 85 75 95" 
+            stroke="#4A3728" 
+            strokeWidth="2" 
+            fill="none"
+        />
+        {/* Cành phụ 4 */}
+        <path 
+            d="M170 38 Q185 25 205 15" 
+            stroke="#4A3728" 
+            strokeWidth="1.5" 
+            fill="none"
+        />
+        
+        {/* Hoa mai 1 - lớn */}
+        <g transform="translate(95, 32)">
+            <circle cx="0" cy="-7" r="5" fill="#FFD700"/>
+            <circle cx="6" cy="-2" r="5" fill="#FFD700"/>
+            <circle cx="4" cy="5" r="5" fill="#FFD700"/>
+            <circle cx="-4" cy="5" r="5" fill="#FFD700"/>
+            <circle cx="-6" cy="-2" r="5" fill="#FFD700"/>
+            <circle cx="0" cy="0" r="3" fill="#FFA000"/>
+        </g>
+        
+        {/* Hoa mai 2 */}
+        <g transform="translate(160, 22)">
+            <circle cx="0" cy="-6" r="4.5" fill="#FFD700"/>
+            <circle cx="5" cy="-2" r="4.5" fill="#FFD700"/>
+            <circle cx="3" cy="4" r="4.5" fill="#FFD700"/>
+            <circle cx="-3" cy="4" r="4.5" fill="#FFD700"/>
+            <circle cx="-5" cy="-2" r="4.5" fill="#FFD700"/>
+            <circle cx="0" cy="0" r="2.5" fill="#FFA000"/>
+        </g>
+        
+        {/* Hoa mai 3 */}
+        <g transform="translate(200, 12)">
+            <circle cx="0" cy="-5" r="4" fill="#FFD700"/>
+            <circle cx="4" cy="-1" r="4" fill="#FFD700"/>
+            <circle cx="3" cy="4" r="4" fill="#FFD700"/>
+            <circle cx="-3" cy="4" r="4" fill="#FFD700"/>
+            <circle cx="-4" cy="-1" r="4" fill="#FFD700"/>
+            <circle cx="0" cy="0" r="2" fill="#FFA000"/>
+        </g>
+        
+        {/* Hoa mai 4 - trên cành phụ xuống */}
+        <g transform="translate(70, 92)">
+            <circle cx="0" cy="-5" r="4" fill="#FFD700"/>
+            <circle cx="4" cy="-1" r="4" fill="#FFD700"/>
+            <circle cx="3" cy="4" r="4" fill="#FFD700"/>
+            <circle cx="-3" cy="4" r="4" fill="#FFD700"/>
+            <circle cx="-4" cy="-1" r="4" fill="#FFD700"/>
+            <circle cx="0" cy="0" r="2" fill="#FFA000"/>
+        </g>
+        
+        {/* Hoa mai 5 - nhỏ */}
+        <g transform="translate(45, 60)">
+            <circle cx="0" cy="-4" r="3.5" fill="#FFD700"/>
+            <circle cx="3" cy="-1" r="3.5" fill="#FFD700"/>
+            <circle cx="2" cy="3" r="3.5" fill="#FFD700"/>
+            <circle cx="-2" cy="3" r="3.5" fill="#FFD700"/>
+            <circle cx="-3" cy="-1" r="3.5" fill="#FFD700"/>
+            <circle cx="0" cy="0" r="2" fill="#FFA000"/>
+        </g>
+        
+        {/* Nụ mai */}
+        <circle cx="130" cy="42" r="3" fill="#FFD700"/>
+        <circle cx="180" cy="30" r="2.5" fill="#FFD700"/>
+        <circle cx="55" cy="78" r="2.5" fill="#FFD700"/>
+        <circle cx="25" cy="72" r="3" fill="#FFD700"/>
+        
+        {/* Đèn lồng đỏ */}
+        <g transform="translate(115, 55)">
+            {/* Dây treo */}
+            <line x1="0" y1="-15" x2="0" y2="0" stroke="#8B0000" strokeWidth="1"/>
+            {/* Thân đèn */}
+            <ellipse cx="0" cy="8" rx="6" ry="10" fill="#DC143C"/>
+            <ellipse cx="0" cy="8" rx="4" ry="8" fill="#FF4500" opacity="0.5"/>
+            {/* Viền trên dưới */}
+            <rect x="-5" y="-2" width="10" height="3" fill="#FFD700" rx="1"/>
+            <rect x="-5" y="16" width="10" height="3" fill="#FFD700" rx="1"/>
+            {/* Tua */}
+            <line x1="-2" y1="19" x2="-2" y2="25" stroke="#DC143C" strokeWidth="1"/>
+            <line x1="0" y1="19" x2="0" y2="27" stroke="#DC143C" strokeWidth="1"/>
+            <line x1="2" y1="19" x2="2" y2="25" stroke="#DC143C" strokeWidth="1"/>
+        </g>
+    </svg>
+);
+
 const ChanTrang = () => {
     return (
-        <footer className="footer">
-            <div className="container">
+        <footer className="footer" style={{ position: 'relative', overflow: 'hidden' }}>
+            {/* Cành mai 2 bên */}
+            <CanhMaiNgang side="left" />
+            <CanhMaiNgang side="right" />
+            
+            <div className="container" style={{ position: 'relative', zIndex: 1 }}>
                 <div className="footer-content">
                     <div className="footer-brand">
                         <h3 className="logo-text">IVIE</h3>
