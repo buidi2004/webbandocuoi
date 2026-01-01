@@ -1,4 +1,4 @@
-// IVIE Wedding Studio - Main App
+// IVIE Wedding Studio - Main App v2.0
 import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import sal from 'sal.js';
