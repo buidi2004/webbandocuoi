@@ -466,7 +466,11 @@ def ui_banner():
     
     with t1:
         banners = call_api("GET", "/api/banner/tat_ca", clear_cache=False)
-        if banners:
+        if banners is None:
+            st.error("❌ Không thể kết nối đến server. Vui lòng thử lại sau.")
+        elif len(banners) == 0:
+            st.info("📭 Chưa có banner nào. Hãy thêm banner mới ở tab 'THÊM MỚI'.")
+        else:
             for b in banners:
                 with st.container(border=True):
                     c1, c2, c3 = st.columns([1, 3, 1])

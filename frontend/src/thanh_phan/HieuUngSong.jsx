@@ -33,13 +33,13 @@ const HieuUngSong = () => {
                     `}
                 </style>
                 <defs>
-                    <linearGradient id="gradient" x1="99%" y1="42%" x2="1%" y2="58%">
-                        <stop offset="5%" stopColor="#fcb900"></stop>
-                        <stop offset="95%" stopColor="#8ED1FC"></stop>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#ffffff"></stop>
+                        <stop offset="100%" stopColor="#ffffff"></stop>
                     </linearGradient>
                 </defs>
-                <path d="M 0,600 L 0,150 C 88.9,157.2 177.8,164.4 280,154 C 382.2,143.6 497.6,115.7 589,104 C 680.4,92.3 747.9,96.8 836,107 C 924.1,117.1 1032.9,132.9 1137,141 C 1241.1,149.1 1340.6,149.6 1440,150 L 1440,600 L 0,600 Z" stroke="none" strokeWidth="0" fill="url(#gradient)" fillOpacity="0.53" className="transition-all duration-300 ease-in-out delay-150 path-0"></path>
-                <path d="M 0,600 L 0,350 C 93.2,323.3 186.4,296.7 267,292 C 347.6,287.3 415.7,304.7 534,299 C 652.3,293.3 820.9,264.6 917,281 C 1013.1,297.4 1036.9,359.0 1112,378 C 1187.1,397.0 1313.6,373.5 1440,350 L 1440,600 L 0,600 Z" stroke="none" strokeWidth="0" fill="url(#gradient)" fillOpacity="1" className="transition-all duration-300 ease-in-out delay-150 path-1"></path>
+                <path d="M 0,600 L 0,150 C 88.9,157.2 177.8,164.4 280,154 C 382.2,143.6 497.6,115.7 589,104 C 680.4,92.3 747.9,96.8 836,107 C 924.1,117.1 1032.9,132.9 1137,141 C 1241.1,149.1 1340.6,149.6 1440,150 L 1440,600 L 0,600 Z" stroke="none" strokeWidth="0" fill="url(#gradient)" fillOpacity="0.4" className="transition-all duration-300 ease-in-out delay-150 path-0"></path>
+                <path d="M 0,600 L 0,350 C 93.2,323.3 186.4,296.7 267,292 C 347.6,287.3 415.7,304.7 534,299 C 652.3,293.3 820.9,264.6 917,281 C 1013.1,297.4 1036.9,359.0 1112,378 C 1187.1,397.0 1313.6,373.5 1440,350 L 1440,600 L 0,600 Z" stroke="none" strokeWidth="0" fill="url(#gradient)" fillOpacity="0.8" className="transition-all duration-300 ease-in-out delay-150 path-1"></path>
             </svg>
         </div>
     );
