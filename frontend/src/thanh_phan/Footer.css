@@ -8,7 +8,7 @@
     min-height: 200px;
 }
 
-/* ===== NỘI DUNG TRUNG TÂM - FLEXBOX ===== */
+/* ===== NỘI DUNG TRUNG TÂM ===== */
 .footer-center {
     display: flex;
     flex-direction: column;
@@ -20,7 +20,6 @@
     gap: 1rem;
 }
 
-/* Logo IVIE - màu vàng kim */
 .footer-logo {
     font-family: 'Playfair Display', serif;
     font-size: 2.5rem;
@@ -31,7 +30,6 @@
     text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
 }
 
-/* Slogan */
 .footer-slogan {
     font-size: 0.95rem;
     color: rgba(255, 255, 255, 0.7);
@@ -39,7 +37,6 @@
     font-style: italic;
 }
 
-/* Menu Navigation */
 .footer-nav {
     display: flex;
     align-items: center;
@@ -65,7 +62,6 @@
     font-size: 0.8rem;
 }
 
-/* Social Icons */
 .footer-social {
     display: flex;
     gap: 1rem;
@@ -91,66 +87,76 @@
     box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
 }
 
-/* Copyright */
 .footer-copyright {
     font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.5);
     margin: 0.5rem 0 0;
 }
 
-/* ===== CÀNH MAI SVG - TRANG TRÍ ===== */
-.canh-mai {
+/* ===== TRANG TRÍ CÀNH MAI ===== */
+.trang-tri-trai,
+.trang-tri-phai {
     position: absolute;
     bottom: 0;
     width: 200px;
-    height: 150px;
+    height: 100px;
     pointer-events: none;
     z-index: 1;
-    opacity: 0;
 }
 
-.canh-mai-trai {
+.trang-tri-trai {
     left: 0;
-    transform-origin: left bottom;
-    transform: translateX(-100%) rotate(-10deg);
 }
 
-.canh-mai-phai {
+.trang-tri-phai {
     right: 0;
-    transform-origin: right bottom;
-    transform: translateX(100%) rotate(10deg) scaleX(-1);
 }
 
-/* GIAI ĐOẠN 1: Slide In + Fade In */
-.canh-mai-trai.visible {
-    animation: slideInLeft 1.2s ease-out forwards, swayLeft 4s ease-in-out 1.2s infinite;
+/* Cành mai nằm ngang */
+.canh-mai-ngang {
+    position: absolute;
+    bottom: 10px;
+    width: 180px;
+    height: 60px;
 }
 
-.canh-mai-phai.visible {
-    animation: slideInRight 1.2s ease-out forwards, swayRight 4s ease-in-out 1.4s infinite;
+.canh-mai-ngang-trai {
+    left: 10px;
 }
 
-@keyframes slideInLeft {
-    0% { opacity: 0; transform: translateX(-100%) rotate(-10deg); }
-    100% { opacity: 1; transform: translateX(0) rotate(0deg); }
+.canh-mai-ngang-phai {
+    right: 10px;
+    transform: scaleX(-1);
 }
 
-@keyframes slideInRight {
-    0% { opacity: 0; transform: translateX(100%) rotate(10deg) scaleX(-1); }
-    100% { opacity: 1; transform: translateX(0) rotate(0deg) scaleX(-1); }
+/* ===== HẠT VÀNG LẤP LÁNH ===== */
+.hat-vang-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
 }
 
-/* GIAI ĐOẠN 2: Gió lay nhẹ */
-@keyframes swayLeft {
-    0%, 100% { transform: translateX(0) rotate(0deg); }
-    25% { transform: translateX(2px) rotate(1.5deg); }
-    75% { transform: translateX(-1px) rotate(-1deg); }
+.hat-vang {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: radial-gradient(circle, #FFD700 0%, #FFA500 50%, transparent 70%);
+    border-radius: 50%;
+    animation: twinkle 2s ease-in-out infinite;
+    box-shadow: 0 0 6px #FFD700, 0 0 10px #FFA500;
 }
 
-@keyframes swayRight {
-    0%, 100% { transform: translateX(0) rotate(0deg) scaleX(-1); }
-    25% { transform: translateX(-2px) rotate(-1.5deg) scaleX(-1); }
-    75% { transform: translateX(1px) rotate(1deg) scaleX(-1); }
+@keyframes twinkle {
+    0%, 100% { 
+        opacity: 0.3; 
+        transform: scale(0.8);
+    }
+    50% { 
+        opacity: 1; 
+        transform: scale(1.2);
+    }
 }
 
 /* RESPONSIVE */
@@ -160,11 +166,14 @@
     .footer-slogan { font-size: 0.85rem; }
     .footer-nav { gap: 0.3rem; }
     .footer-nav a { font-size: 0.8rem; }
-    .canh-mai { width: 100px; opacity: 0.6; }
+    .trang-tri-trai,
+    .trang-tri-phai { width: 120px; height: 70px; opacity: 0.7; }
+    .canh-mai-ngang { width: 100px; height: 40px; }
 }
 
 @media (max-width: 480px) {
     .footer-nav .nav-divider { display: none; }
     .footer-nav { flex-direction: column; gap: 0.5rem; }
-    .canh-mai { display: none; }
+    .trang-tri-trai,
+    .trang-tri-phai { display: none; }
 }
