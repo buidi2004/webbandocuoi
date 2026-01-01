@@ -1,0 +1,158 @@
+/* StickyCTA.css - Nút CTA cố định góc phải */
+
+.sticky-cta {
+    position: fixed;
+    right: 20px;
+    bottom: 100px; /* Above StickyBottomBar */
+    z-index: 998;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* CTA Button Base */
+.cta-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    min-width: 48px; /* Touch target minimum */
+    min-height: 48px; /* Touch target minimum */
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.cta-btn:hover {
+    transform: translateX(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Icon */
+.cta-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    font-size: 1.2rem;
+}
+
+/* Text - hidden by default, show on hover */
+.cta-text {
+    max-width: 0;
+    opacity: 0;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.cta-text.show {
+    max-width: 120px;
+    opacity: 1;
+    margin-right: 4px;
+}
+
+/* Zalo Button - Blue */
+.zalo-btn {
+    background: linear-gradient(135deg, #0068ff 0%, #0052cc 100%);
+    color: #fff;
+}
+
+.zalo-btn:hover {
+    background: linear-gradient(135deg, #0052cc 0%, #003d99 100%);
+}
+
+/* Phone Button - Green */
+.phone-btn {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    color: #fff;
+}
+
+.phone-btn:hover {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+}
+
+/* Messenger Button - Purple */
+.messenger-btn {
+    background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+    color: #fff;
+}
+
+.messenger-btn:hover {
+    background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%);
+}
+
+/* Pulse animation for attention */
+@keyframes pulse-cta {
+    0%, 100% {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+    50% {
+        box-shadow: 0 4px 25px rgba(0, 104, 255, 0.4);
+    }
+}
+
+.zalo-btn {
+    animation: pulse-cta 3s infinite;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .sticky-cta {
+        right: 16px;
+        bottom: 90px; /* Adjust for mobile bottom bar */
+        gap: 10px;
+    }
+
+    .cta-btn {
+        padding: 10px;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        justify-content: center;
+    }
+
+    /* Always hide text on mobile */
+    .cta-text {
+        display: none !important;
+    }
+
+    .cta-icon {
+        width: 22px;
+        height: 22px;
+    }
+
+    /* Hide on mobile if configured */
+    .sticky-cta.hide-mobile {
+        display: none;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 375px) {
+    .sticky-cta {
+        right: 12px;
+        bottom: 85px;
+    }
+
+    .cta-btn {
+        width: 44px;
+        height: 44px;
+        padding: 8px;
+    }
+}
+
+/* Desktop hover expand */
+@media (min-width: 769px) {
+    .sticky-cta:hover .cta-text {
+        max-width: 120px;
+        opacity: 1;
+        margin-right: 4px;
+    }
+}

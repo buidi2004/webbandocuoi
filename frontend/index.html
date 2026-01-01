@@ -37,10 +37,51 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://ivie-backend.onrender.com" />
+  <link rel="dns-prefetch" href="https://ivie-backend.onrender.com" />
+  
+  <!-- Preload critical fonts -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" /></noscript>
+  
+  <!-- Google Analytics 4 - Defer loading -->
+  <!-- HƯỚNG DẪN: Thay G-XXXXXXXXXX bằng Measurement ID của bạn -->
+  <script>
+    // Defer GA4 loading để không block render
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        var script = document.createElement('script');
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX';
+        script.async = true;
+        document.head.appendChild(script);
+        
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        window.gtag = gtag;
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+      }, 2000); // Delay 2s sau khi page load
+    });
+  </script>
+  
+  <!-- Critical CSS inline -->
+  <style>
+    /* Critical CSS - Above the fold */
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:system-ui,-apple-system,sans-serif;background:#fff;color:#1a1a1a}
+    #root{min-height:100vh}
+    .loading-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#fff}
+    .loading-spinner{width:40px;height:40px;border:3px solid #f3f3f3;border-top:3px solid #c9a86c;border-radius:50%;animation:spin 1s linear infinite}
+    @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+  </style>
 </head>
 
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <!-- Loading placeholder để cải thiện FCP -->
+    <div class="loading-screen">
+      <div class="loading-spinner"></div>
+    </div>
+  </div>
   <script type="module" src="/src/chinh.jsx"></script>
 </body>
 

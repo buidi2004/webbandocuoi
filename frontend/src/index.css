@@ -1,25 +1,26 @@
 :root {
-  /* Colors */
-  --primary: #d4a373;
-  /* Gold/Beige */
-  --primary-dark: #b08968;
+  /* Colors - Cải thiện độ tương phản WCAG AA */
+  --primary: #c9a86c; /* Gold - đủ contrast trên nền trắng */
+  --primary-dark: #9a7b4f; /* Darker gold cho text */
   --secondary: #faedcd;
-  /* Light Cream */
-  --accent: #ccd5ae;
-  /* Soft Green */
+  --accent: #6b8e5a; /* Darker green cho contrast */
   --dark: #1a1a1a;
   --light: #ffffff;
-  --text: #333333;
-  --text-light: #666666;
-  --border: #e5e5e5;
+  --text: #2d2d2d; /* Darker text cho contrast */
+  --text-light: #555555; /* Darker light text */
+  --text-muted: #666666;
+  --border: #d5d5d5;
 
   /* Typography */
-  --font-serif: 'Cormorant Garamond', serif;
-  --font-sans: 'Montserrat', sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
   /* Spacing */
   --container-width: 1200px;
   --header-height: 80px;
+
+  /* Touch targets - Minimum 44x44px cho accessibility */
+  --touch-target-min: 44px;
 
   /* Shadows */
   --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
@@ -123,13 +124,14 @@ button {
   align-items: center;
   justify-content: center;
   padding: 1rem 2.5rem;
+  min-height: var(--touch-target-min); /* Accessibility: touch target */
+  min-width: var(--touch-target-min);
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
   transition: var(--transition);
   font-size: 0.9rem;
   border-radius: 50px;
-  /* Đồng bộ bo góc tròn cho tất cả nút */
 }
 
 .btn-primary {
@@ -197,4 +199,73 @@ main {
   .container {
     padding: 0 1.25rem;
   }
+}
+
+
+/* ===== ACCESSIBILITY IMPROVEMENTS ===== */
+
+/* Focus states cho keyboard navigation */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Touch targets - minimum 44x44px */
+a, button, input[type="button"], input[type="submit"], 
+input[type="checkbox"], input[type="radio"], select {
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --text: #000000;
+    --text-light: #333333;
+    --border: #000000;
+  }
+}
+
+/* ===== PERFORMANCE OPTIMIZATIONS ===== */
+
+/* GPU acceleration for animations */
+.hero-slide,
+.fade-in-section,
+[class*="animate"] {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Contain paint for better performance */
+.card,
+.product-card-new,
+.service-card {
+  contain: layout style paint;
+}
+
+/* Image optimization hints */
+img {
+  content-visibility: auto;
+}
+
+/* Lazy load images below fold */
+img[loading="lazy"] {
+  background-color: #f5f5f5;
 }
