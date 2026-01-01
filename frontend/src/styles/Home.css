@@ -76,13 +76,13 @@
 
 @keyframes reveal-up {
     0% {
-        opacity: 0;
-        transform: translateY(40px) skewY(2deg);
+        opacity: 0.3;
+        transform: translateY(20px);
     }
 
     100% {
         opacity: 1;
-        transform: translateY(0) skewY(0);
+        transform: translateY(0);
     }
 }
 
@@ -94,7 +94,7 @@
     margin-bottom: 1rem;
     color: var(--primary);
     font-weight: 600;
-    opacity: 0;
+    opacity: 1;
 }
 
 .hero-title {
@@ -104,7 +104,7 @@
     margin-bottom: 2rem;
     color: #fff !important;
     text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    opacity: 0;
+    opacity: 1;
 }
 
 .hero-title .highlight {
@@ -122,14 +122,22 @@
     max-width: 700px;
     line-height: 1.7;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    opacity: 0;
+    opacity: 1;
 }
 
 .hero-buttons {
     display: flex;
     gap: 1.5rem;
     justify-content: center;
-    opacity: 0;
+    opacity: 1;
+}
+
+/* Animation khi hero-content có class animate - chạy lần đầu */
+.hero-content.animate .hero-subtitle,
+.hero-content.animate .hero-title,
+.hero-content.animate .hero-description,
+.hero-content.animate .hero-buttons {
+    animation: reveal-up 0.8s cubic-bezier(0.2, 1, 0.3, 1) forwards;
 }
 
 .banner-dots {
