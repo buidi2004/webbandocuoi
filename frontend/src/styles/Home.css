@@ -56,27 +56,7 @@
     z-index: 2;
 }
 
-/* Ken Burns animation áp dụng cho .hero-slide-image khi slide active */
-.hero-slide.active .hero-slide-image {
-    animation: kenburns-zoom-in 8s ease-out forwards;
-}
-
-/* Các hiệu ứng Ken Burns khác nhau cho mỗi slide */
-.hero-slide:nth-child(1).active .hero-slide-image {
-    animation: kenburns-zoom-in 8s ease-out forwards;
-}
-
-.hero-slide:nth-child(2).active .hero-slide-image {
-    animation: kenburns-pan-left 8s ease-out forwards;
-}
-
-.hero-slide:nth-child(3).active .hero-slide-image {
-    animation: kenburns-pan-right 8s ease-out forwards;
-}
-
-.hero-slide:nth-child(4).active .hero-slide-image {
-    animation: kenburns-zoom-out 8s ease-out forwards;
-}
+/* Ken Burns animation được xử lý bởi GSAP trong TrangChu.jsx */
 
 /* Hiệu ứng zoom in từ center */
 @keyframes kenburns-zoom-in {

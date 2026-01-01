@@ -13,6 +13,15 @@ import LichTrong from '../thanh_phan/LichTrong';
 import LazyImage from '../thanh_phan/LazyImage';
 import '../styles/Home.css';
 
+// Các kiểu Ken Burns effect
+const kenBurnsEffects = [
+    { scale: [1, 1.15], x: [0, 0], y: [0, 0] },           // zoom in
+    { scale: [1.05, 1.12], x: ['3%', '-3%'], y: [0, 0] }, // pan left
+    { scale: [1.05, 1.12], x: ['-3%', '3%'], y: [0, 0] }, // pan right  
+    { scale: [1.2, 1], x: [0, 0], y: [0, 0] },            // zoom out
+    { scale: [1, 1.1], x: [0, '-2%'], y: [0, '-2%'] },    // pan diagonal
+];
+
 const TrangChu = () => {
     const [banners, setBanners] = useState([]);
     const [idxBanner, setIdxBanner] = useState(0);
@@ -21,6 +30,8 @@ const TrangChu = () => {
     const [thuVien, setThuVien] = useState([]);
 
     const containerRef = useRef(null);
+    const slideRefs = useRef([]);
+    const kenBurnsTimeline = useRef(null);
     gsap.registerPlugin(ScrollTrigger);
 
     useEffect(() => {
@@ -76,6 +87,49 @@ const TrangChu = () => {
         return () => clearInterval(timer);
     }, [banners]);
 
+    // GSAP Ken Burns effect khi slide thay đổi
+    useEffect(() => {
+        if (banners.length === 0) return;
+        
+        // Kill animation cũ
+        if (kenBurnsTimeline.current) {
+            kenBurnsTimeline.current.kill();
+        }
+
+        // Lấy effect cho slide hiện tại
+        const effectIndex = idxBanner % kenBurnsEffects.length;
+        const effect = kenBurnsEffects[effectIndex];
+        
+        // Tìm element hình ảnh của slide active
+        const activeSlide = slideRefs.current[idxBanner];
+        if (!activeSlide) return;
+        
+        const imageEl = activeSlide.querySelector('.hero-slide-image');
+        if (!imageEl) return;
+
+        // Reset transform trước
+        gsap.set(imageEl, { 
+            scale: effect.scale[0], 
+            x: effect.x[0], 
+            y: effect.y[0] 
+        });
+
+        // Chạy animation Ken Burns
+        kenBurnsTimeline.current = gsap.to(imageEl, {
+            scale: effect.scale[1],
+            x: effect.x[1],
+            y: effect.y[1],
+            duration: 6,
+            ease: "power1.out"
+        });
+
+        return () => {
+            if (kenBurnsTimeline.current) {
+                kenBurnsTimeline.current.kill();
+            }
+        };
+    }, [idxBanner, banners.length]);
+
     const bannerHienTai = banners[idxBanner];
 
     return (
@@ -85,7 +139,8 @@ const TrangChu = () => {
                 {banners.length > 0 ? (
                     banners.map((b, i) => (
                         <div
-                            key={`slide-${b.id}-${i === idxBanner ? 'active' : 'inactive'}`}
+                            key={b.id}
+                            ref={el => slideRefs.current[i] = el}
                             className={`hero-slide ${i === idxBanner ? 'active' : ''}`}
                         >
                             <div 
