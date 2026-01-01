@@ -55,18 +55,19 @@ const CartItem = ({ item, onRemove, onUpdateQuantity, formatPrice }) => {
                         alt={item.name} 
                         onError={(e) => e.target.src = 'https://placehold.co/80x100/f5f5f5/333?text=IVIE'} 
                     />
-                    <div className="combo-badge">COMBO</div>
+                    <div className="combo-badge">GÓI COMBO</div>
                 </div>
                 <div className="item-info">
                     <h3>{item.name}</h3>
-                    <p className="item-variant">
-                        {item.selected_items?.vay?.length || 0} váy + {item.selected_items?.vest?.length || 0} vest
+                    <p className="item-variant combo-summary">
+                        📦 Trọn gói: {item.selected_items?.vay?.length || 0} váy + {item.selected_items?.vest?.length || 0} vest
                     </p>
+                    <p className="combo-included-note">✓ Tất cả sản phẩm đã bao gồm trong giá combo</p>
                     <button 
                         className="btn-view-combo-details"
                         onClick={() => setShowComboDetails(!showComboDetails)}
                     >
-                        {showComboDetails ? '▲ Thu gọn' : '▼ Xem chi tiết'}
+                        {showComboDetails ? '▲ Thu gọn' : '▼ Xem chi tiết sản phẩm đã chọn'}
                     </button>
                     
                     {/* Chi tiết combo */}
@@ -76,36 +77,38 @@ const CartItem = ({ item, onRemove, onUpdateQuantity, formatPrice }) => {
                                 <p style={{ fontSize: '13px', color: '#999' }}>Đang tải...</p>
                             ) : (
                                 <>
-                                    {comboImages.vay.length > 0 && (
+                                    {item.selected_items?.vay?.length > 0 && (
                                         <div className="combo-section">
-                                            <h4>Váy cưới đã chọn:</h4>
+                                            <h4>👗 Váy cưới đã chọn ({item.selected_items.vay.length}):</h4>
                                             <div className="combo-items-grid">
-                                                {comboImages.vay.map(vay => (
-                                                    <div key={vay.id} className="combo-mini-item">
+                                                {(comboImages.vay.length > 0 ? comboImages.vay : item.selected_items.vay).map((vay, idx) => (
+                                                    <div key={vay.id || idx} className="combo-mini-item">
                                                         <img 
                                                             src={layUrlHinhAnh(vay.image_url)} 
                                                             alt={vay.name}
                                                             onError={(e) => e.target.src = 'https://placehold.co/60x80/f5f5f5/333?text=IVIE'}
                                                         />
                                                         <span>{vay.name}</span>
+                                                        <span className="included-tag">Đã bao gồm</span>
                                                     </div>
                                                 ))}
                                             </div>
                                         </div>
                                     )}
                                     
-                                    {comboImages.vest.length > 0 && (
+                                    {item.selected_items?.vest?.length > 0 && (
                                         <div className="combo-section">
-                                            <h4>Vest nam đã chọn:</h4>
+                                            <h4>🤵 Vest nam đã chọn ({item.selected_items.vest.length}):</h4>
                                             <div className="combo-items-grid">
-                                                {comboImages.vest.map(vest => (
-                                                    <div key={vest.id} className="combo-mini-item">
+                                                {(comboImages.vest.length > 0 ? comboImages.vest : item.selected_items.vest).map((vest, idx) => (
+                                                    <div key={vest.id || idx} className="combo-mini-item">
                                                         <img 
                                                             src={layUrlHinhAnh(vest.image_url)} 
                                                             alt={vest.name}
                                                             onError={(e) => e.target.src = 'https://placehold.co/60x80/f5f5f5/333?text=IVIE'}
                                                         />
                                                         <span>{vest.name}</span>
+                                                        <span className="included-tag">Đã bao gồm</span>
                                                     </div>
                                                 ))}
                                             </div>
@@ -116,16 +119,12 @@ const CartItem = ({ item, onRemove, onUpdateQuantity, formatPrice }) => {
                         </div>
                     )}
                 </div>
-                <div className="item-price">
+                <div className="item-price combo-price">
+                    <span className="price-label">Giá trọn gói</span>
                     {formatPrice(item.price_to_use || item.purchase_price || item.rental_price_day)}
                 </div>
                 <div className="item-actions">
                     <button className="btn-remove" onClick={() => onRemove(item.id, item.loai)}>Xoá</button>
-                    <div className="qty-control">
-                        <button onClick={() => onUpdateQuantity(item.id, -1, item.loai)}>−</button>
-                        <span>{item.quantity || 1}</span>
-                        <button onClick={() => onUpdateQuantity(item.id, 1, item.loai)} disabled={(item.quantity || 1) >= (item.so_luong || 10)}>+</button>
-                    </div>
                 </div>
             </div>
         );
