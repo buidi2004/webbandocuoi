@@ -85,12 +85,17 @@ const TrangChu = () => {
                 {banners.length > 0 ? (
                     banners.map((b, i) => (
                         <div
-                            key={b.id}
+                            key={`slide-${b.id}-${i === idxBanner ? 'active' : 'inactive'}`}
                             className={`hero-slide ${i === idxBanner ? 'active' : ''}`}
-                            style={{
-                                backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(${layUrlHinhAnh(b.image_url)})`
-                            }}
-                        ></div>
+                        >
+                            <div 
+                                className="hero-slide-image"
+                                style={{
+                                    backgroundImage: `url(${layUrlHinhAnh(b.image_url)})`
+                                }}
+                            />
+                            <div className="hero-slide-overlay" />
+                        </div>
                     ))
                 ) : (
                     <div className="hero-slide active default-banner"></div>

@@ -20,11 +20,33 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-size: cover;
-    background-position: center;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 1.2s;
+    transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 1.5s;
+    z-index: 1;
+    overflow: hidden;
+}
+
+/* Element con chứa hình ảnh - sẽ được animate */
+.hero-slide-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    will-change: transform;
+}
+
+/* Overlay gradient */
+.hero-slide-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6));
     z-index: 1;
 }
 
@@ -32,7 +54,78 @@
     opacity: 1;
     visibility: visible;
     z-index: 2;
-    animation: kenburns-smart 8s ease-out forwards;
+}
+
+/* Ken Burns animation áp dụng cho .hero-slide-image khi slide active */
+.hero-slide.active .hero-slide-image {
+    animation: kenburns-zoom-in 8s ease-out forwards;
+}
+
+/* Các hiệu ứng Ken Burns khác nhau cho mỗi slide */
+.hero-slide:nth-child(1).active .hero-slide-image {
+    animation: kenburns-zoom-in 8s ease-out forwards;
+}
+
+.hero-slide:nth-child(2).active .hero-slide-image {
+    animation: kenburns-pan-left 8s ease-out forwards;
+}
+
+.hero-slide:nth-child(3).active .hero-slide-image {
+    animation: kenburns-pan-right 8s ease-out forwards;
+}
+
+.hero-slide:nth-child(4).active .hero-slide-image {
+    animation: kenburns-zoom-out 8s ease-out forwards;
+}
+
+/* Hiệu ứng zoom in từ center */
+@keyframes kenburns-zoom-in {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1.15);
+    }
+}
+
+/* Hiệu ứng pan từ phải sang trái + zoom nhẹ */
+@keyframes kenburns-pan-left {
+    0% {
+        transform: scale(1.05) translateX(3%);
+    }
+    100% {
+        transform: scale(1.12) translateX(-3%);
+    }
+}
+
+/* Hiệu ứng pan từ trái sang phải + zoom nhẹ */
+@keyframes kenburns-pan-right {
+    0% {
+        transform: scale(1.05) translateX(-3%);
+    }
+    100% {
+        transform: scale(1.12) translateX(3%);
+    }
+}
+
+/* Hiệu ứng zoom out */
+@keyframes kenburns-zoom-out {
+    0% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Hiệu ứng pan chéo */
+@keyframes kenburns-pan {
+    0% {
+        transform: scale(1) translate(0, 0);
+    }
+    100% {
+        transform: scale(1.1) translate(-2%, -2%);
+    }
 }
 
 .hero-slide.default-banner {
