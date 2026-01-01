@@ -11,6 +11,7 @@ import WrapperAtropos from '../thanh_phan/WrapperAtropos';
 import InstagramFeed from '../thanh_phan/InstagramFeed';
 import LichTrong from '../thanh_phan/LichTrong';
 import LazyImage from '../thanh_phan/LazyImage';
+import HeroShowcase from '../thanh_phan/HeroShowcase';
 import '../styles/Home.css';
 
 const TrangChu = () => {
@@ -181,6 +182,9 @@ const TrangChu = () => {
                 {/* Hiệu ứng sóng */}
                 <HieuUngSong />
             </section>
+
+            {/* Hero Showcase - Carousel dịch vụ nổi bật */}
+            <HeroShowcase />
 
             {/* Khung hiệu ứng hạt - responsive */}
             <section className="particle-section" style={{ 
