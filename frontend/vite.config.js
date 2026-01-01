@@ -15,25 +15,31 @@ export default defineConfig({
           'vendor-3d': ['three', '@react-three/fiber', '@react-three/drei'],
           'vendor-utils': ['axios', 'atropos'],
         },
+        // Tối ưu tên file cho caching
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
     // Tối ưu chunk size
     chunkSizeWarningLimit: 500,
     // Minify CSS
     cssMinify: true,
-    // Minify JS với terser
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // Xóa console.log trong production
-        drop_debugger: true,
-      },
-    },
+    // CSS code splitting
+    cssCodeSplit: true,
+    // Minify JS với esbuild (mặc định, nhanh hơn terser)
+    minify: 'esbuild',
     // Source maps cho production (optional)
     sourcemap: false,
+    // Target modern browsers
+    target: 'es2020',
   },
   // Tối ưu dependencies
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom', 'axios'],
+  },
+  // Esbuild options để drop console
+  esbuild: {
+    drop: ['console', 'debugger'],
   },
 })
