@@ -11,15 +11,15 @@ export default function HieuUngChuyenTrang() {
         setHienThi(true);
         setDangChuyenTrang(true);
 
-        // Fade out sau 400ms
+        // Fade out sau 600ms (tăng thời gian để người dùng thấy loading)
         const timer1 = setTimeout(() => {
             setDangChuyenTrang(false);
-        }, 400);
+        }, 600);
 
-        // Ẩn hoàn toàn sau 800ms
+        // Ẩn hoàn toàn sau 1000ms
         const timer2 = setTimeout(() => {
             setHienThi(false);
-        }, 800);
+        }, 1000);
 
         return () => {
             clearTimeout(timer1);
@@ -43,12 +43,12 @@ export default function HieuUngChuyenTrang() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 background: dangChuyenTrang 
-                    ? 'rgba(255, 255, 255, 0.95)' 
+                    ? 'linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(250,248,245,0.98) 100%)' 
                     : 'rgba(255, 255, 255, 0)',
                 transition: 'background 0.4s ease-out'
             }}
         >
-            {/* Logo IVIE */}
+            {/* Logo IVIE với hiệu ứng xoay */}
             <div
                 style={{
                     opacity: dangChuyenTrang ? 1 : 0,
@@ -57,42 +57,106 @@ export default function HieuUngChuyenTrang() {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    gap: '16px'
+                    gap: '20px'
                 }}
             >
+                {/* Logo xoay */}
+                <div
+                    style={{
+                        width: '80px',
+                        height: '80px',
+                        borderRadius: '50%',
+                        border: '3px solid transparent',
+                        borderTopColor: '#c9a86c',
+                        borderRightColor: '#d4b896',
+                        animation: 'spin 1s linear infinite',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                >
+                    <div
+                        style={{
+                            width: '60px',
+                            height: '60px',
+                            borderRadius: '50%',
+                            background: 'linear-gradient(135deg, #c9a86c 0%, #d4b896 100%)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 4px 15px rgba(201, 168, 108, 0.3)'
+                        }}
+                    >
+                        <span
+                            style={{
+                                fontSize: '20px',
+                                fontWeight: 700,
+                                color: '#fff',
+                                fontFamily: 'Playfair Display, serif',
+                                letterSpacing: '2px'
+                            }}
+                        >
+                            IV
+                        </span>
+                    </div>
+                </div>
+
+                {/* Tên thương hiệu */}
                 <span
                     style={{
-                        fontSize: '48px',
+                        fontSize: '32px',
                         fontWeight: 700,
                         color: '#c9a86c',
                         fontFamily: 'Playfair Display, serif',
-                        letterSpacing: '8px'
+                        letterSpacing: '6px'
                     }}
                 >
                     IVIE
                 </span>
                 
-                {/* Loading dots */}
-                <div style={{ display: 'flex', gap: '8px' }}>
-                    {[0, 1, 2].map((i) => (
-                        <div
-                            key={i}
-                            style={{
-                                width: '8px',
-                                height: '8px',
-                                borderRadius: '50%',
-                                background: '#c9a86c',
-                                animation: `pulse 1s ease-in-out ${i * 0.15}s infinite`
-                            }}
-                        />
-                    ))}
+                {/* Loading text */}
+                <span
+                    style={{
+                        fontSize: '12px',
+                        color: '#999',
+                        letterSpacing: '3px',
+                        textTransform: 'uppercase'
+                    }}
+                >
+                    Đang tải...
+                </span>
+
+                {/* Loading bar */}
+                <div
+                    style={{
+                        width: '120px',
+                        height: '3px',
+                        background: '#eee',
+                        borderRadius: '3px',
+                        overflow: 'hidden'
+                    }}
+                >
+                    <div
+                        style={{
+                            width: '40%',
+                            height: '100%',
+                            background: 'linear-gradient(90deg, #c9a86c, #d4b896)',
+                            borderRadius: '3px',
+                            animation: 'loadingBar 1s ease-in-out infinite'
+                        }}
+                    />
                 </div>
             </div>
 
             <style>{`
-                @keyframes pulse {
-                    0%, 100% { opacity: 0.3; transform: scale(0.8); }
-                    50% { opacity: 1; transform: scale(1.2); }
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                @keyframes loadingBar {
+                    0% { transform: translateX(-100%); }
+                    50% { transform: translateX(150%); }
+                    100% { transform: translateX(300%); }
                 }
             `}</style>
         </div>
