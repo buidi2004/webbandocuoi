@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ImageModal from '../thanh_phan/ImageModal';
+import BookingButton from '../thanh_phan/BookingButton';
+import RelatedProducts from '../thanh_phan/RelatedProducts';
 import { useToast } from '../thanh_phan/Toast';
 import { sanPhamAPI, layUrlHinhAnh } from '../api/khach_hang';
+import { trackViewItem } from '../utils/analytics';
 import '../styles/product-detail.css';
 
 export default function ProductDetail() {
@@ -51,6 +54,14 @@ export default function ProductDetail() {
       try {
         const res = await sanPhamAPI.layTheoId(id);
         setSanPham(res.data);
+        
+        // Track view item với GA4
+        trackViewItem({
+          item_id: res.data.id,
+          item_name: res.data.name,
+          price: res.data.rental_price_day,
+          item_category: res.data.category || 'wedding'
+        });
         
         // Lấy đánh giá sản phẩm
         try {
@@ -193,11 +204,47 @@ export default function ProductDetail() {
     ? sanPham.gallery_images
     : [sanPham.image_url];
 
+  // Tạo SEO-friendly alt text
+  const seoAltText = (idx) => `${sanPham.name.toLowerCase().replace(/\s+/g, '-')}-ivie-wedding-studio-${idx + 1}`;
+
+  // JSON-LD Product Schema cho SEO
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": sanPham.name,
+    "image": gallery.map(img => layUrlHinhAnh(img)),
+    "description": sanPham.description || `${sanPham.name} - Váy cưới cao cấp tại IVIE Wedding Studio`,
+    "sku": sanPham.code,
+    "brand": {
+      "@type": "Brand",
+      "name": "IVIE Wedding Studio"
+    },
+    "offers": {
+      "@type": "AggregateOffer",
+      "priceCurrency": "VND",
+      "lowPrice": sanPham.rental_price_day,
+      "highPrice": sanPham.purchase_price || sanPham.rental_price_day * 30,
+      "availability": sanPham.het_hang ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+      "seller": {
+        "@type": "Organization",
+        "name": "IVIE Wedding Studio"
+      }
+    },
+    "aggregateRating": danhGiaList.length > 0 ? {
+      "@type": "AggregateRating",
+      "ratingValue": diemTrungBinh,
+      "reviewCount": danhGiaList.length
+    } : undefined
+  };
+
   function next() { setIndex(i => (i + 1) % gallery.length); }
   function prev() { setIndex(i => (i - 1 + gallery.length) % gallery.length); }
 
   return (
     <main className="product-page">
+      {/* JSON-LD Schema cho SEO */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
+      
       <div className="product-grid">
         <section className="gallery" aria-label="Hình ảnh sản phẩm">
           <div className="gallery-main">
@@ -205,7 +252,7 @@ export default function ProductDetail() {
             <img 
               id="mainImg" 
               src={layUrlHinhAnh(gallery[index])} 
-              alt={`${sanPham.name} - ${index+1}`} 
+              alt={seoAltText(index)} 
               style={{cursor:'zoom-in'}} 
               onClick={() => setModalOpen(true)}
               onError={(e) => e.target.src = 'https://placehold.co/800x1100?text=IVIE+Studio'}
@@ -229,7 +276,7 @@ export default function ProductDetail() {
               >
                 <img 
                   src={layUrlHinhAnh(src)} 
-                  alt={`Thumb ${i+1}`}
+                  alt={seoAltText(i)}
                   onError={(e) => e.target.src = 'https://placehold.co/160x220?text=Mẫu+'+(i+1)}
                 />
                 <div style={{
@@ -431,6 +478,9 @@ export default function ProductDetail() {
                 </span>
                 <span style={{fontSize:'0.8rem', fontWeight:'400', opacity:0.9}}>Thuê {days} ngày - {total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}đ</span>
               </button>
+              
+              {/* Nút đặt lịch thử váy */}
+              <BookingButton productId={sanPham.id} productName={sanPham.name} />
               </>
               )}
             </div>
@@ -450,7 +500,7 @@ export default function ProductDetail() {
         </aside>
       </div>
 
-      <ImageModal src={layUrlHinhAnh(gallery[index])} alt={`${sanPham.name} - ${index+1}`} open={modalOpen} onClose={() => setModalOpen(false)} />
+      <ImageModal src={layUrlHinhAnh(gallery[index])} alt={seoAltText(index)} open={modalOpen} onClose={() => setModalOpen(false)} />
       
       {/* Phần đánh giá sản phẩm */}
       <section className="reviews-section" style={{marginTop:'30px', padding:'24px', background:'#fff', borderRadius:'12px', border:'1px solid #eee'}}>
@@ -618,6 +668,9 @@ export default function ProductDetail() {
           )
         )}
       </section>
+      
+      {/* Sản phẩm liên quan */}
+      {id && <RelatedProducts productId={id} />}
     </main>
   );
 }

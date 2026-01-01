@@ -10,6 +10,7 @@ import HieuUngHat from '../thanh_phan/HieuUngHat';
 import WrapperAtropos from '../thanh_phan/WrapperAtropos';
 import InstagramFeed from '../thanh_phan/InstagramFeed';
 import LichTrong from '../thanh_phan/LichTrong';
+import LazyImage from '../thanh_phan/LazyImage';
 import '../styles/Home.css';
 
 const TrangChu = () => {
@@ -327,12 +328,10 @@ const TrangChu = () => {
                             thuVien.slice(0, 3).map((item, idx) => (
                                 <WrapperAtropos key={item.id} className={`featured-item ${idx === 0 ? 'large' : ''}`}>
                                     <div style={{ width: '100%', height: '100%' }} data-atropos-offset="0">
-                                        <img
+                                        <LazyImage
                                             src={layUrlHinhAnh(item.image_url)}
-                                            alt={item.title || `Gallery ${idx}`}
-                                            loading="lazy"
-                                            onError={(e) => e.target.src = 'https://placehold.co/600x800/e5e5e5/333?text=Collection'}
-                                            data-atropos-offset="5"
+                                            alt={`${(item.title || 'bo-suu-tap').toLowerCase().replace(/\s+/g, '-')}-ivie-wedding-studio`}
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                         />
                                         <div className="collection-label">
                                             <h4>{item.title || `Bộ sưu tập ${idx + 1}`}</h4>

@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { thuVienAPI, layUrlHinhAnh } from '../api/khach_hang';
 import BoSuuTapGach from '../thanh_phan/BoSuuTapGach';
 import HieuUngHat from '../thanh_phan/HieuUngHat';
+import LazyImage from '../thanh_phan/LazyImage';
 
 const ThuVien = () => {
     const [danhSachAnh, setDanhSachAnh] = useState([]);

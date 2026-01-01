@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { sanPhamAPI, layUrlHinhAnh } from '../api/khach_hang';
 import { useToast } from '../thanh_phan/Toast';
 import QuickViewModal from '../thanh_phan/QuickViewModal';
+import LazyImage from '../thanh_phan/LazyImage';
 import '../styles/products.css';
 
 const SanPham = () => {
@@ -144,7 +145,11 @@ const SanPham = () => {
                                         localStorage.setItem('ivie_viewed', JSON.stringify(filtered));
                                         setSanPhamDaXem(filtered.slice(0, 4));
                                     }}>×</button>
-                                    <img src={layUrlHinhAnh(sp.image_url)} alt={sp.name} />
+                                    <LazyImage 
+                                        src={layUrlHinhAnh(sp.image_url)} 
+                                        alt={`${sp.name.toLowerCase().replace(/\s+/g, '-')}-ivie-wedding`}
+                                        style={{ width: '100%', height: '100%' }}
+                                    />
                                     <div className="viewed-info">
                                         <p className="viewed-name">{sp.name}</p>
                                         <p className="viewed-price">{dinhDangGia(sp.rental_price_day)}</p>
@@ -279,11 +284,10 @@ const SanPham = () => {
                                         {!sp.het_hang && sp.is_hot && <div className="promo-tag hot-deal">🔥 Hot Deal</div>}
                                         {!sp.het_hang && sp.is_new && <div className="new-tag new-arrival">✨ Mới</div>}
                                         <div className="product-img">
-                                            <img 
+                                            <LazyImage 
                                                 src={layUrlHinhAnh(sp.image_url)} 
-                                                alt={sp.name}
-                                                loading="lazy"
-                                                onError={(e) => e.target.src = 'https://placehold.co/300x400/f5f5f5/333?text=IVIE'} 
+                                                alt={`${sp.name.toLowerCase().replace(/\s+/g, '-')}-ivie-wedding-studio`}
+                                                style={{ width: '100%', height: '100%' }}
                                             />
                                             {/* Icon buttons on hover */}
                                             {!sp.het_hang && (
