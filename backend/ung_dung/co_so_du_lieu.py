@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, Text, ForeignKey, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, Text, ForeignKey, DateTime, Date
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -292,6 +292,17 @@ class Combo(CoSo):
     noi_bat = Column(Boolean, default=False)
     hoat_dong = Column(Boolean, default=True)
     ngay_tao = Column(DateTime, default=datetime.utcnow)
+
+
+# Lịch trống (Availability Calendar)
+class LichTrong(CoSo):
+    __tablename__ = "lich_trong"
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, nullable=False, unique=True)
+    status = Column(String, default="available")  # available, booked, blocked
+    slots_available = Column(Integer, default=3)
+    note = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 
 # Dependency

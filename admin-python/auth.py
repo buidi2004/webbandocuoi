@@ -43,6 +43,9 @@ MENU_PERMISSIONS = {
     "🖼️ Quản lý Banner": "banners",
     "👗 Quản lý Sản phẩm": "products",  # Nhân viên KHÔNG có
     "🎁 Quản lý Combo": "combo",
+    "👥 Quản lý Khách hàng": "customers",  # NEW
+    "📅 Quản lý Lịch trống": "calendar",  # NEW
+    "❤️ Thống kê Yêu thích": "favorites",  # NEW
     "🤝 Đối tác & Khiếu nại": "partners",
     "📁 Thư viện ảnh mẫu": "gallery",
     "✨ Dịch vụ Chuyên gia": "experts",

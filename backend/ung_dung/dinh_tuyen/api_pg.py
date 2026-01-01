@@ -467,3 +467,148 @@ def xoa_combo(combo_id: int, phien: Session = Depends(lay_phien)):
     phien.delete(combo)
     phien.commit()
     return {"thong_bao": "Đã xóa combo thành công"}
+
+
+# ============ LỊCH TRỐNG API ============
+@bo_dinh_tuyen.get("/lich_trong", summary="Lấy danh sách lịch trống")
+def lay_danh_sach_lich_trong(
+    thang: Optional[int] = None,
+    nam: Optional[int] = None,
+    phien: Session = Depends(lay_phien)
+):
+    from sqlalchemy import text
+    from datetime import datetime
+    
+    # Nếu không có tháng/năm, lấy tháng hiện tại
+    if not thang:
+        thang = datetime.now().month
+    if not nam:
+        nam = datetime.now().year
+    
+    try:
+        result = phien.execute(text("""
+            SELECT id, date, status, slots_available, note, created_at
+            FROM lich_trong
+            WHERE EXTRACT(MONTH FROM date) = :thang AND EXTRACT(YEAR FROM date) = :nam
+            ORDER BY date
+        """), {"thang": thang, "nam": nam})
+        
+        lich_list = []
+        for r in result:
+            lich_list.append({
+                "id": r[0],
+                "date": str(r[1]),
+                "status": r[2],
+                "slots_available": r[3],
+                "note": r[4],
+                "created_at": str(r[5]) if r[5] else None
+            })
+        return lich_list
+    except Exception as e:
+        # Nếu bảng chưa tồn tại, trả về list rỗng
+        return []
+
+
+@bo_dinh_tuyen.post("/lich_trong", summary="Thêm/Cập nhật ngày trong lịch")
+def tao_lich_trong(
+    date: str,
+    status: str = "available",
+    slots_available: int = 3,
+    note: str = None,
+    phien: Session = Depends(lay_phien)
+):
+    from sqlalchemy import text
+    
+    try:
+        # Kiểm tra xem ngày đã tồn tại chưa
+        existing = phien.execute(text("SELECT id FROM lich_trong WHERE date = :date"), {"date": date}).first()
+        
+        if existing:
+            # Cập nhật
+            phien.execute(text("""
+                UPDATE lich_trong 
+                SET status = :status, slots_available = :slots, note = :note
+                WHERE date = :date
+            """), {"date": date, "status": status, "slots": slots_available, "note": note})
+        else:
+            # Thêm mới
+            phien.execute(text("""
+                INSERT INTO lich_trong (date, status, slots_available, note)
+                VALUES (:date, :status, :slots, :note)
+            """), {"date": date, "status": status, "slots": slots_available, "note": note})
+        
+        phien.commit()
+        return {"thong_bao": "Đã cập nhật lịch thành công"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi: {str(e)}")
+
+
+@bo_dinh_tuyen.delete("/lich_trong/{lich_id}", summary="Xóa ngày trong lịch")
+def xoa_lich_trong(lich_id: int, phien: Session = Depends(lay_phien)):
+    from sqlalchemy import text
+    
+    try:
+        phien.execute(text("DELETE FROM lich_trong WHERE id = :id"), {"id": lich_id})
+        phien.commit()
+        return {"thong_bao": "Đã xóa thành công"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi: {str(e)}")
+
+
+# ============ THỐNG KÊ YÊU THÍCH API ============
+@bo_dinh_tuyen.get("/yeu_thich/thong_ke", summary="Thống kê yêu thích")
+def thong_ke_yeu_thich(phien: Session = Depends(lay_phien)):
+    from sqlalchemy import text, func
+    from ung_dung.co_so_du_lieu import YeuThich
+    
+    try:
+        # Tổng số lượt yêu thích
+        total_favorites = phien.query(func.count(YeuThich.id)).scalar() or 0
+        
+        # Số sản phẩm được yêu thích
+        products_with_favorites = phien.query(func.count(func.distinct(YeuThich.san_pham_id))).scalar() or 0
+        
+        # Số người dùng có yêu thích
+        users_with_favorites = phien.query(func.count(func.distinct(YeuThich.nguoi_dung_id))).scalar() or 0
+        
+        # Top sản phẩm được yêu thích nhất
+        top_products_query = phien.execute(text("""
+            SELECT sp.id, sp.ten as name, sp.ma as code, sp.danh_muc as category, 
+                   sp.url_anh as image_url, sp.gia_thue_ngay as rental_price_day,
+                   COUNT(yt.id) as favorite_count
+            FROM san_pham sp
+            LEFT JOIN yeu_thich yt ON sp.id = yt.san_pham_id
+            GROUP BY sp.id, sp.ten, sp.ma, sp.danh_muc, sp.url_anh, sp.gia_thue_ngay
+            HAVING COUNT(yt.id) > 0
+            ORDER BY favorite_count DESC
+            LIMIT 10
+        """))
+        
+        top_products = []
+        for r in top_products_query:
+            top_products.append({
+                "id": r[0],
+                "name": r[1],
+                "code": r[2],
+                "category": r[3],
+                "image_url": r[4],
+                "rental_price_day": r[5],
+                "favorite_count": r[6]
+            })
+        
+        return {
+            "total_favorites": total_favorites,
+            "products_with_favorites": products_with_favorites,
+            "users_with_favorites": users_with_favorites,
+            "top_products": top_products,
+            "trend": []  # Có thể thêm sau
+        }
+    except Exception as e:
+        # Nếu bảng chưa tồn tại
+        return {
+            "total_favorites": 0,
+            "products_with_favorites": 0,
+            "users_with_favorites": 0,
+            "top_products": [],
+            "trend": []
+        }

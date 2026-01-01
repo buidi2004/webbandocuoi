@@ -485,6 +485,280 @@ def ui_banner():
                                 st.toast("Đã xóa banner")
                                 st.rerun()
 
+# ============ QUẢN LÝ KHÁCH HÀNG ============
+def ui_quan_ly_khach_hang():
+    st.header("👥 Quản lý Khách hàng")
+    
+    # Lấy danh sách người dùng
+    users = call_api("GET", "/pg/nguoi_dung", clear_cache=False)
+    
+    if users is None:
+        st.error("❌ Không thể kết nối đến server")
+        return
+    
+    if len(users) == 0:
+        st.info("📭 Chưa có khách hàng nào đăng ký")
+        return
+    
+    # Thống kê tổng quan
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("👥 Tổng khách hàng", len(users))
+    with col2:
+        verified = len([u for u in users if u.get('is_verified', False)])
+        st.metric("✅ Đã xác thực", verified)
+    with col3:
+        has_orders = len([u for u in users if u.get('total_orders', 0) > 0])
+        st.metric("🛒 Có đơn hàng", has_orders)
+    with col4:
+        recent = len([u for u in users if u.get('created_at', '')[:7] == datetime.now().strftime('%Y-%m')])
+        st.metric("🆕 Tháng này", recent)
+    
+    st.markdown("---")
+    
+    # Tìm kiếm và lọc
+    col_search, col_filter = st.columns([3, 1])
+    with col_search:
+        search = st.text_input("🔍 Tìm kiếm", placeholder="Tên, email, số điện thoại...")
+    with col_filter:
+        filter_type = st.selectbox("Lọc", ["Tất cả", "Đã xác thực", "Chưa xác thực", "Có đơn hàng"])
+    
+    # Lọc dữ liệu
+    filtered = users
+    if search:
+        search_lower = search.lower()
+        filtered = [u for u in filtered if 
+                   search_lower in str(u.get('full_name', '')).lower() or
+                   search_lower in str(u.get('email', '')).lower() or
+                   search_lower in str(u.get('phone', '')).lower()]
+    
+    if filter_type == "Đã xác thực":
+        filtered = [u for u in filtered if u.get('is_verified', False)]
+    elif filter_type == "Chưa xác thực":
+        filtered = [u for u in filtered if not u.get('is_verified', False)]
+    elif filter_type == "Có đơn hàng":
+        filtered = [u for u in filtered if u.get('total_orders', 0) > 0]
+    
+    st.write(f"Hiển thị: **{len(filtered)}** khách hàng")
+    
+    # Danh sách khách hàng
+    for user in filtered:
+        with st.container(border=True):
+            col1, col2, col3, col4 = st.columns([3, 2, 2, 1])
+            
+            with col1:
+                verified_icon = "✅" if user.get('is_verified', False) else "⏳"
+                st.write(f"**{user.get('full_name', 'Chưa cập nhật')}** {verified_icon}")
+                st.caption(f"📧 {user.get('email', 'N/A')}")
+                st.caption(f"📱 {user.get('phone', 'Chưa cập nhật')}")
+            
+            with col2:
+                st.write(f"📍 {user.get('address', 'Chưa cập nhật')[:30]}...")
+                if user.get('wedding_date'):
+                    st.write(f"💒 Ngày cưới: {user.get('wedding_date')}")
+            
+            with col3:
+                st.write(f"🛒 Đơn hàng: **{user.get('total_orders', 0)}**")
+                st.write(f"💰 Tổng chi: **{user.get('total_spent', 0):,.0f}đ**")
+                st.caption(f"📅 Đăng ký: {user.get('created_at', '')[:10]}")
+            
+            with col4:
+                if st.button("📋 Chi tiết", key=f"detail_user_{user.get('id')}"):
+                    st.session_state['viewing_user'] = user
+                    st.rerun()
+    
+    # Modal xem chi tiết
+    if 'viewing_user' in st.session_state:
+        user = st.session_state['viewing_user']
+        with st.expander(f"📋 Chi tiết khách hàng: {user.get('full_name', 'N/A')}", expanded=True):
+            col1, col2 = st.columns(2)
+            with col1:
+                st.write("**Thông tin cá nhân:**")
+                st.write(f"- Họ tên: {user.get('full_name', 'N/A')}")
+                st.write(f"- Email: {user.get('email', 'N/A')}")
+                st.write(f"- SĐT: {user.get('phone', 'N/A')}")
+                st.write(f"- Địa chỉ: {user.get('address', 'N/A')}")
+            with col2:
+                st.write("**Thông tin đơn hàng:**")
+                st.write(f"- Tổng đơn: {user.get('total_orders', 0)}")
+                st.write(f"- Tổng chi tiêu: {user.get('total_spent', 0):,.0f}đ")
+                st.write(f"- Ngày cưới: {user.get('wedding_date', 'Chưa cập nhật')}")
+            
+            if st.button("❌ Đóng"):
+                st.session_state.pop('viewing_user', None)
+                st.rerun()
+
+# ============ QUẢN LÝ LỊCH TRỐNG ============
+def ui_quan_ly_lich_trong():
+    st.header("📅 Quản lý Lịch trống")
+    
+    st.info("💡 Quản lý ngày có sẵn/không có sẵn cho dịch vụ cưới")
+    
+    # Lấy dữ liệu lịch
+    calendar_data = call_api("GET", "/pg/lich_trong", clear_cache=False)
+    
+    tab1, tab2 = st.tabs(["📅 Xem lịch", "➕ Thêm ngày"])
+    
+    with tab2:
+        st.subheader("➕ Thêm/Cập nhật ngày")
+        
+        with st.form("form_add_date"):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                selected_date = st.date_input("📅 Chọn ngày", min_value=datetime.now().date())
+                status = st.selectbox("Trạng thái", ["available", "booked", "blocked"], 
+                                     format_func=lambda x: {"available": "✅ Có sẵn", "booked": "📌 Đã đặt", "blocked": "🚫 Khóa"}[x])
+            
+            with col2:
+                slots = st.number_input("Số slot còn trống", min_value=0, max_value=10, value=3)
+                note = st.text_input("Ghi chú", placeholder="VD: Đã có 2 đám cưới")
+            
+            if st.form_submit_button("💾 Lưu", use_container_width=True, type="primary"):
+                data = {
+                    "date": selected_date.strftime("%Y-%m-%d"),
+                    "status": status,
+                    "slots_available": slots,
+                    "note": note
+                }
+                result = call_api("POST", "/pg/lich_trong", data=data)
+                if result:
+                    st.success("✅ Đã cập nhật lịch!")
+                    st.rerun()
+    
+    with tab1:
+        st.subheader("📅 Lịch tháng này")
+        
+        # Hiển thị tháng hiện tại
+        today = datetime.now()
+        month_start = today.replace(day=1)
+        
+        col_prev, col_month, col_next = st.columns([1, 3, 1])
+        with col_month:
+            st.markdown(f"### 📆 Tháng {today.month}/{today.year}")
+        
+        if calendar_data is None:
+            calendar_data = []
+        
+        # Tạo dict để tra cứu nhanh
+        date_status = {d.get('date'): d for d in calendar_data}
+        
+        # Hiển thị lịch dạng grid
+        st.markdown("**Chú thích:** ✅ Có sẵn | 📌 Đã đặt | 🚫 Khóa | ⬜ Chưa cập nhật")
+        
+        # Tạo calendar grid
+        import calendar
+        cal = calendar.monthcalendar(today.year, today.month)
+        
+        # Header
+        cols = st.columns(7)
+        days = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"]
+        for i, day in enumerate(days):
+            cols[i].markdown(f"**{day}**")
+        
+        # Days
+        for week in cal:
+            cols = st.columns(7)
+            for i, day in enumerate(week):
+                if day == 0:
+                    cols[i].write("")
+                else:
+                    date_str = f"{today.year}-{today.month:02d}-{day:02d}"
+                    info = date_status.get(date_str, {})
+                    status = info.get('status', 'unknown')
+                    
+                    icon = {"available": "✅", "booked": "📌", "blocked": "🚫"}.get(status, "⬜")
+                    
+                    is_today = day == today.day
+                    style = "background: #c9a86c; color: white; padding: 5px; border-radius: 5px;" if is_today else ""
+                    
+                    cols[i].markdown(f"<div style='{style}'>{icon} {day}</div>", unsafe_allow_html=True)
+        
+        st.markdown("---")
+        
+        # Danh sách chi tiết
+        st.subheader("📋 Chi tiết các ngày đã cập nhật")
+        
+        if calendar_data:
+            for item in sorted(calendar_data, key=lambda x: x.get('date', '')):
+                status_icon = {"available": "✅", "booked": "📌", "blocked": "🚫"}.get(item.get('status'), "⬜")
+                with st.container(border=True):
+                    col1, col2, col3 = st.columns([2, 2, 1])
+                    with col1:
+                        st.write(f"**{item.get('date')}** {status_icon}")
+                    with col2:
+                        st.write(f"Slots: {item.get('slots_available', 0)} | {item.get('note', '')}")
+                    with col3:
+                        if st.button("🗑️", key=f"del_cal_{item.get('id')}"):
+                            if call_api("DELETE", f"/pg/lich_trong/{item.get('id')}"):
+                                st.toast("Đã xóa!")
+                                st.rerun()
+        else:
+            st.info("Chưa có dữ liệu lịch. Hãy thêm ngày ở tab 'Thêm ngày'.")
+
+# ============ THỐNG KÊ YÊU THÍCH ============
+def ui_thong_ke_yeu_thich():
+    st.header("❤️ Thống kê Yêu thích")
+    
+    # Lấy thống kê yêu thích
+    favorites_stats = call_api("GET", "/pg/yeu_thich/thong_ke", clear_cache=False)
+    
+    if favorites_stats is None:
+        st.error("❌ Không thể kết nối đến server")
+        return
+    
+    # Tổng quan
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("❤️ Tổng lượt yêu thích", favorites_stats.get('total_favorites', 0))
+    with col2:
+        st.metric("👗 Sản phẩm được yêu thích", favorites_stats.get('products_with_favorites', 0))
+    with col3:
+        st.metric("👥 Khách hàng yêu thích", favorites_stats.get('users_with_favorites', 0))
+    
+    st.markdown("---")
+    
+    # Top sản phẩm được yêu thích
+    st.subheader("🏆 Top sản phẩm được yêu thích nhất")
+    
+    top_products = favorites_stats.get('top_products', [])
+    
+    if top_products:
+        for idx, product in enumerate(top_products[:10], 1):
+            with st.container(border=True):
+                col1, col2, col3, col4 = st.columns([0.5, 1, 3, 1])
+                
+                with col1:
+                    medal = {1: "🥇", 2: "🥈", 3: "🥉"}.get(idx, f"#{idx}")
+                    st.markdown(f"### {medal}")
+                
+                with col2:
+                    img_url = lay_url_anh(product.get('image_url'))
+                    st.image(img_url, width=80)
+                
+                with col3:
+                    st.write(f"**{product.get('name', 'N/A')}**")
+                    st.caption(f"Mã: {product.get('code', 'N/A')} | Danh mục: {product.get('category', 'N/A')}")
+                    st.caption(f"Giá: {product.get('rental_price_day', 0):,.0f}đ/ngày")
+                
+                with col4:
+                    st.metric("❤️", product.get('favorite_count', 0))
+    else:
+        st.info("📭 Chưa có dữ liệu yêu thích")
+    
+    st.markdown("---")
+    
+    # Biểu đồ xu hướng (nếu có dữ liệu)
+    st.subheader("📈 Xu hướng yêu thích theo thời gian")
+    
+    trend_data = favorites_stats.get('trend', [])
+    if trend_data:
+        import pandas as pd
+        df = pd.DataFrame(trend_data)
+        st.line_chart(df.set_index('date')['count'])
+    else:
+        st.info("Chưa có đủ dữ liệu để hiển thị xu hướng")
+
 def ui_san_pham():
     # Kiểm tra quyền truy cập
     if not has_permission("products"):
@@ -1840,6 +2114,9 @@ elif "Tư vấn" in choice: ui_tu_van_khach_hang()
 elif "Duyệt Đánh Giá" in choice: ui_duyet_danh_gia()
 elif "Banner" in choice: ui_banner()
 elif "Sản phẩm" in choice: ui_san_pham()
+elif "Khách hàng" in choice: ui_quan_ly_khach_hang()
+elif "Lịch trống" in choice: ui_quan_ly_lich_trong()
+elif "Yêu thích" in choice: ui_thong_ke_yeu_thich()
 elif "Đối tác" in choice: ui_doi_tac_khieu_nai()
 elif "Thư viện" in choice: ui_thu_vien()
 elif "Dịch vụ" in choice: ui_dich_vu_chuyen_gia()
