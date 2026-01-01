@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, BackgroundTasks
 from sqlalchemy.orm import Session
 from datetime import datetime
 from typing import List
@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from ..co_so_du_lieu import lay_csdl, LienHeGui as LienHeDB
 from ..mo_hinh import LienHeTao, LienHePhanHoi, LienHe
 from ..tien_ich_email import gui_email_thong_bao
+from ..telegram_bot import gui_thong_bao_telegram_sync
 
 class CapNhatTrangThai(BaseModel):
     status: str
@@ -59,7 +60,7 @@ def cap_nhat_trang_thai(id_lien_he: int, data: CapNhatTrangThai, csdl: Session =
     return {"message": "Đã cập nhật trạng thái", "status": data.status, "id": id_lien_he}
 
 @bo_dinh_tuyen.post("/", response_model=LienHePhanHoi)
-def gui_lien_he(lien_he: LienHeTao, csdl: Session = Depends(lay_csdl)):
+def gui_lien_he(lien_he: LienHeTao, background_tasks: BackgroundTasks, csdl: Session = Depends(lay_csdl)):
     """Gửi form liên hệ"""
     lh = LienHeDB(
         name=lien_he.name,
@@ -87,13 +88,24 @@ def gui_lien_he(lien_he: LienHeTao, csdl: Session = Depends(lay_csdl)):
     """
     gui_email_thong_bao(tieu_de, noi_dung)
     
+    # Gửi thông báo Telegram (background task)
+    background_tasks.add_task(
+        gui_thong_bao_telegram_sync,
+        ten_khach=lien_he.name,
+        so_dien_thoai=lien_he.phone,
+        email=lien_he.email,
+        dia_chi=lien_he.address,
+        noi_dung=lien_he.message,
+        loai_form="lien_he"
+    )
+    
     return LienHePhanHoi(
         message="Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong thời gian sớm nhất.",
         success=True
     )
 
 @bo_dinh_tuyen.post("/dat_lich", response_model=LienHePhanHoi)
-def gui_dat_lich(lien_he: LienHeTao, csdl: Session = Depends(lay_csdl)):
+def gui_dat_lich(lien_he: LienHeTao, background_tasks: BackgroundTasks, csdl: Session = Depends(lay_csdl)):
     """Gửi yêu cầu đặt lịch"""
     lh = LienHeDB(
         name=lien_he.name,
@@ -119,6 +131,17 @@ def gui_dat_lich(lien_he: LienHeTao, csdl: Session = Depends(lay_csdl)):
     <p>Gần khách hàng hơn với IVIE Wedding.</p>
     """
     gui_email_thong_bao(tieu_de, noi_dung)
+    
+    # Gửi thông báo Telegram (background task)
+    background_tasks.add_task(
+        gui_thong_bao_telegram_sync,
+        ten_khach=lien_he.name,
+        so_dien_thoai=lien_he.phone,
+        email=lien_he.email,
+        dia_chi=lien_he.address,
+        noi_dung=lien_he.message,
+        loai_form="dat_lich"
+    )
     
     return LienHePhanHoi(
         message="Đặt lịch thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.",

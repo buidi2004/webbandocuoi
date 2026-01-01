@@ -29,6 +29,11 @@ services:
         value: "3.12"
       - key: IMGBB_API_KEY
         value: c525fc0204b449b541b0f0a5a4f5d9c4
+      # Telegram Bot - Thay bằng token và chat_id thật
+      - key: TELEGRAM_BOT_TOKEN
+        value: YOUR_TELEGRAM_BOT_TOKEN
+      - key: TELEGRAM_CHAT_ID
+        value: YOUR_TELEGRAM_CHAT_ID
 
   # Frontend - React + Vite + Nginx
   - type: web

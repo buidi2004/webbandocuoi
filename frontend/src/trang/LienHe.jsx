@@ -5,6 +5,7 @@ import The from '../thanh_phan/The';
 import '../styles/contact.css';
 import { lienHeAPI, khieuNaiAPI } from '../api/khach_hang';
 import { useToast } from '../thanh_phan/Toast';
+import { trackGenerateLead } from '../utils/analytics';
 
 
 const LienHe = () => {
@@ -48,8 +49,17 @@ const LienHe = () => {
                 message: `[Dịch vụ: ${duLieuConsult.service}] [Chi nhánh: ${tenChiNhanh[duLieuConsult.chi_nhanh] || duLieuConsult.chi_nhanh}] [Ngân sách: ${tenNganSach[duLieuConsult.ngan_sach] || 'Chưa chọn'}] [Ngày: ${duLieuConsult.date}] ${duLieuConsult.message}`
             };
             await lienHeAPI.datLich(payload);
-            addToast({ message: 'Đã gửi yêu cầu tư vấn!', type: 'success' });
-            setDuLieuConsult({ name: '', phone: '', email: '', address: '', service: 'wedding_photo', message: '', date: '', chi_nhanh: 'cao_lanh', ngan_sach: '' });
+            
+            // Track GA4 event
+            trackGenerateLead('consult', { service: duLieuConsult.service });
+            
+            // Redirect to Thank You page
+            navigate('/cam-on', { 
+                state: { 
+                    formType: 'consult',
+                    productName: duLieuConsult.service 
+                } 
+            });
         } catch (loi) {
             addToast({ message: 'Không thể gửi yêu cầu.', type: 'error' });
         } finally {
@@ -62,8 +72,14 @@ const LienHe = () => {
         setLoadingComplaint(true);
         try {
             await khieuNaiAPI.gui(duLieuComplaint, user?.id);
-            addToast({ message: 'Gửi khiếu nại thành công! Chúng tôi sẽ sớm liên hệ giải quyết.', type: 'info' });
-            setDuLieuComplaint({ title: '', content: '', customer_name: '', customer_phone: '' });
+            
+            // Track GA4 event
+            trackGenerateLead('complaint');
+            
+            // Redirect to Thank You page
+            navigate('/cam-on', { 
+                state: { formType: 'complaint' } 
+            });
         } catch (loi) {
             addToast({ message: 'Không thể gửi khiếu nại.', type: 'error' });
         } finally {
@@ -93,7 +109,7 @@ const LienHe = () => {
                             <div className="contact-info">
                                 <h2 className="section-title" style={{ textAlign: 'left' }}>Thông Tin Liên Hệ</h2>
                                 <div className="info-item"><span>📍</span> <div><h3>Địa Chỉ</h3><p>753 PHẠM HỮU LẦU, PHƯỜNG CAO LÃNH, ĐỒNG THÁP</p></div></div>
-                                <div className="info-item"><span>📞</span> <div><h3>Hotline</h3><p>090 123 4567</p></div></div>
+                                <div className="info-item"><span>📞</span> <div><h3>Hotline</h3><p><a href="tel:0739193848" itemProp="telephone">0739 193 848</a></p></div></div>
                                 <div className="info-item"><span>✉️</span> <div><h3>Email</h3><p>contact@iviestudio.vn</p></div></div>
                             </div>
                             <The className="booking-form-card">
