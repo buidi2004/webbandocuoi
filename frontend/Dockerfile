@@ -7,17 +7,14 @@ WORKDIR /app
 ARG VITE_API_BASE_URL=https://ivie-backend.onrender.com
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
-# Cache bust - update this to force rebuild: v2025.01.01
-ARG CACHEBUST=1
+# Cache bust - update this to force rebuild: v2025.01.01.2
+ARG CACHEBUST=2
 
-# Copy package files first for better caching
-COPY package.json package-lock.json ./
+# Copy ALL source code first to ensure latest files
+COPY . .
 
 # Install dependencies
 RUN npm ci
-
-# Copy source code
-COPY . .
 
 # Build the application with env
 RUN npm run build
