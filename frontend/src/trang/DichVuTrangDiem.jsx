@@ -181,42 +181,72 @@ const DichVuTrangDiem = () => {
                 </div>
             </section>
 
-            {/* Video Showcase Section - Redesigned */}
+            {/* Video Showcase Section - Dynamic from API */}
             <section className="video-showcase-section">
                 <div className="container">
                     <div className="section-header">
                         <h2 className="section-title">Nghệ Sĩ Tiêu Biểu</h2>
                         <p className="section-subtitle">Xem video giới thiệu từ các chuyên gia hàng đầu</p>
                     </div>
-                    <div className="video-showcase-grid">
-                        <div className="video-container-wrapper">
-                            <div className="video-overlay-blur"></div>
-                            <div className="video-frame">
-                                <iframe
-                                    src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&mute=1"
-                                    title="Artist Introduction"
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                ></iframe>
+                    {(() => {
+                        // Tìm chuyên gia có video
+                        const expertWithVideo = chuyenGia.find(cg => cg.video_url);
+                        
+                        if (!expertWithVideo) {
+                            return (
+                                <div style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
+                                    <p>Đang cập nhật video giới thiệu...</p>
+                                </div>
+                            );
+                        }
+                        
+                        // Lấy video ID từ URL
+                        let videoId = "";
+                        const videoUrl = expertWithVideo.video_url || "";
+                        if (videoUrl.includes("youtube.com/watch?v=")) {
+                            videoId = videoUrl.split("v=")[1]?.split("&")[0];
+                        } else if (videoUrl.includes("youtu.be/")) {
+                            videoId = videoUrl.split("youtu.be/")[1]?.split("?")[0];
+                        }
+                        
+                        return (
+                            <div className="video-showcase-grid">
+                                <div className="video-container-wrapper">
+                                    <div className="video-overlay-blur"></div>
+                                    <div className="video-frame">
+                                        {videoId ? (
+                                            <iframe
+                                                src={`https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1`}
+                                                title="Artist Introduction"
+                                                frameBorder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                            ></iframe>
+                                        ) : (
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#111' }}>
+                                                <p style={{ color: '#888' }}>Video đang được cập nhật</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="video-info-overlay">
+                                        <h3>{expertWithVideo.name}</h3>
+                                        <p>{expertWithVideo.title}</p>
+                                    </div>
+                                </div>
+                                <div className="video-description">
+                                    <h3>{expertWithVideo.name} - {expertWithVideo.level === 'master' ? 'Master Artist' : expertWithVideo.title}</h3>
+                                    <p>{expertWithVideo.bio || `Với hơn ${expertWithVideo.years_experience} năm kinh nghiệm trong ngành, ${expertWithVideo.name} đã tạo nên hàng ngàn diện mạo hoàn hảo cho các cô dâu.`}</p>
+                                    <ul className="artist-highlights">
+                                        <li>✨ {expertWithVideo.years_experience}+ năm kinh nghiệm</li>
+                                        <li>💄 {expertWithVideo.brides_count}+ show đã thực hiện</li>
+                                        <li>🏆 {expertWithVideo.level === 'master' ? 'Master Artist' : expertWithVideo.level === 'top_artist' ? 'Top Artist' : 'Senior Artist'}</li>
+                                        <li>📍 Khu vực: {expertWithVideo.location || 'Hà Nội'}</li>
+                                    </ul>
+                                    <NutBam variant="primary" onClick={() => bookNow(expertWithVideo)}>ĐẶT LỊCH NGAY</NutBam>
+                                </div>
                             </div>
-                            <div className="video-info-overlay">
-                                <h3>Hồ Văn Phi</h3>
-                                <p>Master Makeup Artist</p>
-                            </div>
-                        </div>
-                        <div className="video-description">
-                            <h3>Hồ Văn Phi - Master Artist</h3>
-                            <p>Với hơn 10 năm kinh nghiệm trong ngành makeup cưới, Hồ Văn Phi đã tạo nên hàng ngàn diện mạo hoàn hảo cho các cô dâu.</p>
-                            <ul className="artist-highlights">
-                                <li>✨ Top 10 Makeup Artist Việt Nam 2024</li>
-                                <li>💄 Chuyên gia trang điểm phong cách Hàn Quốc</li>
-                                <li>🏆 Giải nhất cuộc thi Makeup Artist toàn quốc</li>
-                                <li>📸 Hợp tác với 50+ nhiếp ảnh gia hàng đầu</li>
-                            </ul>
-                            <NutBam variant="primary" onClick={() => navigate('/lien-he')}>ĐẶT LỊCH NGAY</NutBam>
-                        </div>
-                    </div>
+                        );
+                    })()}
                 </div>
             </section>
 

@@ -1275,7 +1275,7 @@ def ui_thu_vien():
 
 def ui_dich_vu_chuyen_gia():
     st.header("Chuyên gia & Dịch vụ")
-    t_ex, t_sv = st.tabs(["CHUYÊN GIA", "GÓI DỊCH VỤ"])
+    t_ex, t_sv, t_video = st.tabs(["CHUYÊN GIA", "GÓI DỊCH VỤ", "🎬 VIDEO GIỚI THIỆU"])
     with t_ex:
         with st.expander("THÊM CHUYÊN GIA"):
             with st.form("add_ex"):
@@ -1290,6 +1290,8 @@ def ui_dich_vu_chuyen_gia():
                     location = st.text_input("Khu vực làm việc", value="Hà Nội")
                 level = st.selectbox("Cấp bậc", ["senior", "master", "top_artist"], format_func=lambda x: {"senior": "Senior", "master": "Master", "top_artist": "Top Artist"}[x])
                 is_top = st.checkbox("Đánh dấu là TOP Artist (nổi bật)")
+                bio = st.text_area("Giới thiệu ngắn", placeholder="Mô tả về chuyên gia...")
+                video_url = st.text_input("🎬 Link Video YouTube", placeholder="https://www.youtube.com/watch?v=...")
                 img_f = st.file_uploader("Ảnh đại diện")
                 if st.form_submit_button("THÊM CHUYÊN GIA"):
                     url = upload_image(img_f)
@@ -1299,6 +1301,7 @@ def ui_dich_vu_chuyen_gia():
                             "years_experience": years_exp, "brides_count": years_exp * 50,
                             "category": category, "level": level, 
                             "location": location, "price": price, "is_top": is_top,
+                            "bio": bio, "video_url": video_url,
                             "specialties": ["Cưới", "Sự kiện"]
                         }
                         if call_api("POST", "/api/dich_vu/chuyen_gia", data=data):
@@ -1324,23 +1327,97 @@ def ui_dich_vu_chuyen_gia():
                                 en_loc = st.text_input("Khu vực", value=e.get('location', 'Hà Nội'))
                                 en_price = st.number_input("Giá (Booking)", value=float(e.get('price', 1000000)))
                                 en_top = st.checkbox("Top Artist", value=e.get('is_top', False))
+                                en_bio = st.text_area("Giới thiệu", value=e.get('bio', ''))
+                                en_video = st.text_input("🎬 Link Video YouTube", value=e.get('video_url', ''))
                             if st.form_submit_button("LƯU"):
                                 img_url = e['image_url']
                                 if new_img_ex:
                                     u = upload_image(new_img_ex); 
                                     if u: img_url = u
-                                up_data = {"name": en_name, "title": en_title, "image_url": img_url, "category": en_cat, "level": en_level, "location": en_loc, "price": en_price, "is_top": en_top, "years_experience": e['years_experience'], "brides_count": e['brides_count']}
+                                up_data = {"name": en_name, "title": en_title, "image_url": img_url, "category": en_cat, "level": en_level, "location": en_loc, "price": en_price, "is_top": en_top, "bio": en_bio, "video_url": en_video, "years_experience": e['years_experience'], "brides_count": e['brides_count']}
                                 if call_api("PUT", f"/api/dich_vu/chuyen_gia/{e['id']}", data=up_data):
                                     st.session_state[edit_key_ex] = False; st.toast("Đã cập nhật"); st.rerun()
                     else:
                         c1, c2, c3, c4 = st.columns([1, 2, 1, 1])
                         with c1: st.image(lay_url_anh(e['image_url']))
-                        with c2: st.write(f"**{e['name']}**"); st.caption(e['title'])
+                        with c2: 
+                            st.write(f"**{e['name']}**")
+                            st.caption(e['title'])
+                            if e.get('video_url'):
+                                st.caption(f"🎬 Có video")
                         with c3: st.write(f"{float(e.get('price', 1000000)):,.0f}đ")
                         with c4:
                             if st.button("SỬA", key=f"e_ex_{e['id']}"): st.session_state[edit_key_ex] = True; st.rerun()
                             if st.button("XOÁ", key=f"dex_{e['id']}"):
                                 if call_api("DELETE", f"/api/dich_vu/chuyen_gia/{e['id']}"): st.toast("Đã xóa"); st.rerun()
+    
+    # Tab Video giới thiệu
+    with t_video:
+        st.subheader("🎬 Quản lý Video Giới Thiệu Chuyên Gia")
+        st.info("💡 Video sẽ hiển thị ở trang Dịch vụ Chuyên gia trên website")
+        
+        # Lấy danh sách chuyên gia có video
+        exps_with_video = [e for e in (exps or []) if e.get('video_url')]
+        exps_without_video = [e for e in (exps or []) if not e.get('video_url')]
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("🎬 Có video", len(exps_with_video))
+        with col2:
+            st.metric("📷 Chưa có video", len(exps_without_video))
+        
+        st.markdown("---")
+        
+        # Chuyên gia có video
+        st.markdown("### ✅ Chuyên gia đã có video")
+        if exps_with_video:
+            for e in exps_with_video:
+                with st.container(border=True):
+                    c1, c2, c3 = st.columns([1, 2, 1])
+                    with c1:
+                        st.image(lay_url_anh(e['image_url']), width=100)
+                    with c2:
+                        st.write(f"**{e['name']}** - {e['title']}")
+                        # Hiển thị video preview
+                        video_id = ""
+                        if "youtube.com/watch?v=" in e['video_url']:
+                            video_id = e['video_url'].split("v=")[1].split("&")[0]
+                        elif "youtu.be/" in e['video_url']:
+                            video_id = e['video_url'].split("youtu.be/")[1].split("?")[0]
+                        
+                        if video_id:
+                            st.markdown(f"[🎬 Xem video](https://www.youtube.com/watch?v={video_id})")
+                    with c3:
+                        new_video = st.text_input("Đổi link video", value=e['video_url'], key=f"video_{e['id']}")
+                        if st.button("💾 Lưu", key=f"save_video_{e['id']}"):
+                            if call_api("PUT", f"/api/dich_vu/chuyen_gia/{e['id']}", data={**e, "video_url": new_video}):
+                                st.toast("Đã cập nhật video!")
+                                st.rerun()
+        else:
+            st.info("Chưa có chuyên gia nào có video")
+        
+        st.markdown("---")
+        
+        # Chuyên gia chưa có video
+        st.markdown("### ⏳ Chuyên gia chưa có video")
+        if exps_without_video:
+            for e in exps_without_video:
+                with st.container(border=True):
+                    c1, c2, c3 = st.columns([1, 2, 1])
+                    with c1:
+                        st.image(lay_url_anh(e['image_url']), width=80)
+                    with c2:
+                        st.write(f"**{e['name']}** - {e['title']}")
+                    with c3:
+                        add_video = st.text_input("Thêm link video", placeholder="https://youtube.com/...", key=f"add_video_{e['id']}")
+                        if st.button("➕ Thêm", key=f"add_btn_{e['id']}"):
+                            if add_video:
+                                if call_api("PUT", f"/api/dich_vu/chuyen_gia/{e['id']}", data={**e, "video_url": add_video}):
+                                    st.toast("Đã thêm video!")
+                                    st.rerun()
+        else:
+            st.success("Tất cả chuyên gia đều đã có video!")
+    
     with t_sv:
         svs = call_api("GET", "/api/dich_vu/", clear_cache=False)
         if svs:
