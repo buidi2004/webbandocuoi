@@ -69,6 +69,11 @@ if not is_authenticated():
     show_login_page()
     st.stop()  # Dừng execution nếu chưa đăng nhập
 
+# Thông báo nếu backend có thể đang sleep
+if "shown_wake_notice" not in st.session_state:
+    st.session_state.shown_wake_notice = True
+    st.info("💡 Lưu ý: Nếu đây là lần đầu truy cập sau một thời gian, server có thể mất 30-60 giây để khởi động (Render free tier).")
+
 # CSS custom for minimalist B&W Dark Theme
 st.markdown("""
     <style>
@@ -149,8 +154,20 @@ with st.sidebar:
 def get_session():
     """Tạo session requests để tái sử dụng connection"""
     session = requests.Session()
-    session.headers.update({'Connection': 'keep-alive'})
+    session.headers.update({
+        'Connection': 'keep-alive',
+        'Accept-Encoding': 'gzip, deflate'  # Hỗ trợ gzip compression
+    })
     return session
+
+def wake_up_backend():
+    """Đánh thức backend nếu đang sleep (Render free tier)"""
+    try:
+        session = get_session()
+        res = session.get(f"{API_URL}/api/health", timeout=60)
+        return res.status_code == 200
+    except:
+        return False
 
 @st.cache_data(show_spinner=False, ttl=90)  # Cache 90 giây
 def fetch_api_data(endpoint):
@@ -158,7 +175,7 @@ def fetch_api_data(endpoint):
     url = f"{API_URL}{endpoint}"
     try:
         session = get_session()
-        res = session.get(url, timeout=6)  # Timeout ngắn hơn
+        res = session.get(url, timeout=30)  # Tăng timeout cho Render free tier
         if res.status_code == 200:
             return res.json()
         return None
@@ -175,7 +192,7 @@ def fetch_multiple_endpoints(endpoints):
     futures = [executor.submit(fetch_one, ep) for ep in endpoints]
     for future in futures:
         try:
-            ep, data = future.result(timeout=8)
+            ep, data = future.result(timeout=35)
             results[ep] = data
         except:
             pass
@@ -184,38 +201,58 @@ def fetch_multiple_endpoints(endpoints):
 # Session state để tránh rerun không cần thiết
 if "last_action" not in st.session_state:
     st.session_state.last_action = None
+if "backend_awake" not in st.session_state:
+    st.session_state.backend_awake = False
 
-def call_api(method, endpoint, data=None, files=None, clear_cache=True):
+def call_api(method, endpoint, data=None, files=None, clear_cache=True, retries=2):
+    """Gọi API với retry logic cho Render free tier"""
     url = f"{API_URL}{endpoint}"
     session = get_session()
-    try:
-        # Không hiển thị spinner cho GET requests (mượt hơn)
-        if method == "GET":
-            if not clear_cache:
-                return fetch_api_data(endpoint)
-            res = session.get(url, timeout=6)
-        elif method == "POST":
-            res = session.post(url, json=data, files=files, timeout=20)
-        elif method == "PUT":
-            res = session.put(url, json=data, timeout=20)
-        elif method == "PATCH":
-            res = session.patch(url, json=data, timeout=12)
-        elif method == "DELETE":
-            res = session.delete(url, timeout=6)
-        
-        if res.status_code in [200, 201]:
-            if method != "GET" and clear_cache:
-                st.cache_data.clear()
-            return res.json()
-        else:
-            st.error(f"Lỗi API ({res.status_code})")
+    
+    for attempt in range(retries + 1):
+        try:
+            # Timeout dài hơn cho lần đầu (backend có thể đang sleep)
+            timeout = 60 if attempt == 0 and not st.session_state.backend_awake else 15
+            
+            if method == "GET":
+                if not clear_cache:
+                    return fetch_api_data(endpoint)
+                res = session.get(url, timeout=timeout)
+            elif method == "POST":
+                res = session.post(url, json=data, files=files, timeout=timeout)
+            elif method == "PUT":
+                res = session.put(url, json=data, timeout=timeout)
+            elif method == "PATCH":
+                res = session.patch(url, json=data, timeout=timeout)
+            elif method == "DELETE":
+                res = session.delete(url, timeout=timeout)
+            
+            if res.status_code in [200, 201]:
+                st.session_state.backend_awake = True
+                if method != "GET" and clear_cache:
+                    st.cache_data.clear()
+                return res.json()
+            else:
+                st.error(f"Lỗi API ({res.status_code})")
+                return None
+                
+        except requests.Timeout:
+            if attempt < retries:
+                st.warning(f"⏳ Server đang khởi động... (thử lại {attempt + 1}/{retries})")
+                continue
+            st.error("⏱️ Server phản hồi chậm. Vui lòng thử lại sau.")
             return None
-    except requests.Timeout:
-        st.error("⏱️ Server phản hồi chậm")
-        return None
-    except Exception as e:
-        st.error(f"Lỗi kết nối")
-        return None
+        except requests.ConnectionError:
+            if attempt < retries:
+                st.warning(f"🔄 Đang kết nối lại... (thử lại {attempt + 1}/{retries})")
+                continue
+            st.error("❌ Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.")
+            return None
+        except Exception as e:
+            st.error(f"Lỗi kết nối: {str(e)}")
+            return None
+    
+    return None
 
 def upload_image(uploaded_file):
     if uploaded_file is not None:
@@ -243,14 +280,17 @@ def upload_image(uploaded_file):
         url = f"{API_URL}/api/tap_tin/upload"
         try:
             session = get_session()
-            res = session.post(url, files=files, timeout=30)
+            # Timeout dài hơn cho upload (60s cho lần đầu khi backend sleep)
+            timeout = 60 if not st.session_state.get('backend_awake', False) else 30
+            res = session.post(url, files=files, timeout=timeout)
             if res.status_code == 200:
+                st.session_state.backend_awake = True
                 return res.json().get("url")
-            st.error("Lỗi tải ảnh")
+            st.error(f"Lỗi tải ảnh ({res.status_code})")
         except requests.Timeout:
-            st.error("⏱️ Upload ảnh quá lâu")
+            st.error("⏱️ Upload ảnh quá lâu. Server có thể đang khởi động, vui lòng thử lại.")
         except Exception as e:
-            st.error(f"Lỗi upload")
+            st.error(f"Lỗi upload: {str(e)}")
     return None
 
 # Upload nhiều ảnh song song
