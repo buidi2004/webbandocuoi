@@ -2,57 +2,29 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import './Footer.css';
 
-// Component hạt vàng lấp lánh
+// Component hạt vàng lấp lánh - tối ưu performance
 const HatVangLapLanh = ({ side, isVisible }) => {
-    const [particles, setParticles] = useState([]);
-    
-    useEffect(() => {
-        // Tạo các hạt vàng ngẫu nhiên
-        const newParticles = [];
-        for (let i = 0; i < 25; i++) {
-            newParticles.push({
-                id: i,
-                x: Math.random() * 220,
-                y: Math.random() * 120,
-                size: Math.random() * 2 + 1,
-                delay: Math.random() * 3,
-                duration: Math.random() * 2 + 2
-            });
-        }
-        setParticles(newParticles);
-    }, []);
+    // Vị trí cố định cho 10 hạt - không cần useState/useEffect
+    const particles = [
+        { id: 0, x: 30, y: 25, cls: 'hat-sm' },
+        { id: 1, x: 80, y: 45, cls: 'hat-md' },
+        { id: 2, x: 140, y: 20, cls: 'hat-lg' },
+        { id: 3, x: 180, y: 60, cls: 'hat-sm' },
+        { id: 4, x: 50, y: 80, cls: 'hat-md' },
+        { id: 5, x: 120, y: 90, cls: 'hat-sm' },
+        { id: 6, x: 200, y: 35, cls: 'hat-md' },
+        { id: 7, x: 65, y: 55, cls: 'hat-lg' },
+        { id: 8, x: 160, y: 75, cls: 'hat-sm' },
+        { id: 9, x: 100, y: 15, cls: 'hat-md' }
+    ];
     
     return (
-        <div 
-            className={`hat-vang-container ${isVisible ? 'visible' : ''}`}
-            style={{
-                position: 'absolute',
-                [side]: 0,
-                top: '50%',
-                transform: `translateY(-50%) ${side === 'right' ? 'scaleX(-1)' : ''}`,
-                width: '220px',
-                height: '120px',
-                pointerEvents: 'none',
-                zIndex: 0,
-                opacity: isVisible ? 1 : 0,
-                transition: 'opacity 1s ease-out 0.5s'
-            }}
-        >
+        <div className={`hat-vang-container ${side} ${isVisible ? 'visible' : ''}`}>
             {particles.map(p => (
-                <div
+                <span
                     key={p.id}
-                    className="hat-vang-lap-lanh"
-                    style={{
-                        position: 'absolute',
-                        left: `${p.x}px`,
-                        top: `${p.y}px`,
-                        width: `${p.size}px`,
-                        height: `${p.size}px`,
-                        background: 'radial-gradient(circle, #FFD700 0%, #FFA500 50%, transparent 100%)',
-                        borderRadius: '50%',
-                        boxShadow: `0 0 ${p.size * 2}px #FFD700, 0 0 ${p.size * 4}px #FFA500`,
-                        animation: isVisible ? `twinkle ${p.duration}s ease-in-out ${p.delay}s infinite` : 'none'
-                    }}
+                    className={`hat-vang ${p.cls}`}
+                    style={{ left: p.x, top: p.y }}
                 />
             ))}
         </div>

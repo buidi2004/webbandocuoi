@@ -92,20 +92,52 @@
 }
 
 
-/* Hiệu ứng hạt vàng lấp lánh */
+/* Hiệu ứng hạt vàng lấp lánh - TỐI ƯU */
 @keyframes twinkle {
-    0%, 100% {
-        opacity: 0.3;
-        transform: scale(0.8);
-    }
-    50% {
-        opacity: 1;
-        transform: scale(1.2);
-    }
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
 }
 
-.hat-vang-lap-lanh {
+/* Container hạt vàng */
+.hat-vang-container {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 220px;
+    height: 120px;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.8s ease-out 0.5s;
+}
+
+.hat-vang-container.left { left: 0; }
+.hat-vang-container.right { right: 0; transform: translateY(-50%) scaleX(-1); }
+.hat-vang-container.visible { opacity: 1; }
+
+/* Hạt vàng - dùng CSS thay vì inline */
+.hat-vang {
+    position: absolute;
+    border-radius: 50%;
+    background: #FFD700;
+}
+
+.hat-vang.hat-sm {
+    width: 2px;
+    height: 2px;
     animation: twinkle 2s ease-in-out infinite;
+}
+
+.hat-vang.hat-md {
+    width: 3px;
+    height: 3px;
+    animation: twinkle 2.5s ease-in-out 0.5s infinite;
+}
+
+.hat-vang.hat-lg {
+    width: 4px;
+    height: 4px;
+    animation: twinkle 3s ease-in-out 1s infinite;
 }
 
 /* ===== HIỆU ỨNG CÀNH MAI FOOTER ===== */
@@ -202,14 +234,4 @@
     animation: 
         slideInRight 0.8s ease-out forwards,
         wiggleRight 4s ease-in-out 1.2s infinite;
-}
-
-/* Container hạt vàng */
-.hat-vang-container {
-    opacity: 0;
-    transition: opacity 0.8s ease-out 0.5s;
-}
-
-.hat-vang-container.visible {
-    opacity: 1;
 }
