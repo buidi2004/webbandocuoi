@@ -13,15 +13,6 @@ import LichTrong from '../thanh_phan/LichTrong';
 import LazyImage from '../thanh_phan/LazyImage';
 import '../styles/Home.css';
 
-// Các kiểu Ken Burns effect
-const kenBurnsEffects = [
-    { scale: [1, 1.15], x: [0, 0], y: [0, 0] },           // zoom in
-    { scale: [1.05, 1.12], x: ['3%', '-3%'], y: [0, 0] }, // pan left
-    { scale: [1.05, 1.12], x: ['-3%', '3%'], y: [0, 0] }, // pan right  
-    { scale: [1.2, 1], x: [0, 0], y: [0, 0] },            // zoom out
-    { scale: [1, 1.1], x: [0, '-2%'], y: [0, '-2%'] },    // pan diagonal
-];
-
 const TrangChu = () => {
     const [banners, setBanners] = useState([]);
     const [idxBanner, setIdxBanner] = useState(0);
@@ -78,16 +69,16 @@ const TrangChu = () => {
         return () => ctx.revert();
     }, [gioiThieu, diemNhan, thuVien]); // Re-run when data loads
 
-    // Hiệu ứng chuyển Banner tự động
-    useEffect(() => {
-        if (banners.length <= 1) return;
-        const timer = setInterval(() => {
-            setIdxBanner(prev => (prev + 1) % banners.length);
-        }, 6000);
-        return () => clearInterval(timer);
-    }, [banners]);
+    // Hiệu ứng chuyển Banner tự động - tắt vì dùng zoom liên tục
+    // useEffect(() => {
+    //     if (banners.length <= 1) return;
+    //     const timer = setInterval(() => {
+    //         setIdxBanner(prev => (prev + 1) % banners.length);
+    //     }, 6000);
+    //     return () => clearInterval(timer);
+    // }, [banners]);
 
-    // GSAP Ken Burns effect khi slide thay đổi
+    // GSAP Zoom in/out liên tục - 12s zoom ra, 12s thu lại
     useEffect(() => {
         if (banners.length === 0) return;
         
@@ -96,10 +87,6 @@ const TrangChu = () => {
             kenBurnsTimeline.current.kill();
         }
 
-        // Lấy effect cho slide hiện tại
-        const effectIndex = idxBanner % kenBurnsEffects.length;
-        const effect = kenBurnsEffects[effectIndex];
-        
         // Tìm element hình ảnh của slide active
         const activeSlide = slideRefs.current[idxBanner];
         if (!activeSlide) return;
@@ -107,21 +94,16 @@ const TrangChu = () => {
         const imageEl = activeSlide.querySelector('.hero-slide-image');
         if (!imageEl) return;
 
-        // Reset transform trước
-        gsap.set(imageEl, { 
-            scale: effect.scale[0], 
-            x: effect.x[0], 
-            y: effect.y[0] 
-        });
+        // Reset về scale 1
+        gsap.set(imageEl, { scale: 1 });
 
-        // Chạy animation Ken Burns
-        kenBurnsTimeline.current = gsap.to(imageEl, {
-            scale: effect.scale[1],
-            x: effect.x[1],
-            y: effect.y[1],
-            duration: 6,
-            ease: "power1.out"
-        });
+        // Tạo timeline zoom in/out lặp vô hạn
+        kenBurnsTimeline.current = gsap.timeline({ repeat: -1, yoyo: true })
+            .to(imageEl, {
+                scale: 1.15,
+                duration: 12,
+                ease: "power1.inOut"
+            });
 
         return () => {
             if (kenBurnsTimeline.current) {
