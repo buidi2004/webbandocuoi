@@ -5,3 +5,5 @@ pandas
 Pillow
 openpyxl
 bcrypt==4.1.2
+streamlit-quill
+plotly

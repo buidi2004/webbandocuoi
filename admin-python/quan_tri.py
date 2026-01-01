@@ -1137,52 +1137,156 @@ def ui_doi_tac_khieu_nai():
 
 def ui_blog():
     st.header("📰 Quản lý Blog & Tin tức")
-    t1, t2 = st.tabs(["DANH SÁCH BÀI VIẾT", "THÊM BÀI VIẾT MỚI"])
     
+    # Kiểm tra và import streamlit-quill
+    try:
+        from streamlit_quill import st_quill
+        has_quill = True
+    except ImportError:
+        has_quill = False
+        st.warning("⚠️ Để sử dụng Rich Text Editor, hãy cài đặt: `pip install streamlit-quill`")
+    
+    t1, t2, t3 = st.tabs(["📋 DANH SÁCH BÀI VIẾT", "✏️ THÊM BÀI VIẾT MỚI", "📝 SỬA BÀI VIẾT"])
+    
+    # === TAB 2: THÊM BÀI VIẾT MỚI ===
     with t2:
-        with st.form("new_blog"):
-            title = st.text_input("Tiêu đề bài viết")
-            category = st.selectbox("Danh mục", ["tips", "news", "wedding-story"], format_func=lambda x: {"tips": "💡 Mẹo cưới", "news": "📰 Tin tức", "wedding-story": "💕 Câu chuyện cưới"}[x])
-            excerpt = st.text_area("Tóm tắt ngắn", height=80)
-            content = st.text_area("Nội dung bài viết (hỗ trợ HTML)", height=300)
-            img = st.file_uploader("Ảnh bìa", type=["jpg", "png", "webp"])
-            is_published = st.checkbox("Xuất bản ngay", value=False)
-            
-            if st.form_submit_button("TẠO BÀI VIẾT"):
-                img_url = upload_image(img) if img else None
-                data = {
-                    "title": title,
-                    "excerpt": excerpt, 
-                    "content": content,
-                    "image_url": img_url,
-                    "category": category,
-                    "is_published": is_published
-                }
-                if call_api("POST", "/api/blog/", data=data):
-                    st.toast("Đã tạo bài viết mới!")
-                    st.rerun()
+        st.subheader("✏️ Tạo bài viết mới")
+        
+        # Không dùng form để có thể sử dụng Rich Text Editor
+        title = st.text_input("📌 Tiêu đề bài viết", key="new_blog_title")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            category = st.selectbox(
+                "📁 Danh mục", 
+                ["tips", "news", "wedding-story"], 
+                format_func=lambda x: {"tips": "💡 Mẹo cưới", "news": "📰 Tin tức", "wedding-story": "💕 Câu chuyện cưới"}[x],
+                key="new_blog_category"
+            )
+        with col2:
+            is_published = st.checkbox("🚀 Xuất bản ngay", value=False, key="new_blog_published")
+        
+        excerpt = st.text_area("📝 Tóm tắt ngắn (hiển thị ở danh sách)", height=80, key="new_blog_excerpt")
+        
+        # SEO Fields
+        with st.expander("🔍 SEO Settings (Tùy chọn)"):
+            seo_title = st.text_input("Meta Title", placeholder="Tiêu đề hiển thị trên Google", key="new_seo_title")
+            seo_desc = st.text_area("Meta Description", placeholder="Mô tả ngắn cho SEO (150-160 ký tự)", height=80, key="new_seo_desc")
+            seo_keywords = st.text_input("Keywords", placeholder="từ khóa 1, từ khóa 2, ...", key="new_seo_keywords")
+        
+        st.markdown("### 📄 Nội dung bài viết")
+        
+        # Rich Text Editor
+        if has_quill:
+            content = st_quill(
+                placeholder="Viết nội dung bài viết tại đây...",
+                html=True,
+                key="new_blog_content"
+            )
+        else:
+            content = st.text_area(
+                "Nội dung bài viết (hỗ trợ HTML)", 
+                height=400,
+                key="new_blog_content_fallback",
+                help="Cài đặt streamlit-quill để có Rich Text Editor"
+            )
+        
+        # Ảnh bìa
+        st.markdown("### 🖼️ Ảnh bìa")
+        img = st.file_uploader("Chọn ảnh bìa", type=["jpg", "png", "webp"], key="new_blog_img")
+        if img:
+            st.image(img, caption="Xem trước ảnh bìa", width=400)
+        
+        # Nút tạo bài viết
+        if st.button("💾 TẠO BÀI VIẾT", type="primary", use_container_width=True):
+            if not title:
+                st.error("⚠️ Vui lòng nhập tiêu đề bài viết!")
+            elif not content:
+                st.error("⚠️ Vui lòng nhập nội dung bài viết!")
+            else:
+                with st.spinner("Đang tạo bài viết..."):
+                    img_url = upload_image(img) if img else None
+                    data = {
+                        "title": title,
+                        "excerpt": excerpt, 
+                        "content": content,
+                        "image_url": img_url,
+                        "category": category,
+                        "is_published": is_published,
+                        "seo_title": seo_title if seo_title else title,
+                        "seo_description": seo_desc if seo_desc else excerpt[:160],
+                        "seo_keywords": seo_keywords
+                    }
+                    if call_api("POST", "/api/blog/", data=data):
+                        st.success("✅ Đã tạo bài viết mới!")
+                        st.balloons()
+                        st.rerun()
     
+    # === TAB 1: DANH SÁCH BÀI VIẾT ===
     with t1:
+        st.subheader("📋 Danh sách bài viết")
+        
+        # Bộ lọc
+        col1, col2 = st.columns(2)
+        with col1:
+            filter_status = st.selectbox("Trạng thái", ["Tất cả", "Đã xuất bản", "Bản nháp"], key="blog_filter_status")
+        with col2:
+            filter_cat = st.selectbox("Danh mục", ["Tất cả", "tips", "news", "wedding-story"], key="blog_filter_cat")
+        
         posts = call_api("GET", "/api/blog/?published_only=false", clear_cache=False)
+        
         if posts:
-            for p in posts:
+            # Lọc
+            filtered_posts = posts
+            if filter_status == "Đã xuất bản":
+                filtered_posts = [p for p in filtered_posts if p.get('is_published')]
+            elif filter_status == "Bản nháp":
+                filtered_posts = [p for p in filtered_posts if not p.get('is_published')]
+            
+            if filter_cat != "Tất cả":
+                filtered_posts = [p for p in filtered_posts if p.get('category') == filter_cat]
+            
+            st.write(f"📊 Hiển thị **{len(filtered_posts)}** bài viết")
+            
+            for p in filtered_posts:
                 with st.container(border=True):
                     c1, c2, c3 = st.columns([1, 3, 1])
                     with c1:
                         if p.get('image_url'):
                             st.image(lay_url_anh(p['image_url']), use_container_width=True)
+                        else:
+                            st.info("📷")
                     with c2:
-                        status_badge = "✅ Đã xuất bản" if p.get('is_published') else "📝 Bản nháp"
-                        st.write(f"**{p['title']}** {status_badge}")
-                        st.caption(f"📁 {p['category']} | 👁️ {p['views']} lượt xem")
+                        # Status badge với màu
+                        if p.get('is_published'):
+                            st.markdown(f"""
+                                **{p['title']}** 
+                                <span style="background:#2ecc7120; color:#2ecc71; padding:2px 8px; border-radius:8px; font-size:0.8em;">✅ Đã xuất bản</span>
+                            """, unsafe_allow_html=True)
+                        else:
+                            st.markdown(f"""
+                                **{p['title']}** 
+                                <span style="background:#FFA50020; color:#FFA500; padding:2px 8px; border-radius:8px; font-size:0.8em;">📝 Bản nháp</span>
+                            """, unsafe_allow_html=True)
+                        
+                        cat_labels = {"tips": "💡 Mẹo cưới", "news": "📰 Tin tức", "wedding-story": "💕 Câu chuyện cưới"}
+                        st.caption(f"📁 {cat_labels.get(p['category'], p['category'])} | 👁️ {p.get('views', 0)} lượt xem")
                         st.text(p.get('excerpt', '')[:100] + "..." if p.get('excerpt') else "")
                     with c3:
-                        if st.button("XÓA", key=f"del_blog_{p['id']}"):
+                        # Nút sửa
+                        if st.button("✏️ SỬA", key=f"edit_blog_{p['id']}"):
+                            st.session_state['editing_blog'] = p
+                            st.rerun()
+                        
+                        # Nút xóa
+                        if st.button("🗑️ XÓA", key=f"del_blog_{p['id']}"):
                             if call_api("DELETE", f"/api/blog/{p['id']}"):
                                 st.toast("Đã xóa bài viết")
                                 st.rerun()
+                        
+                        # Nút xuất bản (nếu là bản nháp)
                         if not p.get('is_published'):
-                            if st.button("XUẤT BẢN", key=f"pub_{p['id']}"):
+                            if st.button("🚀 XUẤT BẢN", key=f"pub_{p['id']}"):
                                 data = {
                                     "title": p['title'], "excerpt": p.get('excerpt', ''),
                                     "content": p['content'], "image_url": p.get('image_url'),
@@ -1193,9 +1297,118 @@ def ui_blog():
                                     st.rerun()
         else:
             st.info("Chưa có bài viết nào.")
+    
+    # === TAB 3: SỬA BÀI VIẾT ===
+    with t3:
+        editing_blog = st.session_state.get('editing_blog', None)
+        
+        if editing_blog:
+            st.subheader(f"✏️ Sửa bài viết: {editing_blog.get('title', '')}")
+            
+            edit_title = st.text_input("📌 Tiêu đề", value=editing_blog.get('title', ''), key="edit_blog_title")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                cat_options = ["tips", "news", "wedding-story"]
+                current_cat = editing_blog.get('category', 'tips')
+                edit_category = st.selectbox(
+                    "📁 Danh mục",
+                    cat_options,
+                    index=cat_options.index(current_cat) if current_cat in cat_options else 0,
+                    format_func=lambda x: {"tips": "💡 Mẹo cưới", "news": "📰 Tin tức", "wedding-story": "💕 Câu chuyện cưới"}[x],
+                    key="edit_blog_category"
+                )
+            with col2:
+                edit_published = st.checkbox("🚀 Xuất bản", value=editing_blog.get('is_published', False), key="edit_blog_published")
+            
+            edit_excerpt = st.text_area("📝 Tóm tắt", value=editing_blog.get('excerpt', ''), height=80, key="edit_blog_excerpt")
+            
+            # SEO Fields
+            with st.expander("🔍 SEO Settings"):
+                edit_seo_title = st.text_input("Meta Title", value=editing_blog.get('seo_title', ''), key="edit_seo_title")
+                edit_seo_desc = st.text_area("Meta Description", value=editing_blog.get('seo_description', ''), height=80, key="edit_seo_desc")
+                edit_seo_keywords = st.text_input("Keywords", value=editing_blog.get('seo_keywords', ''), key="edit_seo_keywords")
+            
+            st.markdown("### 📄 Nội dung bài viết")
+            
+            # Rich Text Editor cho sửa
+            if has_quill:
+                edit_content = st_quill(
+                    value=editing_blog.get('content', ''),
+                    html=True,
+                    key="edit_blog_content"
+                )
+            else:
+                edit_content = st.text_area(
+                    "Nội dung (HTML)",
+                    value=editing_blog.get('content', ''),
+                    height=400,
+                    key="edit_blog_content_fallback"
+                )
+            
+            # Ảnh bìa
+            st.markdown("### 🖼️ Ảnh bìa")
+            if editing_blog.get('image_url'):
+                st.image(lay_url_anh(editing_blog['image_url']), caption="Ảnh hiện tại", width=300)
+            
+            edit_img = st.file_uploader("Thay đổi ảnh bìa", type=["jpg", "png", "webp"], key="edit_blog_img")
+            if edit_img:
+                st.image(edit_img, caption="Ảnh mới", width=300)
+            
+            # Buttons
+            col_btn1, col_btn2 = st.columns(2)
+            with col_btn1:
+                if st.button("❌ HỦY", use_container_width=True):
+                    st.session_state.pop('editing_blog', None)
+                    st.rerun()
+            with col_btn2:
+                if st.button("💾 LƯU THAY ĐỔI", type="primary", use_container_width=True):
+                    with st.spinner("Đang lưu..."):
+                        img_url = editing_blog.get('image_url', '')
+                        if edit_img:
+                            uploaded = upload_image(edit_img)
+                            if uploaded:
+                                img_url = uploaded
+                        
+                        data = {
+                            "title": edit_title,
+                            "excerpt": edit_excerpt,
+                            "content": edit_content,
+                            "image_url": img_url,
+                            "category": edit_category,
+                            "is_published": edit_published,
+                            "seo_title": edit_seo_title,
+                            "seo_description": edit_seo_desc,
+                            "seo_keywords": edit_seo_keywords
+                        }
+                        
+                        if call_api("PUT", f"/api/blog/{editing_blog['id']}", data=data):
+                            st.success("✅ Đã cập nhật bài viết!")
+                            st.session_state.pop('editing_blog', None)
+                            st.rerun()
+        else:
+            st.info("👈 Chọn bài viết từ tab 'Danh sách bài viết' để sửa")
 
 def ui_don_hang():
     st.header("🛒 Quản lý Đơn hàng")
+    
+    # CSS cho status badges
+    st.markdown("""
+        <style>
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 500;
+            display: inline-block;
+        }
+        .status-pending { background: #FFA50020; color: #FFA500; border: 1px solid #FFA500; }
+        .status-processing { background: #3498db20; color: #3498db; border: 1px solid #3498db; }
+        .status-shipped { background: #9b59b620; color: #9b59b6; border: 1px solid #9b59b6; }
+        .status-delivered { background: #2ecc7120; color: #2ecc71; border: 1px solid #2ecc71; }
+        .status-cancelled { background: #e74c3c20; color: #e74c3c; border: 1px solid #e74c3c; }
+        </style>
+    """, unsafe_allow_html=True)
     
     # Nút refresh
     if st.button("🔄 Làm mới danh sách"):
@@ -1208,6 +1421,57 @@ def ui_don_hang():
     if not don_hang_list:
         st.info("Chưa có đơn hàng nào.")
         return
+    
+    # Thống kê nhanh theo trạng thái
+    status_counts = {'pending': 0, 'processing': 0, 'shipped': 0, 'delivered': 0, 'cancelled': 0}
+    total_revenue = 0
+    for dh in don_hang_list:
+        s = dh.get('status', 'pending')
+        if s in status_counts:
+            status_counts[s] += 1
+        if s in ['delivered', 'shipped']:
+            total_revenue += dh.get('total_amount', 0)
+    
+    # Hiển thị thống kê nhanh
+    st.markdown("### 📊 Thống kê nhanh")
+    m1, m2, m3, m4, m5 = st.columns(5)
+    with m1:
+        st.markdown(f"""
+            <div style="text-align:center; padding:10px; background:#FFA50015; border-radius:8px; border:1px solid #FFA50050;">
+                <div style="font-size:1.5em; font-weight:bold; color:#FFA500;">{status_counts['pending']}</div>
+                <div style="font-size:0.8em; color:#888;">Chờ xử lý</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with m2:
+        st.markdown(f"""
+            <div style="text-align:center; padding:10px; background:#3498db15; border-radius:8px; border:1px solid #3498db50;">
+                <div style="font-size:1.5em; font-weight:bold; color:#3498db;">{status_counts['processing']}</div>
+                <div style="font-size:0.8em; color:#888;">Đang xử lý</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with m3:
+        st.markdown(f"""
+            <div style="text-align:center; padding:10px; background:#9b59b615; border-radius:8px; border:1px solid #9b59b650;">
+                <div style="font-size:1.5em; font-weight:bold; color:#9b59b6;">{status_counts['shipped']}</div>
+                <div style="font-size:0.8em; color:#888;">Đang giao</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with m4:
+        st.markdown(f"""
+            <div style="text-align:center; padding:10px; background:#2ecc7115; border-radius:8px; border:1px solid #2ecc7150;">
+                <div style="font-size:1.5em; font-weight:bold; color:#2ecc71;">{status_counts['delivered']}</div>
+                <div style="font-size:0.8em; color:#888;">Đã giao</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with m5:
+        st.markdown(f"""
+            <div style="text-align:center; padding:10px; background:#e74c3c15; border-radius:8px; border:1px solid #e74c3c50;">
+                <div style="font-size:1.5em; font-weight:bold; color:#e74c3c;">{status_counts['cancelled']}</div>
+                <div style="font-size:0.8em; color:#888;">Đã hủy</div>
+            </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("---")
     
     # Bộ lọc
     col1, col2 = st.columns(2)
@@ -1240,22 +1504,19 @@ def ui_don_hang():
     st.markdown("---")
     
     # Hiển thị đơn hàng
-    for dh in paginated_orders:  # Chỉ hiển thị đơn trong trang hiện tại
+    for dh in paginated_orders:
         status = dh.get('status', 'pending')
-        status_color = {
-            'pending': '🟡',
-            'processing': '🔵', 
-            'shipped': '🟣',
-            'delivered': '🟢',
-            'cancelled': '🔴'
-        }.get(status, '⚪')
-        status_text = {
-            'pending': 'Chờ xử lý',
-            'processing': 'Đang xử lý',
-            'shipped': 'Đang giao',
-            'delivered': 'Đã giao',
-            'cancelled': 'Đã hủy'
-        }.get(status, status)
+        
+        # Status styling
+        status_config = {
+            'pending': ('🟡', 'status-pending', 'Chờ xử lý', '#FFA500'),
+            'processing': ('🔵', 'status-processing', 'Đang xử lý', '#3498db'),
+            'shipped': ('🟣', 'status-shipped', 'Đang giao', '#9b59b6'),
+            'delivered': ('🟢', 'status-delivered', 'Đã giao', '#2ecc71'),
+            'cancelled': ('🔴', 'status-cancelled', 'Đã hủy', '#e74c3c')
+        }
+        
+        icon, css_class, status_text, color = status_config.get(status, ('⚪', '', status, '#888'))
         
         with st.container(border=True):
             c1, c2, c3 = st.columns([3, 2, 1])
@@ -1265,7 +1526,12 @@ def ui_don_hang():
                 st.write(f"📍 {dh.get('shipping_address')}")
             with c2:
                 st.write(f"💰 **{dh.get('total_amount', 0):,.0f}đ**")
-                st.write(f"{status_color} {status_text}")
+                # Color-coded status badge
+                st.markdown(f"""
+                    <span class="status-badge {css_class}">
+                        {icon} {status_text}
+                    </span>
+                """, unsafe_allow_html=True)
                 # Ngày đặt
                 order_date = dh.get('order_date', '')
                 if order_date:
@@ -1291,9 +1557,13 @@ def ui_don_hang():
 
 # --- Main Layout ---
 if "Tổng quan" in choice:
-    st.header("Tổng quan")
+    st.header("📊 Tổng quan Dashboard")
+    
     # Fetch statistics from new API - với cache
     stats = fetch_api_data("/api/thong_ke/tong_quan")
+    don_hang_list = fetch_api_data("/api/don_hang/")
+    
+    # === METRICS ROW ===
     if stats:
         c1, c2, c3, c4 = st.columns(4)
         with c1: st.metric("🛍️ SẢN PHẨM", stats.get('tong_san_pham', 0))
@@ -1315,6 +1585,173 @@ if "Tổng quan" in choice:
         c1, c2 = st.columns(2)
         with c1: st.metric("TỔNG SẢN PHẨM", len(products) if products else 0)
         with c2: st.metric("LIÊN HỆ MỚI", len([c for c in (contacts or []) if c.get('status') == 'pending']))
+    
+    st.markdown("---")
+    
+    # === CHARTS SECTION ===
+    st.subheader("📈 Biểu đồ thống kê")
+    
+    chart_col1, chart_col2 = st.columns(2)
+    
+    # === PIE CHART: TRẠNG THÁI ĐƠN HÀNG ===
+    with chart_col1:
+        st.markdown("#### 🥧 Trạng thái đơn hàng")
+        
+        if don_hang_list:
+            # Đếm số lượng theo trạng thái
+            status_counts = {
+                'pending': 0,
+                'processing': 0,
+                'shipped': 0,
+                'delivered': 0,
+                'cancelled': 0
+            }
+            for dh in don_hang_list:
+                status = dh.get('status', 'pending')
+                if status in status_counts:
+                    status_counts[status] += 1
+            
+            # Tạo DataFrame cho pie chart
+            status_labels = {
+                'pending': 'Chờ xử lý',
+                'processing': 'Đang xử lý',
+                'shipped': 'Đang giao',
+                'delivered': 'Đã giao',
+                'cancelled': 'Đã hủy'
+            }
+            
+            pie_data = pd.DataFrame({
+                'Trạng thái': [status_labels.get(k, k) for k, v in status_counts.items() if v > 0],
+                'Số lượng': [v for v in status_counts.values() if v > 0]
+            })
+            
+            if not pie_data.empty:
+                import plotly.express as px
+                fig_pie = px.pie(
+                    pie_data, 
+                    values='Số lượng', 
+                    names='Trạng thái',
+                    color='Trạng thái',
+                    color_discrete_map={
+                        'Chờ xử lý': '#FFA500',
+                        'Đang xử lý': '#3498db',
+                        'Đang giao': '#9b59b6',
+                        'Đã giao': '#2ecc71',
+                        'Đã hủy': '#e74c3c'
+                    },
+                    hole=0.4
+                )
+                fig_pie.update_layout(
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    font_color='white',
+                    showlegend=True,
+                    legend=dict(orientation="h", yanchor="bottom", y=-0.2)
+                )
+                st.plotly_chart(fig_pie, use_container_width=True)
+            else:
+                st.info("Chưa có dữ liệu đơn hàng")
+        else:
+            st.info("Chưa có dữ liệu đơn hàng")
+    
+    # === BAR CHART: DOANH THU THEO TUẦN ===
+    with chart_col2:
+        st.markdown("#### 📊 Doanh thu 7 ngày gần nhất")
+        
+        if don_hang_list:
+            from datetime import datetime, timedelta
+            
+            # Tính doanh thu theo ngày (7 ngày gần nhất)
+            today = datetime.now()
+            revenue_by_day = {}
+            
+            for i in range(7):
+                day = today - timedelta(days=i)
+                day_str = day.strftime('%d/%m')
+                revenue_by_day[day_str] = 0
+            
+            for dh in don_hang_list:
+                if dh.get('status') in ['delivered', 'shipped', 'processing']:
+                    order_date_str = dh.get('order_date', '')
+                    if order_date_str:
+                        try:
+                            order_date = datetime.fromisoformat(order_date_str.replace('Z', '+00:00'))
+                            day_str = order_date.strftime('%d/%m')
+                            if day_str in revenue_by_day:
+                                revenue_by_day[day_str] += dh.get('total_amount', 0)
+                        except:
+                            pass
+            
+            # Đảo ngược để hiển thị từ cũ đến mới
+            bar_data = pd.DataFrame({
+                'Ngày': list(reversed(list(revenue_by_day.keys()))),
+                'Doanh thu': list(reversed(list(revenue_by_day.values())))
+            })
+            
+            import plotly.express as px
+            fig_bar = px.bar(
+                bar_data,
+                x='Ngày',
+                y='Doanh thu',
+                color_discrete_sequence=['#3498db']
+            )
+            fig_bar.update_layout(
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+                font_color='white',
+                xaxis=dict(showgrid=False),
+                yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.1)')
+            )
+            st.plotly_chart(fig_bar, use_container_width=True)
+        else:
+            st.info("Chưa có dữ liệu doanh thu")
+    
+    st.markdown("---")
+    
+    # === ĐƠN HÀNG GẦN ĐÂY ===
+    st.subheader("🕐 Đơn hàng gần đây")
+    
+    if don_hang_list:
+        # Lấy 5 đơn hàng mới nhất
+        recent_orders = sorted(don_hang_list, key=lambda x: x.get('order_date', ''), reverse=True)[:5]
+        
+        for dh in recent_orders:
+            status = dh.get('status', 'pending')
+            
+            # Color-coded status badges với HTML
+            status_styles = {
+                'pending': ('🟡', '#FFA500', 'Chờ xử lý'),
+                'processing': ('🔵', '#3498db', 'Đang xử lý'),
+                'shipped': ('🟣', '#9b59b6', 'Đang giao'),
+                'delivered': ('🟢', '#2ecc71', 'Đã giao'),
+                'cancelled': ('🔴', '#e74c3c', 'Đã hủy')
+            }
+            
+            icon, color, text = status_styles.get(status, ('⚪', '#888', status))
+            
+            with st.container(border=True):
+                c1, c2, c3, c4 = st.columns([1, 3, 2, 2])
+                with c1:
+                    st.write(f"**#{dh.get('id')}**")
+                with c2:
+                    st.write(f"{dh.get('customer_name', 'N/A')}")
+                    st.caption(f"📞 {dh.get('customer_phone', '')}")
+                with c3:
+                    st.write(f"💰 **{dh.get('total_amount', 0):,.0f}đ**")
+                with c4:
+                    st.markdown(f"""
+                        <span style="
+                            background-color: {color}20;
+                            color: {color};
+                            padding: 4px 12px;
+                            border-radius: 12px;
+                            font-size: 0.85em;
+                            font-weight: 500;
+                            border: 1px solid {color};
+                        ">{icon} {text}</span>
+                    """, unsafe_allow_html=True)
+    else:
+        st.info("Chưa có đơn hàng nào")
 
 elif "Liên hệ" in choice: ui_lien_he()
 elif "Đơn hàng" in choice: ui_don_hang()
