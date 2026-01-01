@@ -107,3 +107,109 @@
 .hat-vang-lap-lanh {
     animation: twinkle 2s ease-in-out infinite;
 }
+
+/* ===== HIỆU ỨNG CÀNH MAI FOOTER ===== */
+
+/* Slide từ trái vào */
+@keyframes slideInLeft {
+    0% {
+        opacity: 0;
+        transform: translateY(-50%) translateX(-100px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+    }
+}
+
+/* Slide từ phải vào */
+@keyframes slideInRight {
+    0% {
+        opacity: 0;
+        transform: translateY(-50%) scaleX(-1) translateX(-100px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(-50%) scaleX(-1) translateX(0);
+    }
+}
+
+/* Hiệu ứng nở hoa - scale và rotate nhẹ */
+@keyframes bloomIn {
+    0% {
+        transform: translateY(-50%) scale(0.7);
+        opacity: 0;
+    }
+    60% {
+        transform: translateY(-50%) scale(1.05) rotate(2deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-50%) scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+/* Hiệu ứng lắc lư theo gió */
+@keyframes wiggle {
+    0%, 100% {
+        transform: translateY(-50%) rotate(0deg);
+    }
+    25% {
+        transform: translateY(-50%) rotate(1.5deg);
+    }
+    75% {
+        transform: translateY(-50%) rotate(-1.5deg);
+    }
+}
+
+/* Hiệu ứng lắc lư cho bên phải (đã scaleX) */
+@keyframes wiggleRight {
+    0%, 100% {
+        transform: translateY(-50%) scaleX(-1) rotate(0deg);
+    }
+    25% {
+        transform: translateY(-50%) scaleX(-1) rotate(1.5deg);
+    }
+    75% {
+        transform: translateY(-50%) scaleX(-1) rotate(-1.5deg);
+    }
+}
+
+/* Style cho cành mai SVG */
+.canh-mai-svg {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Cành mai bên trái */
+.canh-mai-svg.left {
+    transform: translateY(-50%) translateX(-100px);
+}
+
+.canh-mai-svg.left.visible {
+    animation: 
+        slideInLeft 0.8s ease-out forwards,
+        wiggle 4s ease-in-out 1s infinite;
+}
+
+/* Cành mai bên phải */
+.canh-mai-svg.right {
+    transform: translateY(-50%) scaleX(-1) translateX(-100px);
+}
+
+.canh-mai-svg.right.visible {
+    animation: 
+        slideInRight 0.8s ease-out forwards,
+        wiggleRight 4s ease-in-out 1.2s infinite;
+}
+
+/* Container hạt vàng */
+.hat-vang-container {
+    opacity: 0;
+    transition: opacity 0.8s ease-out 0.5s;
+}
+
+.hat-vang-container.visible {
+    opacity: 1;
+}

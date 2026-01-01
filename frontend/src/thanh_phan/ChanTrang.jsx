@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import './Footer.css';
 
 // Component hạt vàng lấp lánh
-const HatVangLapLanh = ({ side }) => {
+const HatVangLapLanh = ({ side, isVisible }) => {
     const [particles, setParticles] = useState([]);
     
     useEffect(() => {
@@ -23,16 +23,21 @@ const HatVangLapLanh = ({ side }) => {
     }, []);
     
     return (
-        <div style={{
-            position: 'absolute',
-            [side]: 0,
-            top: '50%',
-            transform: `translateY(-50%) ${side === 'right' ? 'scaleX(-1)' : ''}`,
-            width: '220px',
-            height: '120px',
-            pointerEvents: 'none',
-            zIndex: 0
-        }}>
+        <div 
+            className={`hat-vang-container ${isVisible ? 'visible' : ''}`}
+            style={{
+                position: 'absolute',
+                [side]: 0,
+                top: '50%',
+                transform: `translateY(-50%) ${side === 'right' ? 'scaleX(-1)' : ''}`,
+                width: '220px',
+                height: '120px',
+                pointerEvents: 'none',
+                zIndex: 0,
+                opacity: isVisible ? 1 : 0,
+                transition: 'opacity 1s ease-out 0.5s'
+            }}
+        >
             {particles.map(p => (
                 <div
                     key={p.id}
@@ -46,7 +51,7 @@ const HatVangLapLanh = ({ side }) => {
                         background: 'radial-gradient(circle, #FFD700 0%, #FFA500 50%, transparent 100%)',
                         borderRadius: '50%',
                         boxShadow: `0 0 ${p.size * 2}px #FFD700, 0 0 ${p.size * 4}px #FFA500`,
-                        animation: `twinkle ${p.duration}s ease-in-out ${p.delay}s infinite`
+                        animation: isVisible ? `twinkle ${p.duration}s ease-in-out ${p.delay}s infinite` : 'none'
                     }}
                 />
             ))}
@@ -54,19 +59,19 @@ const HatVangLapLanh = ({ side }) => {
     );
 };
 
-// Component cành mai nằm ngang cho footer
-const CanhMaiNgang = ({ side }) => (
+// Component cành mai nằm ngang cho footer với hiệu ứng
+const CanhMaiNgang = ({ side, isVisible }) => (
     <svg 
         width="220" 
         height="120" 
         viewBox="0 0 220 120"
+        className={`canh-mai-svg ${side} ${isVisible ? 'visible' : ''}`}
         style={{
             position: 'absolute',
             [side]: 0,
             top: '50%',
-            transform: `translateY(-50%) ${side === 'right' ? 'scaleX(-1)' : ''}`,
-            opacity: 0.85,
-            pointerEvents: 'none'
+            pointerEvents: 'none',
+            zIndex: 1
         }}
     >
         {/* Cành chính nằm ngang */}
@@ -180,15 +185,43 @@ const CanhMaiNgang = ({ side }) => (
 );
 
 const ChanTrang = () => {
+    const footerRef = useRef(null);
+    const [isVisible, setIsVisible] = useState(false);
+    
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                // Khi footer xuất hiện trong viewport
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                }
+            },
+            {
+                threshold: 0.2, // Kích hoạt khi 20% footer visible
+                rootMargin: '50px' // Kích hoạt sớm hơn 50px
+            }
+        );
+        
+        if (footerRef.current) {
+            observer.observe(footerRef.current);
+        }
+        
+        return () => {
+            if (footerRef.current) {
+                observer.unobserve(footerRef.current);
+            }
+        };
+    }, []);
+    
     return (
-        <footer className="footer" style={{ position: 'relative', overflow: 'hidden' }}>
+        <footer ref={footerRef} className="footer" style={{ position: 'relative', overflow: 'hidden' }}>
             {/* Hiệu ứng hạt vàng lấp lánh */}
-            <HatVangLapLanh side="left" />
-            <HatVangLapLanh side="right" />
+            <HatVangLapLanh side="left" isVisible={isVisible} />
+            <HatVangLapLanh side="right" isVisible={isVisible} />
             
             {/* Cành mai 2 bên */}
-            <CanhMaiNgang side="left" />
-            <CanhMaiNgang side="right" />
+            <CanhMaiNgang side="left" isVisible={isVisible} />
+            <CanhMaiNgang side="right" isVisible={isVisible} />
             
             <div className="container" style={{ position: 'relative', zIndex: 1 }}>
                 <div className="footer-content">
