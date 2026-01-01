@@ -1,5 +1,58 @@
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import './Footer.css';
+
+// Component hạt vàng lấp lánh
+const HatVangLapLanh = ({ side }) => {
+    const [particles, setParticles] = useState([]);
+    
+    useEffect(() => {
+        // Tạo các hạt vàng ngẫu nhiên
+        const newParticles = [];
+        for (let i = 0; i < 25; i++) {
+            newParticles.push({
+                id: i,
+                x: Math.random() * 220,
+                y: Math.random() * 120,
+                size: Math.random() * 2 + 1,
+                delay: Math.random() * 3,
+                duration: Math.random() * 2 + 2
+            });
+        }
+        setParticles(newParticles);
+    }, []);
+    
+    return (
+        <div style={{
+            position: 'absolute',
+            [side]: 0,
+            top: '50%',
+            transform: `translateY(-50%) ${side === 'right' ? 'scaleX(-1)' : ''}`,
+            width: '220px',
+            height: '120px',
+            pointerEvents: 'none',
+            zIndex: 0
+        }}>
+            {particles.map(p => (
+                <div
+                    key={p.id}
+                    className="hat-vang-lap-lanh"
+                    style={{
+                        position: 'absolute',
+                        left: `${p.x}px`,
+                        top: `${p.y}px`,
+                        width: `${p.size}px`,
+                        height: `${p.size}px`,
+                        background: 'radial-gradient(circle, #FFD700 0%, #FFA500 50%, transparent 100%)',
+                        borderRadius: '50%',
+                        boxShadow: `0 0 ${p.size * 2}px #FFD700, 0 0 ${p.size * 4}px #FFA500`,
+                        animation: `twinkle ${p.duration}s ease-in-out ${p.delay}s infinite`
+                    }}
+                />
+            ))}
+        </div>
+    );
+};
 
 // Component cành mai nằm ngang cho footer
 const CanhMaiNgang = ({ side }) => (
@@ -129,6 +182,10 @@ const CanhMaiNgang = ({ side }) => (
 const ChanTrang = () => {
     return (
         <footer className="footer" style={{ position: 'relative', overflow: 'hidden' }}>
+            {/* Hiệu ứng hạt vàng lấp lánh */}
+            <HatVangLapLanh side="left" />
+            <HatVangLapLanh side="right" />
+            
             {/* Cành mai 2 bên */}
             <CanhMaiNgang side="left" />
             <CanhMaiNgang side="right" />

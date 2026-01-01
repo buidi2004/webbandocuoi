@@ -90,3 +90,20 @@
         text-align: center;
     }
 }
+
+
+/* Hiệu ứng hạt vàng lấp lánh */
+@keyframes twinkle {
+    0%, 100% {
+        opacity: 0.3;
+        transform: scale(0.8);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+.hat-vang-lap-lanh {
+    animation: twinkle 2s ease-in-out infinite;
+}
