@@ -8,8 +8,11 @@ export default function HieuUngHatCuoiTrang() {
             height: '600px',
             background: '#fff',
             overflow: 'hidden'
-        }}>
-            <HieuUngHat particleCount={400} nenTrang={true} />
+        }}
+        className="hieu-ung-cuoi-trang"
+        >
+            {/* Giảm số hạt - component sẽ tự giảm thêm trên mobile */}
+            <HieuUngHat particleCount={200} nenTrang={true} />
             
             {/* Content overlay căn giữa */}
             <div style={{
@@ -23,31 +26,33 @@ export default function HieuUngHatCuoiTrang() {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '50px',
+                padding: '30px 20px',
                 pointerEvents: 'none',
                 textAlign: 'center'
             }}>
                 <h2 style={{
                     color: '#1a1a1a',
-                    fontSize: '42px',
+                    fontSize: 'clamp(28px, 5vw, 42px)',
                     fontWeight: 700,
                     lineHeight: 1.2,
                     marginBottom: '16px',
-                    fontFamily: 'Playfair Display, serif'
+                    fontFamily: 'Playfair Display, serif',
+                    textShadow: '0 1px 2px rgba(255,255,255,0.8)'
                 }}>
                     Khám Phá Thêm
                 </h2>
                 <p style={{
                     color: '#666',
-                    fontSize: '18px',
+                    fontSize: 'clamp(14px, 3vw, 18px)',
                     maxWidth: '500px',
-                    marginBottom: '30px'
+                    marginBottom: '30px',
+                    textShadow: '0 1px 2px rgba(255,255,255,0.8)'
                 }}>
                     Trải nghiệm dịch vụ cưới trọn gói chuẩn quốc tế tại IVIE Studio
                 </p>
-                <div style={{ display: 'flex', gap: '16px', pointerEvents: 'auto' }}>
+                <div style={{ display: 'flex', gap: '12px', pointerEvents: 'auto', flexWrap: 'wrap', justifyContent: 'center' }}>
                     <a href="/lien-he" style={{
-                        padding: '14px 28px',
+                        padding: '12px 24px',
                         background: '#c9a86c',
                         color: '#fff',
                         fontSize: '14px',
@@ -70,8 +75,8 @@ export default function HieuUngHatCuoiTrang() {
                         Liên Hệ Ngay
                     </a>
                     <a href="/san-pham" style={{
-                        padding: '14px 28px',
-                        background: 'transparent',
+                        padding: '12px 24px',
+                        background: 'rgba(255,255,255,0.9)',
                         color: '#1a1a1a',
                         fontSize: '14px',
                         fontWeight: 600,
@@ -86,7 +91,7 @@ export default function HieuUngHatCuoiTrang() {
                         e.target.style.color = '#fff';
                     }}
                     onMouseLeave={(e) => {
-                        e.target.style.background = 'transparent';
+                        e.target.style.background = 'rgba(255,255,255,0.9)';
                         e.target.style.color = '#1a1a1a';
                     }}
                     >
@@ -94,6 +99,15 @@ export default function HieuUngHatCuoiTrang() {
                     </a>
                 </div>
             </div>
+            
+            {/* CSS cho mobile */}
+            <style>{`
+                @media (max-width: 768px) {
+                    .hieu-ung-cuoi-trang {
+                        height: 450px !important;
+                    }
+                }
+            `}</style>
         </section>
     );
 }

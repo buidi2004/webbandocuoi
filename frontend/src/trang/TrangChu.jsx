@@ -137,22 +137,23 @@ const TrangChu = () => {
                 <HieuUngSong />
             </section>
 
-            {/* Khung hiệu ứng hạt */}
-            <section style={{ 
+            {/* Khung hiệu ứng hạt - responsive */}
+            <section className="particle-section" style={{ 
                 padding: '40px 20px',
                 background: '#fff'
             }}>
-                <div style={{
+                <div className="particle-container" style={{
                     position: 'relative',
-                    width: 'calc(100% - 280px)',
+                    width: '100%',
                     maxWidth: '1600px',
-                    height: '800px',
+                    height: 'clamp(400px, 60vw, 800px)',
                     margin: '0 auto',
                     background: '#000',
                     borderRadius: '24px',
                     overflow: 'hidden'
                 }}>
-                    <HieuUngHat particleCount={200} nenTrang={false} />
+                    {/* Giảm số hạt - component sẽ tự giảm thêm trên mobile */}
+                    <HieuUngHat particleCount={120} nenTrang={false} />
                     
                     {/* Content overlay */}
                     <div style={{
@@ -165,16 +166,17 @@ const TrangChu = () => {
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'center',
-                        padding: '50px',
+                        padding: 'clamp(20px, 5vw, 50px)',
                         pointerEvents: 'none'
                     }}>
                         <h2 style={{
                             color: '#fff',
-                            fontSize: '36px',
+                            fontSize: 'clamp(24px, 5vw, 36px)',
                             fontWeight: 400,
                             lineHeight: 1.3,
                             marginBottom: '20px',
-                            fontFamily: 'Playfair Display, serif'
+                            fontFamily: 'Playfair Display, serif',
+                            textShadow: '0 2px 4px rgba(0,0,0,0.5)'
                         }}>
                             Khám Phá<br/>
                             Vẻ Đẹp<br/>
@@ -183,10 +185,10 @@ const TrangChu = () => {
                         
                         <div style={{ display: 'flex', gap: '12px', pointerEvents: 'auto' }}>
                             <Link to="/san-pham" style={{
-                                padding: '12px 24px',
+                                padding: '10px 20px',
                                 background: 'transparent',
                                 color: '#c9a86c',
-                                fontSize: '14px',
+                                fontSize: 'clamp(12px, 2vw, 14px)',
                                 fontWeight: 500,
                                 borderRadius: '50px',
                                 border: '2px solid #c9a86c',
@@ -198,6 +200,18 @@ const TrangChu = () => {
                         </div>
                     </div>
                 </div>
+                
+                {/* CSS responsive cho particle section */}
+                <style>{`
+                    @media (max-width: 768px) {
+                        .particle-section {
+                            padding: 20px 15px !important;
+                        }
+                        .particle-container {
+                            border-radius: 16px !important;
+                        }
+                    }
+                `}</style>
             </section>
             <section className="section about-section">
                 <div className="container">

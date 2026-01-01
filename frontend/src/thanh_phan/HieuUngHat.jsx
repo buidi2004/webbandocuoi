@@ -1,11 +1,25 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function HieuUngHat({ particleCount = 80, nenTrang = false }) {
     const canvasRef = useRef(null);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        // Detect mobile
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
+
+        // Giảm số hạt trên mobile để không che chữ
+        const actualParticleCount = isMobile ? Math.min(particleCount * 0.3, 30) : particleCount;
 
         // Tối ưu: dùng 2d context với các options tốt nhất
         const ctx = canvas.getContext('2d', { 
@@ -19,7 +33,7 @@ export default function HieuUngHat({ particleCount = 80, nenTrang = false }) {
         let isMouseActive = false;
         let mouseIdleTimer = null;
         
-        const REPULSION_RADIUS = 150;
+        const REPULSION_RADIUS = isMobile ? 80 : 150;
         const ROTATION_SPEED = 0.0003;
         
         // Cache các giá trị tính toán
@@ -29,8 +43,8 @@ export default function HieuUngHat({ particleCount = 80, nenTrang = false }) {
             const parent = canvas.parentElement;
             if (!parent) return;
             
-            // Tối ưu: set size trực tiếp
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            // Tối ưu: giảm DPR trên mobile
+            const dpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2);
             const width = parent.offsetWidth;
             const height = parent.offsetHeight;
             
@@ -49,9 +63,10 @@ export default function HieuUngHat({ particleCount = 80, nenTrang = false }) {
 
         const initParticles = (width, height) => {
             particles = [];
-            const sizes = [1, 1.5, 2, 2.5, 3, 3.5, 4];
+            // Kích thước hạt nhỏ hơn trên mobile
+            const sizes = isMobile ? [0.8, 1, 1.2, 1.5] : [1, 1.5, 2, 2.5, 3, 3.5, 4];
             
-            for (let i = 0; i < particleCount; i++) {
+            for (let i = 0; i < actualParticleCount; i++) {
                 let x, y;
                 
                 if (nenTrang) {
@@ -66,9 +81,10 @@ export default function HieuUngHat({ particleCount = 80, nenTrang = false }) {
                 
                 const baseSize = sizes[i % sizes.length];
                 
-                // Pre-calculate color string để tránh tính toán trong loop
+                // Pre-calculate color string - opacity thấp hơn trên mobile
                 const hue = nenTrang ? (200 + Math.random() * 30) : (200 + Math.random() * 60);
                 const brightness = nenTrang ? (55 + Math.random() * 25) : (60 + Math.random() * 30);
+                const opacity = isMobile ? 0.5 : 1;
                 
                 particles.push({
                     x, y,
@@ -78,14 +94,16 @@ export default function HieuUngHat({ particleCount = 80, nenTrang = false }) {
                     vy: 0,
                     size: baseSize,
                     baseSize: baseSize,
-                    color: `hsl(${hue}, 80%, ${brightness}%)`
+                    color: isMobile 
+                        ? `hsla(${hue}, 80%, ${brightness}%, ${opacity})`
+                        : `hsl(${hue}, 80%, ${brightness}%)`
                 });
             }
         };
 
         const animate = () => {
-            const width = canvas.width / (window.devicePixelRatio || 1);
-            const height = canvas.height / (window.devicePixelRatio || 1);
+            const width = canvas.width / (isMobile ? 1 : (window.devicePixelRatio || 1));
+            const height = canvas.height / (isMobile ? 1 : (window.devicePixelRatio || 1));
             
             // Clear canvas
             ctx.fillStyle = nenTrang ? '#fff' : '#000';
@@ -150,6 +168,21 @@ export default function HieuUngHat({ particleCount = 80, nenTrang = false }) {
             }, 1500);
         };
 
+        // Touch support cho mobile
+        const handleTouchMove = (e) => {
+            if (e.touches.length > 0) {
+                const rect = canvas.getBoundingClientRect();
+                mouse.x = e.touches[0].clientX - rect.left;
+                mouse.y = e.touches[0].clientY - rect.top;
+                isMouseActive = true;
+                
+                if (mouseIdleTimer) clearTimeout(mouseIdleTimer);
+                mouseIdleTimer = setTimeout(() => {
+                    isMouseActive = false;
+                }, 1500);
+            }
+        };
+
         const handleMouseLeave = () => {
             mouse.x = -9999;
             mouse.y = -9999;
@@ -165,6 +198,8 @@ export default function HieuUngHat({ particleCount = 80, nenTrang = false }) {
         if (parent) {
             parent.addEventListener('mousemove', handleMouseMove, { passive: true });
             parent.addEventListener('mouseleave', handleMouseLeave, { passive: true });
+            parent.addEventListener('touchmove', handleTouchMove, { passive: true });
+            parent.addEventListener('touchend', handleMouseLeave, { passive: true });
         }
 
         return () => {
@@ -174,9 +209,11 @@ export default function HieuUngHat({ particleCount = 80, nenTrang = false }) {
             if (parent) {
                 parent.removeEventListener('mousemove', handleMouseMove);
                 parent.removeEventListener('mouseleave', handleMouseLeave);
+                parent.removeEventListener('touchmove', handleTouchMove);
+                parent.removeEventListener('touchend', handleMouseLeave);
             }
         };
-    }, [particleCount, nenTrang]);
+    }, [particleCount, nenTrang, isMobile]);
 
     return (
         <canvas
@@ -189,7 +226,8 @@ export default function HieuUngHat({ particleCount = 80, nenTrang = false }) {
                 height: '100%',
                 background: nenTrang ? '#fff' : '#000',
                 borderRadius: 'inherit',
-                zIndex: 1
+                zIndex: 1,
+                opacity: isMobile ? 0.6 : 1  // Giảm opacity trên mobile
             }}
         />
     );
