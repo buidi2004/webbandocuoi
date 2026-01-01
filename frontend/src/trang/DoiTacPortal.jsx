@@ -110,11 +110,151 @@ const DoiTacPortal = () => {
     };
 
     const [activeView, setActiveView] = useState('apply'); // apply, status
+    const [scrollY, setScrollY] = useState(0);
+
+    // Theo dõi scroll để tạo hiệu ứng parallax
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrollY(window.scrollY);
+        };
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Component cành mai với hiệu ứng parallax
+    const CanhMai = ({ side }) => {
+        // Tính toán hiệu ứng dựa trên scroll
+        const parallaxY = scrollY * 0.15; // Di chuyển theo chiều dọc
+        const rotation = Math.sin(scrollY * 0.005) * 3; // Lắc nhẹ
+        const scale = 1 + Math.sin(scrollY * 0.003) * 0.05; // Co giãn nhẹ
+        
+        return (
+        <div style={{
+            position: 'fixed',
+            [side]: 0,
+            top: `calc(50% + ${parallaxY}px)`,
+            transform: `translateY(-50%) ${side === 'right' ? 'scaleX(-1)' : ''} rotate(${side === 'left' ? rotation : -rotation}deg) scale(${scale})`,
+            zIndex: 10,
+            pointerEvents: 'none',
+            opacity: 0.9,
+            transition: 'transform 0.1s ease-out'
+        }}>
+            <svg width="120" height="400" viewBox="0 0 120 400">
+                {/* Thân cành chính */}
+                <path 
+                    d="M10 400 Q30 300 25 200 Q20 100 40 20" 
+                    stroke="#5D4037" 
+                    strokeWidth="6" 
+                    fill="none"
+                />
+                {/* Cành phụ 1 */}
+                <path 
+                    d="M25 280 Q50 260 70 240" 
+                    stroke="#5D4037" 
+                    strokeWidth="3" 
+                    fill="none"
+                />
+                {/* Cành phụ 2 */}
+                <path 
+                    d="M22 180 Q55 170 80 150" 
+                    stroke="#5D4037" 
+                    strokeWidth="3" 
+                    fill="none"
+                />
+                {/* Cành phụ 3 */}
+                <path 
+                    d="M30 100 Q60 90 90 70" 
+                    stroke="#5D4037" 
+                    strokeWidth="2.5" 
+                    fill="none"
+                />
+                {/* Cành phụ 4 */}
+                <path 
+                    d="M35 50 Q55 40 75 25" 
+                    stroke="#5D4037" 
+                    strokeWidth="2" 
+                    fill="none"
+                />
+                
+                {/* Hoa mai - vàng rực */}
+                {/* Hoa 1 */}
+                <g transform="translate(65, 235)">
+                    <circle cx="0" cy="-8" r="6" fill="#FFD700"/>
+                    <circle cx="7" cy="-2" r="6" fill="#FFD700"/>
+                    <circle cx="5" cy="6" r="6" fill="#FFD700"/>
+                    <circle cx="-5" cy="6" r="6" fill="#FFD700"/>
+                    <circle cx="-7" cy="-2" r="6" fill="#FFD700"/>
+                    <circle cx="0" cy="0" r="4" fill="#FFA000"/>
+                </g>
+                
+                {/* Hoa 2 */}
+                <g transform="translate(75, 145)">
+                    <circle cx="0" cy="-7" r="5" fill="#FFD700"/>
+                    <circle cx="6" cy="-2" r="5" fill="#FFD700"/>
+                    <circle cx="4" cy="5" r="5" fill="#FFD700"/>
+                    <circle cx="-4" cy="5" r="5" fill="#FFD700"/>
+                    <circle cx="-6" cy="-2" r="5" fill="#FFD700"/>
+                    <circle cx="0" cy="0" r="3" fill="#FFA000"/>
+                </g>
+                
+                {/* Hoa 3 */}
+                <g transform="translate(85, 65)">
+                    <circle cx="0" cy="-6" r="5" fill="#FFD700"/>
+                    <circle cx="5" cy="-2" r="5" fill="#FFD700"/>
+                    <circle cx="3" cy="4" r="5" fill="#FFD700"/>
+                    <circle cx="-3" cy="4" r="5" fill="#FFD700"/>
+                    <circle cx="-5" cy="-2" r="5" fill="#FFD700"/>
+                    <circle cx="0" cy="0" r="3" fill="#FFA000"/>
+                </g>
+                
+                {/* Hoa 4 */}
+                <g transform="translate(70, 20)">
+                    <circle cx="0" cy="-5" r="4" fill="#FFD700"/>
+                    <circle cx="4" cy="-1" r="4" fill="#FFD700"/>
+                    <circle cx="3" cy="4" r="4" fill="#FFD700"/>
+                    <circle cx="-3" cy="4" r="4" fill="#FFD700"/>
+                    <circle cx="-4" cy="-1" r="4" fill="#FFD700"/>
+                    <circle cx="0" cy="0" r="2.5" fill="#FFA000"/>
+                </g>
+                
+                {/* Hoa 5 - trên cành chính */}
+                <g transform="translate(28, 250)">
+                    <circle cx="0" cy="-6" r="5" fill="#FFD700"/>
+                    <circle cx="5" cy="-2" r="5" fill="#FFD700"/>
+                    <circle cx="3" cy="4" r="5" fill="#FFD700"/>
+                    <circle cx="-3" cy="4" r="5" fill="#FFD700"/>
+                    <circle cx="-5" cy="-2" r="5" fill="#FFD700"/>
+                    <circle cx="0" cy="0" r="3" fill="#FFA000"/>
+                </g>
+                
+                {/* Hoa 6 */}
+                <g transform="translate(25, 160)">
+                    <circle cx="0" cy="-5" r="4" fill="#FFD700"/>
+                    <circle cx="4" cy="-1" r="4" fill="#FFD700"/>
+                    <circle cx="3" cy="4" r="4" fill="#FFD700"/>
+                    <circle cx="-3" cy="4" r="4" fill="#FFD700"/>
+                    <circle cx="-4" cy="-1" r="4" fill="#FFD700"/>
+                    <circle cx="0" cy="0" r="2.5" fill="#FFA000"/>
+                </g>
+                
+                {/* Nụ mai */}
+                <circle cx="40" cy="30" r="4" fill="#FFD700"/>
+                <circle cx="55" cy="110" r="3" fill="#FFD700"/>
+                <circle cx="45" cy="200" r="3.5" fill="#FFD700"/>
+                <circle cx="60" cy="270" r="3" fill="#FFD700"/>
+            </svg>
+        </div>
+        );
+    };
 
     if (loading) return <div style={{ padding: '100px', textAlign: 'center' }}>Đang tải...</div>;
 
     return (
-        <div className="partner-portal" style={{ padding: '100px 0', minHeight: '80vh', background: '#0a0a0a', color: 'white' }}>
+        <div className="partner-portal" style={{ padding: '100px 0', minHeight: '80vh', background: '#0a0a0a', color: 'white', position: 'relative', overflow: 'hidden' }}>
+            {/* Cành mai 2 bên */}
+            <CanhMai side="left" />
+            <CanhMai side="right" />
+            
             <div className="container">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
                     <h1 style={{ color: '#c09a6a' }}>Cổng Thông Tin Đối Tác</h1>
