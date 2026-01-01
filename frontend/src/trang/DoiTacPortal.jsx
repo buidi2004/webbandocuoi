@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NutBam from '../thanh_phan/NutBam';
 import The from '../thanh_phan/The';
@@ -12,6 +12,8 @@ const DoiTacPortal = () => {
     const [hoso, setHoso] = useState([]);
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
+    const [dragActive, setDragActive] = useState(false);
+    const fileInputRef = useRef(null);
     const navigate = useNavigate();
     const { addToast } = useToast();
 
@@ -48,7 +50,7 @@ const DoiTacPortal = () => {
     };
 
     const handleUpload = async (e) => {
-        const file = e.target.files[0];
+        const file = e.target.files?.[0] || e;
         if (!file) return;
 
         setUploading(true);
@@ -67,6 +69,26 @@ const DoiTacPortal = () => {
             addToast({ message: 'Lỗi khi tải lên hình ảnh.', type: 'error' });
         } finally {
             setUploading(false);
+        }
+    };
+
+    // Drag and drop handlers
+    const handleDrag = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.type === 'dragenter' || e.type === 'dragover') {
+            setDragActive(true);
+        } else if (e.type === 'dragleave') {
+            setDragActive(false);
+        }
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(false);
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            handleUpload(e.dataTransfer.files[0]);
         }
     };
 
@@ -94,11 +116,13 @@ const DoiTacPortal = () => {
     return (
         <div className="partner-portal" style={{ padding: '100px 0', minHeight: '80vh', background: '#0a0a0a', color: 'white' }}>
             <div className="container">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
-                    <h1>Cổng Thông Tin Đối Tác</h1>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
+                    <h1 style={{ color: '#c09a6a' }}>Cổng Thông Tin Đối Tác</h1>
                     <div style={{ display: 'flex', gap: '10px' }}>
                         <NutBam variant={activeView === 'apply' ? 'primary' : 'outline'} onClick={() => setActiveView('apply')}>Nộp Hồ Sơ</NutBam>
-                        <NutBam variant={activeView === 'status' ? 'primary' : 'outline'} onClick={() => setActiveView('status')}>Trạng Thái ({hoso.length})</NutBam>
+                        <NutBam variant={activeView === 'status' ? 'primary' : 'outline'} onClick={() => setActiveView('status')} title="Số lượng hồ sơ đã nộp">
+                            Trạng Thái ({hoso.length})
+                        </NutBam>
                     </div>
                 </div>
 
@@ -146,9 +170,45 @@ const DoiTacPortal = () => {
                             </div>
                             <div className="form-group">
                                 <label>Ảnh CV / Portfolio của bạn *</label>
-                                <input type="file" onChange={handleUpload} style={{ marginBottom: '10px' }} />
-                                {uploading && <p>Đang tải ảnh lên...</p>}
-                                {form.cv_url && <div style={{ color: '#c09a6a' }}>✔️ Đã đính kèm ảnh</div>}
+                                <div 
+                                    onDragEnter={handleDrag}
+                                    onDragLeave={handleDrag}
+                                    onDragOver={handleDrag}
+                                    onDrop={handleDrop}
+                                    onClick={() => fileInputRef.current?.click()}
+                                    style={{
+                                        border: `2px dashed ${dragActive ? '#c09a6a' : '#444'}`,
+                                        borderRadius: '12px',
+                                        padding: '30px',
+                                        textAlign: 'center',
+                                        cursor: 'pointer',
+                                        background: dragActive ? 'rgba(192, 154, 106, 0.1)' : '#1a1a1a',
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                >
+                                    <input 
+                                        type="file" 
+                                        ref={fileInputRef}
+                                        onChange={handleUpload} 
+                                        style={{ display: 'none' }} 
+                                        accept="image/*,.pdf"
+                                    />
+                                    {uploading ? (
+                                        <p style={{ color: '#c09a6a' }}>⏳ Đang tải ảnh lên...</p>
+                                    ) : form.cv_url ? (
+                                        <div style={{ color: '#2ecc71' }}>
+                                            <span style={{ fontSize: '2rem' }}>✅</span>
+                                            <p>Đã đính kèm file</p>
+                                            <p style={{ fontSize: '0.8rem', color: '#888' }}>Nhấn để thay đổi</p>
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '10px' }}>📁</span>
+                                            <p style={{ color: '#888' }}>Kéo thả file vào đây hoặc nhấn để chọn</p>
+                                            <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '5px' }}>Hỗ trợ: JPG, PNG, PDF</p>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                             <NutBam type="submit" variant="primary" style={{ marginTop: '20px' }}>GỬI HỒ SƠ ỨNG TUYỂN</NutBam>
                         </form>

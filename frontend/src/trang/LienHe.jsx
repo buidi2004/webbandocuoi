@@ -109,28 +109,45 @@ const LienHe = () => {
                             <div className="contact-info">
                                 <h2 className="section-title" style={{ textAlign: 'left' }}>Thông Tin Liên Hệ</h2>
                                 <div className="info-item"><span>📍</span> <div><h3>Địa Chỉ</h3><p>753 PHẠM HỮU LẦU, PHƯỜNG CAO LÃNH, ĐỒNG THÁP</p></div></div>
-                                <div className="info-item"><span>📞</span> <div><h3>Hotline</h3><p><a href="tel:0739193848" itemProp="telephone">0739 193 848</a></p></div></div>
-                                <div className="info-item"><span>✉️</span> <div><h3>Email</h3><p>contact@iviestudio.vn</p></div></div>
+                                <div className="info-item"><span>📞</span> <div><h3>Hotline</h3><p><a href="tel:0739193848" className="contact-link">0739 193 848</a></p></div></div>
+                                <div className="info-item"><span>✉️</span> <div><h3>Email</h3><p><a href="mailto:contact@iviestudio.vn" className="contact-link">contact@iviestudio.vn</a></p></div></div>
                             </div>
                             <The className="booking-form-card">
                                 <h2 className="form-title">Đăng Ký Tư Vấn</h2>
                                 <form onSubmit={guiConsult} className="booking-form">
-                                    <div className="form-group"><label>Họ Tên *</label><input name="name" value={duLieuConsult.name} onChange={xuLyThayDoiConsult} required /></div>
                                     <div className="form-row">
-                                        <div className="form-group"><label>SĐT *</label><input name="phone" value={duLieuConsult.phone} onChange={xuLyThayDoiConsult} required /></div>
-                                        <div className="form-group"><label>Email</label><input name="email" value={duLieuConsult.email} onChange={xuLyThayDoiConsult} /></div>
+                                        <div className="form-group"><label>Họ Tên *</label><input name="name" value={duLieuConsult.name} onChange={xuLyThayDoiConsult} required placeholder="Nhập họ tên của bạn" /></div>
+                                        <div className="form-group"><label>SĐT *</label><input name="phone" value={duLieuConsult.phone} onChange={xuLyThayDoiConsult} required placeholder="0xxx xxx xxx" /></div>
                                     </div>
-                                    <div className="form-group"><label>Địa Chỉ *</label><input name="address" value={duLieuConsult.address} onChange={xuLyThayDoiConsult} required /></div>
+                                    <div className="form-row">
+                                        <div className="form-group"><label>Email</label><input name="email" type="email" value={duLieuConsult.email} onChange={xuLyThayDoiConsult} placeholder="email@example.com" /></div>
+                                        <div className="form-group"><label>Địa Chỉ *</label><input name="address" value={duLieuConsult.address} onChange={xuLyThayDoiConsult} required placeholder="Địa chỉ của bạn" /></div>
+                                    </div>
                                     <div className="form-row">
                                         <div className="form-group"><label>Dịch Vụ</label><select name="service" value={duLieuConsult.service} onChange={xuLyThayDoiConsult}><option value="wedding_photo">Chụp Ảnh</option><option value="makeup">Trang Điểm</option><option value="dress">Thuê Váy</option><option value="combo">Combo Trọn Gói</option></select></div>
-                                        <div className="form-group"><label>Ngày Dự Kiến</label><input type="date" name="date" value={duLieuConsult.date} onChange={xuLyThayDoiConsult} /></div>
+                                        <div className="form-group"><label>Chi Nhánh</label><select name="chi_nhanh" value={duLieuConsult.chi_nhanh} onChange={xuLyThayDoiConsult}><option value="cao_lanh">Cao Lãnh - Đồng Tháp</option><option value="sa_dec">Sa Đéc - Đồng Tháp</option><option value="can_tho">Cần Thơ</option></select></div>
                                     </div>
                                     <div className="form-row">
-                                        <div className="form-group"><label>Chi Nhánh</label><select name="chi_nhanh" value={duLieuConsult.chi_nhanh} onChange={xuLyThayDoiConsult}><option value="cao_lanh">Cao Lãnh - Đồng Tháp</option><option value="sa_dec">Sa Đéc - Đồng Tháp</option><option value="can_tho">Cần Thơ</option></select></div>
-                                        <div className="form-group"><label>Ngân Sách Dự Kiến</label><select name="ngan_sach" value={duLieuConsult.ngan_sach} onChange={xuLyThayDoiConsult}><option value="">-- Chọn ngân sách --</option><option value="duoi_5tr">Dưới 5 triệu</option><option value="5_10tr">5 - 10 triệu</option><option value="10_20tr">10 - 20 triệu</option><option value="20_50tr">20 - 50 triệu</option><option value="tren_50tr">Trên 50 triệu</option></select></div>
+                                        <div className="form-group">
+                                            <label>Ngày Dự Kiến 📅</label>
+                                            <div className="date-input-wrapper">
+                                                <input type="date" name="date" value={duLieuConsult.date} onChange={xuLyThayDoiConsult} />
+                                            </div>
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Ngân Sách Dự Kiến 💰</label>
+                                            <select name="ngan_sach" value={duLieuConsult.ngan_sach} onChange={xuLyThayDoiConsult}>
+                                                <option value="">-- Chọn ngân sách --</option>
+                                                <option value="duoi_5tr">Dưới 5 triệu</option>
+                                                <option value="5_10tr">5 - 10 triệu</option>
+                                                <option value="10_20tr">10 - 20 triệu</option>
+                                                <option value="20_50tr">20 - 50 triệu</option>
+                                                <option value="tren_50tr">Trên 50 triệu</option>
+                                            </select>
+                                        </div>
                                     </div>
                                     <div className="form-group"><label>Nội dung</label><textarea name="message" value={duLieuConsult.message} onChange={xuLyThayDoiConsult} rows="3" placeholder="Mô tả yêu cầu của bạn..." /></div>
-                                    <NutBam type="submit" variant="primary" disabled={loadingConsult}>{loadingConsult ? 'Đang gửi...' : 'GỬI YÊU CẦU'}</NutBam>
+                                    <NutBam type="submit" variant="primary" className="btn-submit-highlight" disabled={loadingConsult}>{loadingConsult ? 'Đang gửi...' : '✨ GỬI YÊU CẦU'}</NutBam>
                                 </form>
                             </The>
                         </div>
@@ -140,12 +157,14 @@ const LienHe = () => {
                         <div className="complaint-container">
                             <The className="complaint-card">
                                 <h2 className="form-title">Gửi Khiếu Nại</h2>
-                                <p style={{ marginBottom: '20px', color: '#888', textAlign: 'center' }}>Chúng tôi chân thành xin lỗi về những trải nghiệm chưa hài lòng. IVIE cam kết sẽ xử lý khiếu nại của bạn trong vòng 24h.</p>
+                                <p className="complaint-commitment">Chúng tôi chân thành xin lỗi về những trải nghiệm chưa hài lòng. <strong>IVIE cam kết sẽ xử lý khiếu nại của bạn trong vòng 24h.</strong></p>
                                 <form onSubmit={guiComplaint} className="complaint-form">
                                     <div className="form-group"><label>Tiêu đề khiếu nại *</label><input name="title" value={duLieuComplaint.title} onChange={xuLyThayDoiComplaint} required placeholder="Ví dụ: Phản ánh về thái độ phục vụ..." /></div>
-                                    <div className="form-group"><label>Họ Tên (Nếu không đăng nhập)</label><input name="customer_name" value={duLieuComplaint.customer_name} onChange={xuLyThayDoiComplaint} /></div>
-                                    <div className="form-group"><label>Số Điện Thoại</label><input name="customer_phone" value={duLieuComplaint.customer_phone} onChange={xuLyThayDoiComplaint} /></div>
-                                    <div className="form-group"><label>Nội dung chi tiết *</label><textarea name="content" value={duLieuComplaint.content} onChange={xuLyThayDoiComplaint} rows="5" required /></div>
+                                    <div className="form-row">
+                                        <div className="form-group"><label>Họ Tên (Nếu không đăng nhập)</label><input name="customer_name" value={duLieuComplaint.customer_name} onChange={xuLyThayDoiComplaint} placeholder="Nhập họ tên" /></div>
+                                        <div className="form-group"><label>Số Điện Thoại</label><input name="customer_phone" value={duLieuComplaint.customer_phone} onChange={xuLyThayDoiComplaint} placeholder="0xxx xxx xxx" /></div>
+                                    </div>
+                                    <div className="form-group"><label>Nội dung chi tiết *</label><textarea name="content" value={duLieuComplaint.content} onChange={xuLyThayDoiComplaint} rows="5" required placeholder="Mô tả chi tiết vấn đề bạn gặp phải..." /></div>
                                     <NutBam type="submit" variant="danger" disabled={loadingComplaint}>{loadingComplaint ? 'Đang gửi...' : 'GỬI KHIẾU NẠI'}</NutBam>
                                 </form>
                             </The>
@@ -160,11 +179,13 @@ const LienHe = () => {
                             </p>
                             <div className="partner-benefits">
                                 <div className="benefit-box">
-                                    <h3>💄 Đối tác Trang điểm</h3>
+                                    <div className="benefit-icon">💄</div>
+                                    <h3>Đối tác Trang điểm</h3>
                                     <p>Cơ hội làm việc với hàng trăm cô dâu mỗi tháng, môi trường studio hiện đại, thu nhập hấp dẫn theo show.</p>
                                 </div>
                                 <div className="benefit-box">
-                                    <h3>📸 Đối tác Quay chụp</h3>
+                                    <div className="benefit-icon">📸</div>
+                                    <h3>Đối tác Quay chụp</h3>
                                     <p>Hợp tác trong các bộ phim ngắn, album cưới cinematic, trang thiết bị hỗ trợ tối đa.</p>
                                 </div>
                             </div>

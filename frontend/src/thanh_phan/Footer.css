@@ -65,6 +65,16 @@
 .social-link:hover {
     background: #d4af37;
     transform: translateY(-3px);
+    color: #000;
+    box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+}
+
+.social-link svg {
+    transition: transform 0.3s ease;
+}
+
+.social-link:hover svg {
+    transform: scale(1.1);
 }
 
 .footer-bottom {
