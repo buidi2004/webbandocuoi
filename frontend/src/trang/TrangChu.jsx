@@ -96,7 +96,7 @@ const TrangChu = () => {
                     <div className="hero-slide active default-banner"></div>
                 )}
 
-                <div className="hero-content" key={idxBanner}>
+                <div className="hero-content animate" key={`hero-${idxBanner}`}>
                     <span className="hero-subtitle">IVIE STUDIO</span>
                     <h1 className="hero-title">
                         {bannerHienTai?.title ? (
