@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import './Footer.css';
 
 const ChanTrang = () => {
@@ -8,6 +9,12 @@ const ChanTrang = () => {
                     <div className="footer-brand">
                         <h3 className="logo-text">IVIE</h3>
                         <p>Lưu giữ khoảnh khắc hạnh phúc của bạn</p>
+                    </div>
+
+                    <div className="footer-links">
+                        <Link to="/chinh-sach">Chính sách bảo mật</Link>
+                        <Link to="/chinh-sach">Quy định đặt cọc</Link>
+                        <Link to="/lien-he">Liên hệ</Link>
                     </div>
 
                     <div className="footer-social">

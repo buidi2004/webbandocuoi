@@ -22,6 +22,7 @@ import GioHang from './trang/GioHang';
 import DoiTacPortal from './trang/DoiTacPortal';
 import Blog from './trang/Blog';
 import ChiTietBlog from './trang/ChiTietBlog';
+import ChinhSach from './trang/ChinhSach';
 import AntiGravityLanding from './trang/AntiGravityLanding';
 import ProductDetail from './trang/ProductDetail';
 import GalleryDemo from './trang/GalleryDemo';
@@ -70,6 +71,7 @@ function UngDung() {
             <Route path="/doi-tac-portal" element={<DoiTacPortal />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<ChiTietBlog />} />
+            <Route path="/chinh-sach" element={<ChinhSach />} />
             <Route path="/anti-gravity" element={<AntiGravityLanding />} />
             <Route path="/san-pham-demo" element={<ProductDetail />} />
             <Route path="/gallery-demo" element={<GalleryDemo />} />

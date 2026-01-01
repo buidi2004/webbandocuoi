@@ -1,0 +1,333 @@
+/* Availability Calendar Section */
+
+.availability-section {
+    padding: 5rem 0;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+}
+
+.avail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.availability-section .section-title {
+    color: #c9a86c;
+    margin-bottom: 0.5rem;
+}
+
+.availability-section .section-subtitle {
+    color: #888;
+}
+
+.avail-stats {
+    display: flex;
+    gap: 1rem;
+}
+
+.stat-badge {
+    padding: 12px 20px;
+    border-radius: 12px;
+    text-align: center;
+    min-width: 100px;
+}
+
+.stat-badge.hot {
+    background: rgba(231, 76, 60, 0.2);
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.stat-badge.warning {
+    background: rgba(46, 204, 113, 0.2);
+    border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.stat-num {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #fff;
+    font-family: var(--font-serif);
+}
+
+.stat-badge.hot .stat-num { color: #e74c3c; }
+.stat-badge.warning .stat-num { color: #2ecc71; }
+
+.stat-text {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.calendar-wrapper {
+    background: #111;
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid #222;
+}
+
+.calendar-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.calendar-nav h3 {
+    color: #fff;
+    font-size: 1.3rem;
+    font-family: var(--font-serif);
+}
+
+.nav-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #222;
+    border: 1px solid #333;
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+    background: #c9a86c;
+    border-color: #c9a86c;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.calendar-header {
+    text-align: center;
+    padding: 10px;
+    color: #888;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.calendar-day.empty {
+    cursor: default;
+}
+
+.calendar-day.past {
+    background: #1a1a1a;
+    cursor: not-allowed;
+}
+
+.calendar-day.past .day-num {
+    color: #444;
+}
+
+.calendar-day.available {
+    background: #1a2e1a;
+    border: 1px solid #2ecc71;
+}
+
+.calendar-day.available:hover {
+    background: #2ecc71;
+}
+
+.calendar-day.available .day-num {
+    color: #2ecc71;
+}
+
+.calendar-day.available:hover .day-num {
+    color: #fff;
+}
+
+.calendar-day.weekend {
+    background: #2a2a1a;
+    border: 1px solid #f39c12;
+}
+
+.calendar-day.weekend .day-num {
+    color: #f39c12;
+}
+
+.calendar-day.weekend:hover {
+    background: #f39c12;
+}
+
+.calendar-day.weekend:hover .day-num {
+    color: #fff;
+}
+
+.calendar-day.almost {
+    background: #3a2a1a;
+    border: 1px solid #e67e22;
+    animation: pulse-border 2s infinite;
+}
+
+.calendar-day.almost .day-num {
+    color: #e67e22;
+}
+
+.calendar-day.booked {
+    background: #2a1a1a;
+    border: 1px solid #e74c3c;
+    cursor: not-allowed;
+}
+
+.calendar-day.booked .day-num {
+    color: #e74c3c;
+    text-decoration: line-through;
+}
+
+.day-num {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.day-status {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(231, 76, 60, 0.3);
+    color: #e74c3c;
+    margin-top: 2px;
+}
+
+.day-status.hot {
+    background: rgba(230, 126, 34, 0.3);
+    color: #e67e22;
+    animation: blink 1s infinite;
+}
+
+@keyframes pulse-border {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(230, 126, 34, 0.4); }
+    50% { box-shadow: 0 0 0 5px rgba(230, 126, 34, 0); }
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.calendar-legend {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #222;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #888;
+    font-size: 0.85rem;
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+}
+
+.legend-dot.available { background: #2ecc71; }
+.legend-dot.weekend { background: #f39c12; }
+.legend-dot.almost { background: #e67e22; }
+.legend-dot.booked { background: #e74c3c; }
+
+.avail-cta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, rgba(201, 168, 108, 0.1) 0%, rgba(201, 168, 108, 0.05) 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(201, 168, 108, 0.2);
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.cta-content h3 {
+    color: #c9a86c;
+    font-size: 1.2rem;
+    margin: 0 0 5px;
+}
+
+.cta-content p {
+    color: #888;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.cta-btn {
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #c9a86c 0%, #d4b896 100%);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(201, 168, 108, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .avail-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .avail-stats {
+        justify-content: center;
+    }
+    
+    .calendar-wrapper {
+        padding: 1rem;
+    }
+    
+    .calendar-grid {
+        gap: 4px;
+    }
+    
+    .calendar-day {
+        border-radius: 8px;
+    }
+    
+    .day-num {
+        font-size: 0.85rem;
+    }
+    
+    .day-status {
+        display: none;
+    }
+    
+    .calendar-legend {
+        gap: 1rem;
+    }
+    
+    .avail-cta {
+        flex-direction: column;
+        text-align: center;
+    }
+}

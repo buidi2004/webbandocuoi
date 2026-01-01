@@ -8,6 +8,8 @@ import The from '../thanh_phan/The';
 import HieuUngSong from '../thanh_phan/HieuUngSong';
 import HieuUngHat from '../thanh_phan/HieuUngHat';
 import WrapperAtropos from '../thanh_phan/WrapperAtropos';
+import InstagramFeed from '../thanh_phan/InstagramFeed';
+import LichTrong from '../thanh_phan/LichTrong';
 import '../styles/Home.css';
 
 const TrangChu = () => {
@@ -446,6 +448,12 @@ const TrangChu = () => {
                     </div>
                 </div>
             </section>
+
+            {/* Availability Calendar - Lịch trống */}
+            <LichTrong />
+
+            {/* Instagram Feed */}
+            <InstagramFeed />
         </div>
     );
 };
