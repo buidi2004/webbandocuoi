@@ -10,10 +10,6 @@ import ChanTrang from './thanh_phan/ChanTrang';
 import CuonLenDau from './thanh_phan/CuonLenDau';
 import StickyBottomBar from './thanh_phan/StickyBottomBar';
 
-// Lazy load contact components
-const StickyCTA = lazy(() => import('./thanh_phan/StickyCTA'));
-const StickyContactBar = lazy(() => import('./thanh_phan/StickyContactBar'));
-
 // Lazy load heavy components
 const ChatBox = lazy(() => import('./thanh_phan/ChatBox'));
 const HieuUngLaRoi = lazy(() => import('./thanh_phan/HieuUngLaRoi'));
@@ -129,17 +125,6 @@ function UngDung() {
         </Suspense>
         
         <StickyBottomBar />
-        <Suspense fallback={null}>
-          <StickyCTA 
-            zaloLink="https://zalo.me/0739193848"
-            phoneNumber="0739193848"
-          />
-          <StickyContactBar 
-            phoneNumber="0739193848"
-            zaloLink="https://zalo.me/0739193848"
-            mapsLink="https://maps.app.goo.gl/YourGoogleMapsLink"
-          />
-        </Suspense>
       </div>
     </Router>
   );
