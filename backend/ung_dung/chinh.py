@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
 from .co_so_du_lieu import khoi_tao_csdl
+from .cache_utils import CacheControlMiddleware
 from .dinh_tuyen import (
     san_pham, dich_vu, lien_he, tap_tin, 
     noi_dung, banner, thu_vien, nguoi_dung, chat, doi_tac,
@@ -18,6 +20,12 @@ ung_dung = FastAPI(
     description="API cho website IVIE Wedding Studio",
     version="1.0.0"
 )
+
+# GZip Middleware - nén response > 500 bytes để giảm TTFB
+ung_dung.add_middleware(GZipMiddleware, minimum_size=500)
+
+# Cache Control Middleware - tự động thêm cache headers cho GET requests
+ung_dung.add_middleware(CacheControlMiddleware)
 
 # Cấu hình CORS
 # Cấu hình CORS

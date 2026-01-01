@@ -4,6 +4,14 @@ import './LazyImage.css';
 /**
  * LazyImage - Component tải ảnh lazy với Intersection Observer
  * Chỉ tải ảnh khi gần viewport (200px threshold)
+ * 
+ * Props:
+ * - src: URL ảnh
+ * - alt: Alt text (SEO)
+ * - width/height: Kích thước để tránh CLS
+ * - aspectRatio: Tỷ lệ khung hình (default: 4/3)
+ * - priority: true nếu là ảnh quan trọng (LCP)
+ * - threshold: Khoảng cách trước viewport để bắt đầu load (px)
  */
 const LazyImage = ({ 
     src, 
@@ -16,14 +24,18 @@ const LazyImage = ({
     width,
     height,
     aspectRatio = '4/3',
+    priority = false, // Ảnh quan trọng (LCP) - load ngay
     ...props 
 }) => {
     const [isLoaded, setIsLoaded] = useState(false);
-    const [isInView, setIsInView] = useState(false);
+    const [isInView, setIsInView] = useState(priority); // Priority images load immediately
     const [hasError, setHasError] = useState(false);
     const imgRef = useRef(null);
 
     useEffect(() => {
+        // Skip observer for priority images
+        if (priority) return;
+        
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach(entry => {
@@ -45,7 +57,7 @@ const LazyImage = ({
                 observer.unobserve(imgRef.current);
             }
         };
-    }, [threshold]);
+    }, [threshold, priority]);
 
     const handleLoad = () => {
         setIsLoaded(true);
@@ -84,8 +96,9 @@ const LazyImage = ({
                     className={`lazy-image ${isLoaded ? 'loaded' : ''}`}
                     onLoad={handleLoad}
                     onError={handleError}
-                    loading="lazy"
+                    loading={priority ? "eager" : "lazy"}
                     decoding="async"
+                    fetchPriority={priority ? "high" : "auto"}
                     {...props}
                 />
             )}
