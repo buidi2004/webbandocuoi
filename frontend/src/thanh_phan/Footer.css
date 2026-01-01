@@ -104,26 +104,24 @@
     bottom: 0;
     width: 180px;
     height: auto;
-    pointer-events: none; /* Không che link/button */
+    pointer-events: none;
     z-index: 1;
     opacity: 0;
 }
 
-/* Cành mai trái - transform-origin góc trái dưới */
 .canh-mai-trai {
     left: 0;
     transform-origin: left bottom;
     transform: translateX(-100%) rotate(-10deg);
 }
 
-/* Cành mai phải - transform-origin góc phải dưới */
 .canh-mai-phai {
     right: 0;
     transform-origin: right bottom;
     transform: translateX(100%) rotate(10deg) scaleX(-1);
 }
 
-/* ===== GIAI ĐOẠN 1: ENTRANCE - Slide In + Fade In ===== */
+/* GIAI ĐOẠN 1: Slide In + Fade In */
 .canh-mai-trai.visible {
     animation: slideInLeft 1.2s ease-out forwards, swayLeft 4s ease-in-out 1.2s infinite;
 }
@@ -133,93 +131,40 @@
 }
 
 @keyframes slideInLeft {
-    0% {
-        opacity: 0;
-        transform: translateX(-100%) rotate(-10deg);
-    }
-    100% {
-        opacity: 1;
-        transform: translateX(0) rotate(0deg);
-    }
+    0% { opacity: 0; transform: translateX(-100%) rotate(-10deg); }
+    100% { opacity: 1; transform: translateX(0) rotate(0deg); }
 }
 
 @keyframes slideInRight {
-    0% {
-        opacity: 0;
-        transform: translateX(100%) rotate(10deg) scaleX(-1);
-    }
-    100% {
-        opacity: 1;
-        transform: translateX(0) rotate(0deg) scaleX(-1);
-    }
+    0% { opacity: 0; transform: translateX(100%) rotate(10deg) scaleX(-1); }
+    100% { opacity: 1; transform: translateX(0) rotate(0deg) scaleX(-1); }
 }
 
-/* ===== GIAI ĐOẠN 2: LOOP - Gió lay nhẹ (Swaying) ===== */
+/* GIAI ĐOẠN 2: Gió lay nhẹ */
 @keyframes swayLeft {
-    0%, 100% {
-        transform: translateX(0) rotate(0deg);
-    }
-    25% {
-        transform: translateX(2px) rotate(1.5deg);
-    }
-    75% {
-        transform: translateX(-1px) rotate(-1deg);
-    }
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    25% { transform: translateX(2px) rotate(1.5deg); }
+    75% { transform: translateX(-1px) rotate(-1deg); }
 }
 
 @keyframes swayRight {
-    0%, 100% {
-        transform: translateX(0) rotate(0deg) scaleX(-1);
-    }
-    25% {
-        transform: translateX(-2px) rotate(-1.5deg) scaleX(-1);
-    }
-    75% {
-        transform: translateX(1px) rotate(1deg) scaleX(-1);
-    }
+    0%, 100% { transform: translateX(0) rotate(0deg) scaleX(-1); }
+    25% { transform: translateX(-2px) rotate(-1.5deg) scaleX(-1); }
+    75% { transform: translateX(1px) rotate(1deg) scaleX(-1); }
 }
 
-/* ===== RESPONSIVE ===== */
+/* RESPONSIVE */
 @media (max-width: 768px) {
-    .footer-wrapper {
-        padding: 2rem 1rem 1.5rem;
-    }
-    
-    .footer-logo {
-        font-size: 2rem;
-    }
-    
-    .footer-slogan {
-        font-size: 0.85rem;
-    }
-    
-    .footer-nav {
-        gap: 0.3rem;
-    }
-    
-    .footer-nav a {
-        font-size: 0.8rem;
-    }
-    
-    /* Thu nhỏ cành mai trên mobile */
-    .canh-mai {
-        width: 100px;
-        opacity: 0.6;
-    }
+    .footer-wrapper { padding: 2rem 1rem 1.5rem; }
+    .footer-logo { font-size: 2rem; }
+    .footer-slogan { font-size: 0.85rem; }
+    .footer-nav { gap: 0.3rem; }
+    .footer-nav a { font-size: 0.8rem; }
+    .canh-mai { width: 100px; opacity: 0.6; }
 }
 
 @media (max-width: 480px) {
-    .footer-nav .nav-divider {
-        display: none;
-    }
-    
-    .footer-nav {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-    
-    /* Ẩn cành mai trên màn hình rất nhỏ */
-    .canh-mai {
-        display: none;
-    }
+    .footer-nav .nav-divider { display: none; }
+    .footer-nav { flex-direction: column; gap: 0.5rem; }
+    .canh-mai { display: none; }
 }
