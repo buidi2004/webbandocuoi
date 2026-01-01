@@ -8,6 +8,7 @@ import ChatBox from './thanh_phan/ChatBox';
 import HieuUngLaRoi from './thanh_phan/HieuUngLaRoi';
 import HieuUngChuyenTrang from './thanh_phan/HieuUngChuyenTrang';
 import CuonLenDau from './thanh_phan/CuonLenDau';
+import StickyBottomBar from './thanh_phan/StickyBottomBar';
 import TrangChu from './trang/TrangChu';
 import SanPham from './trang/SanPham';
 import ChiTietSanPham from './trang/ChiTietSanPham';
@@ -82,6 +83,7 @@ function UngDung() {
         </main>
         <ChanTrang />
         <ChatBox />
+        <StickyBottomBar />
       </div>
     </Router>
   );

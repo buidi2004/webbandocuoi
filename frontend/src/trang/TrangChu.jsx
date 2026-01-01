@@ -330,9 +330,14 @@ const TrangChu = () => {
                                         <img
                                             src={layUrlHinhAnh(item.image_url)}
                                             alt={item.title || `Gallery ${idx}`}
+                                            loading="lazy"
                                             onError={(e) => e.target.src = 'https://placehold.co/600x800/e5e5e5/333?text=Collection'}
                                             data-atropos-offset="5"
                                         />
+                                        <div className="collection-label">
+                                            <h4>{item.title || `Bộ sưu tập ${idx + 1}`}</h4>
+                                            <span>Xem chi tiết →</span>
+                                        </div>
                                     </div>
                                 </WrapperAtropos>
                             ))
@@ -341,17 +346,29 @@ const TrangChu = () => {
                                 <>
                                     <WrapperAtropos className="featured-item large">
                                         <div style={{ width: '100%', height: '100%' }} data-atropos-offset="0">
-                                            <img src="/images/feat-1.jpg" alt="Váy cưới 1" onError={(e) => e.target.src = 'https://placehold.co/600x800/e5e5e5/333?text=Collection+1'} data-atropos-offset="5" />
+                                            <img src="/images/feat-1.jpg" alt="Váy cưới 1" loading="lazy" onError={(e) => e.target.src = 'https://placehold.co/600x800/e5e5e5/333?text=Collection+1'} data-atropos-offset="5" />
+                                            <div className="collection-label">
+                                                <h4>Váy Cưới Luxury</h4>
+                                                <span>Xem chi tiết →</span>
+                                            </div>
                                         </div>
                                     </WrapperAtropos>
                                     <WrapperAtropos className="featured-item">
                                         <div style={{ width: '100%', height: '100%' }} data-atropos-offset="0">
-                                            <img src="/images/feat-2.jpg" alt="Váy cưới 2" onError={(e) => e.target.src = 'https://placehold.co/400x400/e5e5e5/333?text=Collection+2'} data-atropos-offset="5" />
+                                            <img src="/images/feat-2.jpg" alt="Váy cưới 2" loading="lazy" onError={(e) => e.target.src = 'https://placehold.co/400x400/e5e5e5/333?text=Collection+2'} data-atropos-offset="5" />
+                                            <div className="collection-label">
+                                                <h4>Minimalist</h4>
+                                                <span>Xem chi tiết →</span>
+                                            </div>
                                         </div>
                                     </WrapperAtropos>
                                     <WrapperAtropos className="featured-item">
                                         <div style={{ width: '100%', height: '100%' }} data-atropos-offset="0">
-                                            <img src="/images/feat-3.jpg" alt="Váy cưới 3" onError={(e) => e.target.src = 'https://placehold.co/400x400/e5e5e5/333?text=Collection+3'} data-atropos-offset="5" />
+                                            <img src="/images/feat-3.jpg" alt="Váy cưới 3" loading="lazy" onError={(e) => e.target.src = 'https://placehold.co/400x400/e5e5e5/333?text=Collection+3'} data-atropos-offset="5" />
+                                            <div className="collection-label">
+                                                <h4>Vintage</h4>
+                                                <span>Xem chi tiết →</span>
+                                            </div>
                                         </div>
                                     </WrapperAtropos>
                                 </>

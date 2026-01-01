@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { sanPhamAPI, layUrlHinhAnh } from '../api/khach_hang';
 import { useToast } from '../thanh_phan/Toast';
+import QuickViewModal from '../thanh_phan/QuickViewModal';
 import '../styles/products.css';
 
 const SanPham = () => {
@@ -14,6 +15,7 @@ const SanPham = () => {
     const [khoangGia, setKhoangGia] = useState('all');
     const [sapXep, setSapXep] = useState('hot');
     const [sanPhamDaXem, setSanPhamDaXem] = useState([]);
+    const [quickViewSP, setQuickViewSP] = useState(null);
 
     const navigate = useNavigate();
     const { addToast } = useToast();
@@ -274,11 +276,70 @@ const SanPham = () => {
                                 <div key={sp.id} className={`product-card-new ${sp.het_hang ? 'out-of-stock' : ''}`}>
                                     <div onClick={() => xemChiTiet(sp)}>
                                         {sp.het_hang && <div className="sold-out-overlay"><span>HẾT HÀNG</span></div>}
-                                        {!sp.het_hang && sp.is_hot && <div className="promo-tag">Thuê giảm 20%</div>}
-                                        {!sp.het_hang && sp.is_new && <div className="new-tag">Mới</div>}
+                                        {!sp.het_hang && sp.is_hot && <div className="promo-tag hot-deal">🔥 Hot Deal</div>}
+                                        {!sp.het_hang && sp.is_new && <div className="new-tag new-arrival">✨ Mới</div>}
                                         <div className="product-img">
-                                            <img src={layUrlHinhAnh(sp.image_url)} alt={sp.name}
-                                                onError={(e) => e.target.src = 'https://placehold.co/300x400/f5f5f5/333?text=IVIE'} />
+                                            <img 
+                                                src={layUrlHinhAnh(sp.image_url)} 
+                                                alt={sp.name}
+                                                loading="lazy"
+                                                onError={(e) => e.target.src = 'https://placehold.co/300x400/f5f5f5/333?text=IVIE'} 
+                                            />
+                                            {/* Icon buttons on hover */}
+                                            {!sp.het_hang && (
+                                                <div className="product-hover-actions">
+                                                    <button 
+                                                        className="hover-btn quick-view"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setQuickViewSP(sp);
+                                                        }}
+                                                        title="Xem nhanh"
+                                                    >
+                                                        👁️
+                                                    </button>
+                                                    <button 
+                                                        className="hover-btn add-wishlist"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            addToast({ message: 'Đã thêm vào yêu thích!', type: 'success' });
+                                                        }}
+                                                        title="Yêu thích"
+                                                    >
+                                                        ❤️
+                                                    </button>
+                                                    <button 
+                                                        className="hover-btn quick-add"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            const currentCart = JSON.parse(localStorage.getItem('ivie_cart') || '[]');
+                                                            const item = {
+                                                                id: sp.id,
+                                                                name: sp.name,
+                                                                code: sp.code,
+                                                                image_url: sp.image_url,
+                                                                purchase_price: sp.purchase_price,
+                                                                rental_price_day: sp.rental_price_day,
+                                                                price_to_use: sp.purchase_price,
+                                                                quantity: 1,
+                                                                loai: 'mua',
+                                                                so_luong: sp.so_luong
+                                                            };
+                                                            const existing = currentCart.findIndex(i => i.id === item.id && i.loai === 'mua');
+                                                            if (existing > -1) {
+                                                                currentCart[existing].quantity = (currentCart[existing].quantity || 1) + 1;
+                                                            } else {
+                                                                currentCart.push(item);
+                                                            }
+                                                            localStorage.setItem('ivie_cart', JSON.stringify(currentCart));
+                                                            addToast({ message: 'Đã thêm vào giỏ hàng!', type: 'success' });
+                                                        }}
+                                                        title="Thêm giỏ hàng"
+                                                    >
+                                                        🛒
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="product-details">
                                             <h3 className="product-title">{sp.name}</h3>
@@ -371,6 +432,14 @@ const SanPham = () => {
                     )}
                 </div>
             </div>
+
+            {/* Quick View Modal */}
+            {quickViewSP && (
+                <QuickViewModal 
+                    sanPham={quickViewSP} 
+                    onClose={() => setQuickViewSP(null)} 
+                />
+            )}
         </div>
     );
 };
