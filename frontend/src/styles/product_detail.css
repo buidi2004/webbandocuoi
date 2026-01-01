@@ -1,10 +1,8 @@
 .product-detail-page {
-    padding: 140px 0 80px;
+    padding: 120px 0 60px;
     background-color: #ffffff;
-    /* Bright background */
     min-height: 100vh;
     color: #333;
-    /* Darker text for contrast */
 }
 
 /* Bright mode adjustments for common components if any */
@@ -14,10 +12,10 @@
 
 .product-detail-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 40px;
     align-items: start;
-    margin-bottom: 80px;
+    margin-bottom: 60px;
 }
 
 .product-detail-gallery {
@@ -229,7 +227,7 @@
     box-shadow: 0 8px 15px rgba(181, 148, 16, 0.3);
 }
 
-.product-detail-actions > * {
+.product-detail-actions>* {
     width: 100%;
 }
 
@@ -382,5 +380,75 @@
 
     .product-detail-name {
         font-size: 2.2rem;
+    }
+}
+@media (max-width: 768px) {
+    .product-detail-page { padding: 80px 0 40px; }
+    .product-detail-gallery { position: relative; top: 0; }
+    .product-detail-name { font-size: 1.8rem; }
+    .price-value { font-size: 1.4rem; }
+    .price-value.highlight { font-size: 1.8rem; }
+    .product-attributes { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .attribute-card { padding: 12px; }
+    .attribute-value { font-size: 0.95rem; }
+    .product-detail-price-box { padding: 20px; margin-bottom: 25px; }
+    .review-form { padding: 24px; }
+    .section-header h2 { font-size: 1.8rem; }
+}
+
+@media (max-width: 480px) {
+    .product-detail-name { font-size: 1.5rem; }
+    .product-attributes { grid-template-columns: 1fr; }
+    .days-selector { gap: 8px; }
+    .day-btn { width: 40px; height: 40px; font-size: 1rem; }
+    .product-detail-actions button { padding: 14px !important; font-size: 0.9rem !important; }
+}
+
+/* Sticky Bottom Bar for Mobile */
+@media (max-width: 768px) {
+    .product-detail-actions {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #fff;
+        padding: 12px 20px;
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+        z-index: 1000;
+        flex-direction: row !important;
+        gap: 10px;
+    }
+
+    .product-detail-actions button, .product-detail-actions .btn {
+        margin-bottom: 0 !important;
+        flex: 1;
+        font-size: 0.8rem !important;
+        padding: 12px 8px !important;
+    }
+
+    /* Only show primary buttons in sticky bar to save space */
+    .product-detail-actions .btn-rent-now,
+    .product-detail-actions button[variant='outline'] {
+        /* display: none; */ /* Maybe hide some? Let's keep them small for now */
+    }
+    
+    .product-detail-page {
+        padding-bottom: 100px; /* Space for sticky bar */
+    }
+}
+
+/* Visibility Utilities */
+.mobile-only { display: none !important; }
+@media (max-width: 768px) {
+    .desktop-only { display: none !important; }
+    .mobile-only { display: block !important; }
+    
+    .btn-mobile-primary {
+        background: #b59410 !important;
+        color: #fff !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
     }
 }

@@ -135,56 +135,56 @@ const ChiTietSanPham = () => {
             <div className="container">
                 <div className="product-detail-container">
                     <div className="product-detail-gallery">
-                        <div className="product-detail-image-wrapper" style={{position:'relative'}}>
+                        <div className="product-detail-image-wrapper" style={{ position: 'relative' }}>
                             <img
                                 src={layUrlHinhAnh(gallery[galleryIndex])}
                                 alt={sanPham.name}
                                 onError={(e) => e.target.src = 'https://placehold.co/600x800?text=IVIE+Studio'}
-                                style={{maxHeight:'520px',objectFit:'contain',background:'#f9f9f9'}}
+                                style={{ maxHeight: '520px', objectFit: 'contain', background: '#f9f9f9' }}
                             />
                             {gallery.length > 1 && (
                                 <>
                                     <button
-                                        style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',background:'#fff',border:'1px solid #eee',borderRadius:8,padding:'6px 10px',cursor:'pointer',zIndex:2}}
-                                        onClick={()=>setGalleryIndex(i=>i===0?gallery.length-1:i-1)}
+                                        style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', background: '#fff', border: '1px solid #eee', borderRadius: 8, padding: '6px 10px', cursor: 'pointer', zIndex: 2 }}
+                                        onClick={() => setGalleryIndex(i => i === 0 ? gallery.length - 1 : i - 1)}
                                         aria-label="Ảnh trước"
                                     >&#8592;</button>
                                     <button
-                                        style={{position:'absolute',right:10,top:'50%',transform:'translateY(-50%)',background:'#fff',border:'1px solid #eee',borderRadius:8,padding:'6px 10px',cursor:'pointer',zIndex:2}}
-                                        onClick={()=>setGalleryIndex(i=>(i+1)%gallery.length)}
+                                        style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: '#fff', border: '1px solid #eee', borderRadius: 8, padding: '6px 10px', cursor: 'pointer', zIndex: 2 }}
+                                        onClick={() => setGalleryIndex(i => (i + 1) % gallery.length)}
                                         aria-label="Ảnh sau"
                                     >&#8594;</button>
                                 </>
                             )}
                         </div>
                         {gallery.length > 1 && (
-                            <div style={{display:'flex',gap:10,marginTop:14,justifyContent:'center'}}>
-                                {gallery.map((img,idx)=>(
-                                    <div 
-                                        key={img+idx}
-                                        style={{position:'relative',cursor:'pointer'}}
-                                        onClick={()=>setGalleryIndex(idx)}
+                            <div style={{ display: 'flex', gap: 10, marginTop: 14, justifyContent: 'center' }}>
+                                {gallery.map((img, idx) => (
+                                    <div
+                                        key={img + idx}
+                                        style={{ position: 'relative', cursor: 'pointer' }}
+                                        onClick={() => setGalleryIndex(idx)}
                                     >
                                         <img
                                             src={layUrlHinhAnh(img)}
-                                            alt={`thumb-${idx+1}`}
-                                            style={{width:60,height:60,objectFit:'cover',borderRadius:8,border:galleryIndex===idx?'2.5px solid #b59410':'1.5px solid #eee',boxShadow:galleryIndex===idx?'0 2px 8px #b5941033':'none',background:'#fff'}}
+                                            alt={`thumb-${idx + 1}`}
+                                            style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 8, border: galleryIndex === idx ? '2.5px solid #b59410' : '1.5px solid #eee', boxShadow: galleryIndex === idx ? '0 2px 8px #b5941033' : 'none', background: '#fff' }}
                                         />
                                         <div style={{
-                                            position:'absolute',
-                                            bottom:'4px',
-                                            left:'50%',
-                                            transform:'translateX(-50%)',
-                                            background:'rgba(0,0,0,0.75)',
-                                            color:'white',
-                                            padding:'2px 6px',
-                                            borderRadius:'8px',
-                                            fontSize:'0.65rem',
-                                            fontWeight:'600',
-                                            pointerEvents:'none',
-                                            whiteSpace:'nowrap'
+                                            position: 'absolute',
+                                            bottom: '4px',
+                                            left: '50%',
+                                            transform: 'translateX(-50%)',
+                                            background: 'rgba(0,0,0,0.75)',
+                                            color: 'white',
+                                            padding: '2px 6px',
+                                            borderRadius: '8px',
+                                            fontSize: '0.65rem',
+                                            fontWeight: '600',
+                                            pointerEvents: 'none',
+                                            whiteSpace: 'nowrap'
                                         }}>
-                                            Mẫu {idx+1}
+                                            Mẫu {idx + 1}
                                         </div>
                                     </div>
                                 ))}
@@ -232,48 +232,30 @@ const ChiTietSanPham = () => {
                                     addToCart(false);
                                     navigate('/gio-hang');
                                 }}
-                                style={{ 
-                                    padding: '18px', 
-                                    fontSize: '1rem', 
-                                    backgroundColor: '#b59410',
-                                    color: '#ffffff',
-                                    width: '100%',
-                                    display: 'block',
-                                    border: 'none',
-                                    borderRadius: '50px',
-                                    fontWeight: '600',
-                                    cursor: 'pointer',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '1px',
-                                    transition: 'all 0.3s ease',
-                                    marginBottom: '15px'
-                                }}
-                                className="btn btn-thue-ngay"
+                                className="btn btn-thue-ngay desktop-only"
                             >
                                 THUÊ NGAY
                             </button>
-                            <NutBam
-                                variant="primary"
-                                className="btn-rent-now"
+                            <button
+                                className="btn-mobile-primary mobile-only"
                                 onClick={() => {
                                     addToCart(false);
                                     navigate('/gio-hang');
                                 }}
-                                style={{ padding: '20px', fontSize: '1.1rem' }}
                             >
-                                ĐẶT THUÊ NGAY • {dinhDangGia(sanPham.rental_price_day * soNgayThue)}
-                            </NutBam>
+                                THUÊ NGAY
+                            </button>
                             <NutBam
                                 variant="outline"
                                 onClick={() => addToCart(false)}
-                                style={{ padding: '18px', borderColor: '#1a1a1a', color: '#1a1a1a' }}
+                                className="btn-add-cart-outline"
                             >
-                                THÊM GIỎ HÀNG
+                                THÊM GIỎ
                             </NutBam>
                             <NutBam
                                 variant="outline"
                                 onClick={() => addToCart(true)}
-                                style={{ padding: '18px', borderColor: '#1a1a1a', color: '#1a1a1a' }}
+                                className="desktop-only"
                             >
                                 MUA SỞ HỮU
                             </NutBam>
