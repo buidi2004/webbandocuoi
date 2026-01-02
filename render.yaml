@@ -12,7 +12,7 @@ services:
   - type: web
     name: ivie-backend
     runtime: docker
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: backend/Dockerfile
     dockerContext: ./backend
     plan: free
     healthCheckPath: /api/health
@@ -53,7 +53,7 @@ services:
   - type: web
     name: ivie-frontend
     runtime: docker
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: frontend/Dockerfile
     dockerContext: ./frontend
     plan: free
     envVars:
@@ -64,7 +64,7 @@ services:
   - type: web
     name: ivie-admin
     runtime: docker
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: admin-python/Dockerfile
     dockerContext: ./admin-python
     plan: free
     healthCheckPath: /_stcore/health
