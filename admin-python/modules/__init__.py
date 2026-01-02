@@ -3,7 +3,7 @@ IVIE Wedding Admin - Modules Package
 Chứa các module chức năng được tách riêng để tối ưu hiệu năng
 """
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 __all__ = [
     "api_client",
     "dashboard",
@@ -20,6 +20,9 @@ __all__ = [
     "combos",
     "homepage",
     "utils",
+    "redis_cache",
+    "cdn_client",
+    "debounce",
 ]
 
 
