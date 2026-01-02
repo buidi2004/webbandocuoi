@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query, File, UploadFile, Form
+from fastapi import APIRouter, Depends, Query, File, UploadFile, Form, Response
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import os
@@ -18,6 +18,9 @@ def lay_danh_sach_san_pham(
     sub_category: Optional[str] = Query(None, description="Lọc theo tiểu mục"),
     gioi_tinh: Optional[str] = Query(None, description="Lọc theo giới tính: male, female"),
     sort_by: Optional[str] = Query(None, description="Sắp xếp: price_asc, price_desc, hot, new"),
+    bo_qua: int = Query(0, ge=0),
+    gioi_han: int = Query(0, ge=0, le=1000),
+    phan_hoi: Response = None,
     csdl: Session = Depends(lay_csdl)
 ):
     """Lấy tất cả sản phẩm với bộ lọc và sắp xếp tùy chọn"""
@@ -44,6 +47,12 @@ def lay_danh_sach_san_pham(
         # Default sort by ID desc
         truy_van = truy_van.order_by(SanPhamDB.id.desc())
     
+    tong_so = truy_van.count()
+    if phan_hoi is not None:
+        phan_hoi.headers["X-Total-Count"] = str(tong_so)
+
+    if gioi_han and gioi_han > 0:
+        return truy_van.offset(bo_qua).limit(gioi_han).all()
     return truy_van.all()
 
 

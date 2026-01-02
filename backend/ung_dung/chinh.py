@@ -38,6 +38,7 @@ ung_dung.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Total-Count"],
 )
 
 # Gắn thư mục tĩnh cho hình ảnh (để Admin panel và API có thể truy cập)

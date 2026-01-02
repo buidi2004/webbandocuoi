@@ -2,10 +2,10 @@ import api from './khach_hang';
 
 export const quanTriAPI = {
     // Lấy danh sách sản phẩm (tái sử dụng API khách hàng)
-    layTatCa: (params) => api.get('/api/san_pham', { params }),
+    layTatCa: (params) => api.get('/api/san_pham/', { params }),
 
     // Tạo sản phẩm mới
-    tao: (duLieu) => api.post('/api/san_pham', duLieu),
+    tao: (duLieu) => api.post('/api/san_pham/', duLieu),
 
     // Cập nhật sản phẩm
     capNhat: (id, duLieu) => api.put(`/api/san_pham/${id}`, duLieu),
