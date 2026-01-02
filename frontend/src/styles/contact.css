@@ -10,6 +10,10 @@
     overflow: hidden;
 }
 
+.contact-hero .page-title {
+    font-family: var(--font-heading-vn);
+}
+
 .contact-hero::after {
     content: '';
     position: absolute;
