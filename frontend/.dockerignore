@@ -2,3 +2,31 @@ node_modules
 dist
 .env
 .DS_Store
+
+# VCS / IDE
+.git
+.gitignore
+.vscode
+.idea
+
+# Logs / debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Tests / coverage
+coverage
+*.lcov
+
+# OS junk
+Thumbs.db
+
+# Env / local overrides
+.env.*
+!.env.example
+
+# Build artifacts / caches
+.vite
+.eslintcache

@@ -10,11 +10,12 @@ ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 # Cache bust - update this to force rebuild: v2025.01.01.2
 ARG CACHEBUST=2
 
-# Copy ALL source code first to ensure latest files
-COPY . .
-
-# Install dependencies
+# Install dependencies first (better layer caching)
+COPY package.json package-lock.json ./
 RUN npm ci
+
+# Copy the rest of the source code
+COPY . .
 
 # Build the application with env
 RUN npm run build

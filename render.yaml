@@ -29,6 +29,20 @@ services:
         value: "3.12"
       - key: IMGBB_API_KEY
         value: c525fc0204b449b541b0f0a5a4f5d9c4
+
+      # Email (SMTP) - dùng để gửi thông báo form liên hệ/đặt lịch về mail của bạn
+      - key: SMTP_SERVER
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      # Gmail dùng App Password (không phải mật khẩu đăng nhập)
+      - key: SMTP_USER
+        value: YOUR_GMAIL_ADDRESS
+      - key: SMTP_PASSWORD
+        value: YOUR_GMAIL_APP_PASSWORD
+      - key: NOTIFY_RECEIVER_EMAIL
+        value: buidi7170@gmail.com
+
       # Telegram Bot - Thay bằng token và chat_id thật
       - key: TELEGRAM_BOT_TOKEN
         value: YOUR_TELEGRAM_BOT_TOKEN
