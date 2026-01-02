@@ -1,0 +1,99 @@
+# =============================================================================
+# IVIE Wedding Studio - Backend Dependencies (Optimized)
+# =============================================================================
+
+# Core Framework
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+starlette>=0.41.0
+
+# Database
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.0
+aiosqlite>=0.20.0
+
+# Async Database Support
+asyncpg>=0.29.0
+databases>=0.9.0
+
+# Validation & Serialization
+pydantic>=2.9.0
+pydantic-settings>=2.0.0
+email-validator>=2.2.0
+
+# Authentication & Security
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.0
+bcrypt==4.0.1
+
+# File Handling
+python-multipart>=0.0.7
+aiofiles>=24.1.0
+Pillow>=10.0.0
+
+# Environment & Configuration
+python-dotenv>=1.0.0
+python-decouple>=3.8
+
+# HTTP Client (for external APIs)
+httpx>=0.27.0
+aiohttp>=3.9.0
+
+# Caching
+redis>=5.0.0
+hiredis>=2.3.0
+
+# Performance Monitoring
+psutil>=5.9.0
+
+# Compression
+brotli>=1.1.0
+
+# Rate Limiting (optional)
+slowapi>=0.1.9
+
+# Background Tasks
+celery>=5.3.0
+# Redis is used as broker
+
+# Logging & Monitoring
+structlog>=24.1.0
+python-json-logger>=2.0.7
+
+# Testing (development)
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+pytest-cov>=4.1.0
+httpx>=0.27.0
+
+# Code Quality (development)
+black>=24.0.0
+ruff>=0.3.0
+mypy>=1.8.0
+
+# =============================================================================
+# Optional: Uncomment if needed
+# =============================================================================
+
+# Message Queue
+# rabbitmq>=0.2.0
+
+# Full-text Search
+# elasticsearch>=8.0.0
+
+# Image Processing
+# opencv-python>=4.9.0
+
+# PDF Generation
+# reportlab>=4.1.0
+# weasyprint>=61.0
+
+# Excel Export
+# openpyxl>=3.1.0
+# xlsxwriter>=3.1.0
+
+# Scheduling
+# apscheduler>=3.10.0
+
+# WebSocket
+# websockets>=12.0
