@@ -12,8 +12,8 @@ services:
   - type: web
     name: ivie-backend
     runtime: docker
-    dockerfilePath: backend/Dockerfile
-    dockerContext: backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./backend
     plan: free
     healthCheckPath: /api/health
     envVars:
@@ -53,8 +53,8 @@ services:
   - type: web
     name: ivie-frontend
     runtime: docker
-    dockerfilePath: frontend/Dockerfile
-    dockerContext: frontend
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./frontend
     plan: free
     envVars:
       - key: VITE_API_BASE_URL
