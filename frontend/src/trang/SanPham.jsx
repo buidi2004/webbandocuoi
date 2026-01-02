@@ -66,10 +66,10 @@ const SanPham = () => {
     };
 
     const danhMuc = [
-        { id: 'all', nhan: 'Tất cả', icon: '🎯' },
-        { id: 'wedding_modern', nhan: 'Váy Cưới', icon: '👰' },
-        { id: 'vest', nhan: 'Vest Nam', icon: '🤵' },
-        { id: 'aodai', nhan: 'Áo Dài', icon: '👘' },
+        { id: 'all', nhan: 'Tất cả' },
+        { id: 'wedding_modern', nhan: 'Váy Cưới' },
+        { id: 'vest', nhan: 'Vest Nam' },
+        { id: 'aodai', nhan: 'Áo Dài' },
     ];
 
     const tieuMucTheoLoai = {
@@ -100,12 +100,12 @@ const SanPham = () => {
     ];
 
     const phongCachOptions = [
-        { id: 'all', nhan: 'Tất cả', icon: '✨' },
-        { id: 'minimalist', nhan: 'Minimalist', icon: '🤍' },
-        { id: 'princess', nhan: 'Công chúa', icon: '👑' },
-        { id: 'vintage', nhan: 'Vintage', icon: '🌸' },
-        { id: 'sexy', nhan: 'Quyến rũ', icon: '💃' },
-        { id: 'classic', nhan: 'Cổ điển', icon: '🎀' },
+        { id: 'all', nhan: 'Tất cả' },
+        { id: 'minimalist', nhan: 'Minimalist' },
+        { id: 'princess', nhan: 'Công chúa' },
+        { id: 'vintage', nhan: 'Vintage' },
+        { id: 'sexy', nhan: 'Quyến rũ' },
+        { id: 'classic', nhan: 'Cổ điển' },
     ];
 
     const khoangGiaOptions = [
@@ -200,7 +200,6 @@ const SanPham = () => {
                                 className={`cat-tab ${boLoc === dm.id ? 'active' : ''}`}
                                 onClick={() => { setBoLoc(dm.id); setTieuMuc('all'); setPhongCach('all'); }}
                             >
-                                <span className="cat-icon">{dm.icon}</span>
                                 <span>{dm.nhan}</span>
                             </button>
                         ))}
@@ -231,7 +230,6 @@ const SanPham = () => {
                                     className={`style-tab ${phongCach === pc.id ? 'active' : ''}`}
                                     onClick={() => setPhongCach(pc.id)}
                                 >
-                                    <span className="style-icon">{pc.icon}</span>
                                     <span>{pc.nhan}</span>
                                 </button>
                             ))}
