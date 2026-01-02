@@ -1,0 +1,51 @@
+/* MasonryGrid.css - Responsive masonry layout */
+
+.masonry-grid {
+    column-count: 3;
+    column-gap: var(--masonry-gap, 20px);
+    width: 100%;
+}
+
+.masonry-item {
+    break-inside: avoid;
+    margin-bottom: var(--masonry-gap, 20px);
+}
+
+/* Responsive: 2 columns for tablet (768px - 1023px) */
+@media (max-width: 1023px) {
+    .masonry-grid {
+        column-count: 2;
+    }
+}
+
+/* Responsive: 1 column for mobile (<768px) */
+@media (max-width: 767px) {
+    .masonry-grid {
+        column-count: 1;
+    }
+}
+
+/* Empty state */
+.masonry-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    background: #f9f9f9;
+    border-radius: 16px;
+    text-align: center;
+}
+
+.masonry-empty span {
+    font-size: 4rem;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.masonry-empty p {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #666;
+    font-family: 'Montserrat', sans-serif;
+}

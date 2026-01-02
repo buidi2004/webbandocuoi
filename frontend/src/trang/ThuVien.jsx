@@ -1,15 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { thuVienAPI, sanPhamAPI, layUrlHinhAnh } from '../api/khach_hang';
-import BoSuuTapGach from '../thanh_phan/BoSuuTapGach';
 import HieuUngHat from '../thanh_phan/HieuUngHat';
 import ScrollLinkedGallery from '../thanh_phan/ScrollLinkedGallery';
 import CardCarousel from '../thanh_phan/CardCarousel';
+import MasonryGrid from '../thanh_phan/MasonryGrid';
+import GalleryLightbox from '../thanh_phan/GalleryLightbox';
+import PetalBackground from '../thanh_phan/PetalBackground';
+import GalleryFloatingCTA from '../thanh_phan/GalleryFloatingCTA';
 
 const ThuVien = () => {
     const [danhSachAnh, setDanhSachAnh] = useState([]);
     const [danhSachSanPham, setDanhSachSanPham] = useState([]);
     const [dangTai, setDangTai] = useState(true);
+    
+    // Lightbox state
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [lightboxIndex, setLightboxIndex] = useState(0);
 
     useEffect(() => {
         layDuLieuThuVien();
@@ -36,10 +43,33 @@ const ThuVien = () => {
         }
     };
 
-    const danhSachAnhGallery = danhSachAnh.map(item => ({
+    // Prepare gallery images for MasonryGrid
+    const galleryImages = danhSachAnh.map((item, index) => ({
+        id: item.id || index,
         url: layUrlHinhAnh(item.image_url),
-        moTa: item.title || 'IVIE Studio - Khoảnh khắc hạnh phúc'
+        title: item.title || 'IVIE Studio - Khoảnh khắc hạnh phúc'
     }));
+
+    // Lightbox handlers
+    const handleImageClick = useCallback((index) => {
+        setLightboxIndex(index);
+        setLightboxOpen(true);
+    }, []);
+
+    const handleLightboxClose = useCallback(() => {
+        setLightboxOpen(false);
+    }, []);
+
+    const handleLightboxNavigate = useCallback((direction) => {
+        setLightboxIndex(prev => {
+            const total = galleryImages.length;
+            if (direction === 'prev') {
+                return prev === 0 ? total - 1 : prev - 1;
+            } else {
+                return prev === total - 1 ? 0 : prev + 1;
+            }
+        });
+    }, [galleryImages.length]);
 
     // Hiệu ứng chữ
     const hieuUngTieuDe = {
@@ -90,19 +120,18 @@ const ThuVien = () => {
         }
     ];
 
-    // Chuẩn bị dữ liệu cho scroll-linked animation - dùng 4 ảnh đầu từ thư viện
+    // Chuẩn bị dữ liệu cho scroll-linked animation
     const scrollSections = defaultSectionData.map((section, index) => ({
         id: index + 1,
         title: section.title,
         description: section.description,
         highlight: section.highlight,
-        // Dùng ảnh từ thư viện nếu có, fallback về picsum
         image: danhSachAnh[index] 
             ? layUrlHinhAnh(danhSachAnh[index].image_url)
             : `https://picsum.photos/id/${1015 + index}/800/600`
     }));
 
-    // Chuẩn bị dữ liệu cho CardCarousel - dùng 3 sản phẩm đầu hoặc fallback
+    // Chuẩn bị dữ liệu cho CardCarousel
     const defaultCarouselData = [
         {
             id: 1,
@@ -138,8 +167,8 @@ const ThuVien = () => {
         : defaultCarouselData;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
-            {/* Khung hiệu ứng hạt ở đầu trang - responsive */}
+        <div className="min-h-screen bg-white">
+            {/* Khung hiệu ứng hạt ở đầu trang */}
             <section style={{ 
                 padding: '100px 15px 30px',
                 background: '#fff',
@@ -159,7 +188,7 @@ const ThuVien = () => {
                 }}>
                     <HieuUngHat particleCount={800} nenTrang={true} />
                     
-                    {/* Content overlay căn giữa - responsive mobile */}
+                    {/* Content overlay */}
                     <div style={{
                         position: 'absolute',
                         top: 0,
@@ -176,12 +205,12 @@ const ThuVien = () => {
                         textAlign: 'center'
                     }}>
                         <h1 style={{
-                            color: '#1a1a1a',
+                            color: '#333333',
                             fontSize: 'clamp(1.5rem, 6vw, 3.2rem)',
                             fontWeight: 700,
                             lineHeight: 1.2,
                             marginBottom: '12px',
-                            fontFamily: "'Be Vietnam Pro', system-ui, sans-serif"
+                            fontFamily: "'Playfair Display', Georgia, serif"
                         }}>
                             Thư Viện Ảnh IVIE
                         </h1>
@@ -189,34 +218,37 @@ const ThuVien = () => {
                             color: '#666',
                             fontSize: 'clamp(0.9rem, 3vw, 1.1rem)',
                             maxWidth: '90%',
-                            marginBottom: '20px'
+                            marginBottom: '20px',
+                            fontFamily: "'Montserrat', sans-serif"
                         }}>
                             Khoảnh khắc hạnh phúc của các cặp đôi
                         </p>
                         <div style={{ display: 'flex', gap: '10px', pointerEvents: 'auto', flexWrap: 'wrap', justifyContent: 'center' }}>
                             <a href="/lien-he" style={{
                                 padding: '12px 20px',
-                                background: '#1a1a1a',
+                                background: '#D4AF37',
                                 color: '#fff',
                                 fontSize: '0.85rem',
                                 fontWeight: 600,
                                 borderRadius: '8px',
                                 border: 'none',
                                 cursor: 'pointer',
-                                textDecoration: 'none'
+                                textDecoration: 'none',
+                                fontFamily: "'Montserrat', sans-serif"
                             }}>
                                 Đặt Lịch Chụp
                             </a>
                             <a href="/san-pham" style={{
                                 padding: '12px 20px',
                                 background: 'transparent',
-                                color: '#1a1a1a',
+                                color: '#333333',
                                 fontSize: '0.85rem',
                                 fontWeight: 600,
                                 borderRadius: '8px',
                                 border: 'none',
                                 cursor: 'pointer',
-                                textDecoration: 'none'
+                                textDecoration: 'none',
+                                fontFamily: "'Montserrat', sans-serif"
                             }}>
                                 Xem Sản Phẩm →
                             </a>
@@ -225,145 +257,192 @@ const ThuVien = () => {
                 </div>
             </section>
 
-            {/* Scroll-linked Animation Section - 4 ảnh local */}
+            {/* Scroll-linked Animation Section */}
             <ScrollLinkedGallery sections={scrollSections} />
 
-            {/* Card Carousel Section - 3 sản phẩm đầu */}
+            {/* Card Carousel Section */}
             <CardCarousel items={carouselItems} />
 
-            {/* Phần Gallery - responsive */}
-            <div className="py-8 sm:py-12" style={{ marginTop: '40px' }}>
-                <div className="container mx-auto px-3 sm:px-4">
-                {/* Phần đầu với hiệu ứng chữ */}
-                <div className="text-center mb-12 relative">
-                    {/* Ảnh nền cho hiệu ứng chữ */}
-                    <div className="absolute inset-0 -z-10 opacity-5">
-                        <div
-                            className="w-full h-full bg-cover bg-center"
+            {/* Gallery Section với Petal Background */}
+            <section className="py-12 sm:py-16" style={{ 
+                marginTop: '40px',
+                position: 'relative',
+                overflow: 'hidden',
+                background: '#FFFFFF'
+            }}>
+                {/* Petal Animation Background */}
+                <PetalBackground petalCount={20} />
+
+                <div className="container mx-auto px-4 sm:px-6" style={{ position: 'relative', zIndex: 1 }}>
+                    {/* Section Header */}
+                    <div className="text-center mb-12">
+                        <motion.h2
+                            className="mb-4"
                             style={{
-                                backgroundImage: 'url(https://images.unsplash.com/photo-1519741497674-611481863552?w=1200)',
+                                fontFamily: "'Playfair Display', Georgia, serif",
+                                fontSize: 'clamp(1.75rem, 5vw, 3rem)',
+                                fontWeight: 700,
+                                color: '#333333'
+                            }}
+                            variants={hieuUngTieuDe}
+                            initial="anDi"
+                            whileInView="hienThi"
+                            viewport={{ once: true }}
+                        >
+                            {tieuDe.split('').map((kyTu, viTri) => (
+                                <motion.span key={viTri} variants={hieuUngChuCai}>
+                                    {kyTu === ' ' ? '\u00A0' : kyTu}
+                                </motion.span>
+                            ))}
+                        </motion.h2>
+
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8, delay: 0.5 }}
+                            style={{
+                                fontFamily: "'Montserrat', sans-serif",
+                                fontSize: 'clamp(0.9rem, 2.5vw, 1.1rem)',
+                                color: '#666',
+                                maxWidth: '600px',
+                                margin: '0 auto'
+                            }}
+                        >
+                            Khoảnh khắc hạnh phúc của các cặp đôi - Nơi lưu giữ những kỷ niệm đẹp nhất
+                        </motion.p>
+
+                        {/* Tags */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8, delay: 0.7 }}
+                            className="mt-6 flex items-center justify-center gap-3 flex-wrap"
+                        >
+                            {[
+                                { icon: '📸', text: `${danhSachAnh.length} ảnh` },
+                                { icon: '✨', text: 'Masonry Grid' },
+                                { icon: '💝', text: 'Khoảnh khắc đẹp' },
+                            ].map((tag, index) => (
+                                <span
+                                    key={index}
+                                    style={{
+                                        padding: '8px 16px',
+                                        background: 'white',
+                                        borderRadius: '50px',
+                                        boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
+                                        fontSize: '0.85rem',
+                                        fontFamily: "'Montserrat', sans-serif",
+                                        color: '#333'
+                                    }}
+                                >
+                                    {tag.icon} {tag.text}
+                                </span>
+                            ))}
+                        </motion.div>
+
+                        {/* Decorative line */}
+                        <motion.div
+                            initial={{ scaleX: 0 }}
+                            whileInView={{ scaleX: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 1, delay: 1 }}
+                            style={{
+                                width: '80px',
+                                height: '3px',
+                                background: 'linear-gradient(90deg, transparent, #D4AF37, transparent)',
+                                margin: '24px auto 0'
                             }}
                         />
                     </div>
 
-                    {/* Tiêu đề với hiệu ứng - responsive */}
-                    <motion.h1
-                        className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-[#b59410] to-gray-900 px-4"
-                        variants={hieuUngTieuDe}
-                        initial="anDi"
-                        animate="hienThi"
-                        style={{ wordBreak: 'break-word' }}
-                    >
-                        {tieuDe.split('').map((kyTu, viTri) => (
-                            <motion.span key={viTri} variants={hieuUngChuCai}>
-                                {kyTu === ' ' ? '\u00A0' : kyTu}
-                            </motion.span>
-                        ))}
-                    </motion.h1>
+                    {/* Gallery Content */}
+                    {dangTai ? (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="flex flex-col items-center justify-center py-20"
+                        >
+                            <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                                style={{
+                                    width: '48px',
+                                    height: '48px',
+                                    border: '4px solid #D4AF37',
+                                    borderTopColor: 'transparent',
+                                    borderRadius: '50%',
+                                    marginBottom: '16px'
+                                }}
+                            />
+                            <p style={{ color: '#666', fontFamily: "'Montserrat', sans-serif" }}>
+                                Đang tải bộ sưu tập ảnh...
+                            </p>
+                        </motion.div>
+                    ) : galleryImages.length > 0 ? (
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8 }}
+                        >
+                            <MasonryGrid 
+                                images={galleryImages} 
+                                gap={20}
+                                onImageClick={handleImageClick}
+                            />
+                        </motion.div>
+                    ) : (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="text-center py-20"
+                            style={{
+                                background: '#f9f9f9',
+                                borderRadius: '16px'
+                            }}
+                        >
+                            <div style={{ fontSize: '4rem', marginBottom: '16px', opacity: 0.5 }}>📷</div>
+                            <p style={{ color: '#666', fontSize: '1.1rem', fontFamily: "'Montserrat', sans-serif" }}>
+                                Chưa có ảnh trong thư viện
+                            </p>
+                            <p style={{ color: '#999', fontSize: '0.9rem', marginTop: '8px', fontFamily: "'Montserrat', sans-serif" }}>
+                                Hãy quay lại sau để xem những khoảnh khắc đẹp
+                            </p>
+                        </motion.div>
+                    )}
 
-                    {/* Phụ đề với hiệu ứng fade-in - responsive */}
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.5 }}
-                        className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto px-4"
-                    >
-                        Khoảnh khắc hạnh phúc của các cặp đôi - Nơi lưu giữ những kỷ niệm đẹp nhất
-                    </motion.p>
-
-                    {/* Các nhãn với hiệu ứng lần lượt - responsive */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.7 }}
-                        className="mt-4 sm:mt-6 flex items-center justify-center gap-2 sm:gap-3 flex-wrap text-xs sm:text-sm text-gray-500 px-4"
-                    >
-                        {[
-                            { bieuTuong: '📸', noiDung: `${danhSachAnh.length} ảnh` },
-                            { bieuTuong: '✨', noiDung: 'Bố cục Gạch' },
-                            { bieuTuong: '💝', noiDung: 'Khoảnh khắc đẹp' },
-                        ].map((nhan, viTri) => (
-                            <motion.span
-                                key={viTri}
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.5, delay: 0.9 + viTri * 0.1 }}
-                                whileHover={{ scale: 1.05, y: -2 }}
-                                className="px-3 py-1.5 sm:px-4 sm:py-2 bg-white rounded-full shadow-sm hover:shadow-md transition-all cursor-pointer text-xs sm:text-sm"
-                            >
-                                {nhan.bieuTuong} {nhan.noiDung}
-                            </motion.span>
-                        ))}
-                    </motion.div>
-
-                    {/* Đường trang trí */}
-                    <motion.div
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: 1 }}
-                        transition={{ duration: 1, delay: 1.2 }}
-                        className="w-24 h-1 bg-gradient-to-r from-transparent via-[#b59410] to-transparent mx-auto mt-8"
-                    />
-                </div>
-
-                {/* Nội dung Gallery */}
-                {dangTai ? (
+                    {/* Footer info */}
                     <motion.div
                         initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="flex flex-col items-center justify-center py-20"
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8, delay: 0.5 }}
+                        className="text-center mt-12 pt-8"
+                        style={{ borderTop: '1px solid #eee' }}
                     >
-                        <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                            className="w-12 h-12 border-4 border-[#b59410] border-t-transparent rounded-full mb-4"
-                        />
-                        <p className="text-gray-600">Đang tải bộ sưu tập ảnh...</p>
-                    </motion.div>
-                ) : danhSachAnh.length > 0 ? (
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.3 }}
-                        className="bg-white/50 backdrop-blur-sm rounded-2xl shadow-xl p-6"
-                    >
-                        <BoSuuTapGach danhSachAnh={danhSachAnhGallery} />
-                    </motion.div>
-                ) : (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="text-center py-20 bg-white rounded-2xl shadow-lg"
-                    >
-                        <motion.div
-                            animate={{ y: [0, -10, 0] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                            className="text-6xl mb-4"
-                        >
-                            📷
-                        </motion.div>
-                        <p className="text-gray-500 text-lg">Chưa có ảnh trong thư viện</p>
-                        <p className="text-gray-400 text-sm mt-2">
-                            Hãy quay lại sau để xem những khoảnh khắc đẹp
+                        <p style={{ color: '#666', fontFamily: "'Montserrat', sans-serif", marginBottom: '8px' }}>
+                            💡 <strong>Mẹo:</strong> Di chuột vào ảnh để xem hiệu ứng, click để phóng to
+                        </p>
+                        <p style={{ color: '#999', fontSize: '0.85rem', fontFamily: "'Montserrat', sans-serif" }}>
+                            © 2024 IVIE STUDIO - Lưu giữ khoảnh khắc hạnh phúc
                         </p>
                     </motion.div>
-                )}
+                </div>
+            </section>
 
-                {/* Thông tin cuối trang */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.8, delay: 1.5 }}
-                    className="text-center mt-12 py-8 border-t border-gray-200"
-                >
-                    <p className="text-gray-600 mb-2">
-                        💡 <strong>Mẹo:</strong> Di chuột vào ảnh để xem hiệu ứng, click để phóng to
-                    </p>
-                    <p className="text-gray-500 text-sm">
-                        © 2024 IVIE STUDIO - Lưu giữ khoảnh khắc hạnh phúc
-                    </p>
-                </motion.div>
-            </div>
-        </div>
+            {/* Lightbox */}
+            <GalleryLightbox
+                images={galleryImages}
+                currentIndex={lightboxIndex}
+                isOpen={lightboxOpen}
+                onClose={handleLightboxClose}
+                onNavigate={handleLightboxNavigate}
+            />
+
+            {/* Floating CTA */}
+            <GalleryFloatingCTA />
         </div>
     );
 };

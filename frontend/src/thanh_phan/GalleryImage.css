@@ -1,0 +1,146 @@
+/* GalleryImage.css - Lazy loading với hover effects */
+
+.gallery-image-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    cursor: pointer;
+    background-color: #f5f5f5;
+    will-change: transform, box-shadow;
+    transition: transform 300ms ease, box-shadow 300ms ease;
+}
+
+/* Hover effects - only on non-touch devices */
+.gallery-image-container:not(.touch-device):hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Skeleton placeholder */
+.gallery-image-skeleton {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
+}
+
+.skeleton-animation {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        #f0f0f0 25%,
+        #e0e0e0 50%,
+        #f0f0f0 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite;
+}
+
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Actual image */
+.gallery-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    opacity: 0;
+    transition: opacity 500ms ease-in-out;
+}
+
+.gallery-image.loaded {
+    opacity: 1;
+}
+
+/* Error state */
+.gallery-image-error {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f5f5f5;
+    color: #999;
+}
+
+.gallery-image-error span {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+    opacity: 0.5;
+}
+
+.gallery-image-error p {
+    margin: 0;
+    font-size: 0.85rem;
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Hover overlay */
+.gallery-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.7) 0%,
+        rgba(0, 0, 0, 0.3) 50%,
+        transparent 100%
+    );
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 300ms ease;
+}
+
+.gallery-image-container:not(.touch-device):hover .gallery-image-overlay {
+    opacity: 1;
+}
+
+.overlay-icon {
+    color: white;
+    transform: scale(0.8);
+    transition: transform 300ms ease;
+}
+
+.gallery-image-container:not(.touch-device):hover .overlay-icon {
+    transform: scale(1);
+}
+
+.overlay-title {
+    color: white;
+    font-size: 0.9rem;
+    font-family: 'Montserrat', sans-serif;
+    margin: 12px 16px 0;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 300ms ease, transform 300ms ease;
+}
+
+.gallery-image-container:not(.touch-device):hover .overlay-title {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Touch device - tap feedback */
+.gallery-image-container.touch-device:active {
+    transform: scale(0.98);
+}
