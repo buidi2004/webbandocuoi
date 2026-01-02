@@ -9,8 +9,35 @@ const ThanhTimKiem = ({ isOpen, onClose }) => {
     const [danhSachCombo, setDanhSachCombo] = useState([]);
     const [ketQua, setKetQua] = useState({ sanPham: [], combo: [] });
     const [dangTai, setDangTai] = useState(false);
+    const [phongCach, setPhongCach] = useState('all');
+    const [khoangGia, setKhoangGia] = useState('all');
     const inputRef = useRef(null);
     const navigate = useNavigate();
+
+    const goiYTimKiem = [
+        'Váy cưới hiện đại',
+        'Áo dài truyền thống',
+        'Combo Album',
+        'Vest nam',
+        'Váy đuôi cá',
+    ];
+
+    const phongCachOptions = [
+        { id: 'all', nhan: 'Tất cả' },
+        { id: 'minimalist', nhan: 'Minimalist' },
+        { id: 'princess', nhan: 'Công chúa' },
+        { id: 'vintage', nhan: 'Vintage' },
+        { id: 'sexy', nhan: 'Quyến rũ' },
+        { id: 'classic', nhan: 'Cổ điển' },
+    ];
+
+    const khoangGiaOptions = [
+        { id: 'all', nhan: 'Tất cả giá' },
+        { id: 'duoi_500k', nhan: 'Dưới 500K' },
+        { id: '500k_1tr', nhan: '500K - 1 triệu' },
+        { id: '1tr_2tr', nhan: '1 - 2 triệu' },
+        { id: 'tren_2tr', nhan: 'Trên 2 triệu' },
+    ];
 
     useEffect(() => {
         if (isOpen && sanPham.length === 0) {
@@ -24,6 +51,8 @@ const ThanhTimKiem = ({ isOpen, onClose }) => {
         } else {
             setTuKhoa('');
             setKetQua({ sanPham: [], combo: [] });
+            setPhongCach('all');
+            setKhoangGia('all');
         }
     }, [isOpen]);
 
@@ -45,76 +74,68 @@ const ThanhTimKiem = ({ isOpen, onClose }) => {
             if (res.data) setDanhSachCombo(res.data);
         } catch (error) {
             console.error("Lỗi tải combo:", error);
-            // Fallback to default combos
             setDanhSachCombo([
-                {
-                    id: 1,
-                    ten: 'COMBO KHỞI ĐẦU',
-                    gia: 2000000,
-                    mo_ta: 'Gói cơ bản cho các cặp đôi',
-                    hinh_anh: 'https://images.unsplash.com/photo-1594552072238-b8a33785b261?auto=format&fit=crop&q=80&w=600'
-                },
-                {
-                    id: 2,
-                    ten: 'COMBO TIẾT KIỆM',
-                    gia: 5000000,
-                    mo_ta: 'Sự lựa chọn phổ biến nhất',
-                    hinh_anh: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=600'
-                },
-                {
-                    id: 3,
-                    ten: 'COMBO VIP TOÀN NĂNG',
-                    gia: 15000000,
-                    mo_ta: 'Trọn gói ngày cưới hoàn hảo',
-                    hinh_anh: 'https://images.unsplash.com/photo-1511285560982-1351cdeb9821?auto=format&fit=crop&q=80&w=600'
-                }
+                { id: 1, ten: 'COMBO KHỞI ĐẦU', gia: 2000000, mo_ta: 'Gói cơ bản cho các cặp đôi', hinh_anh: 'https://images.unsplash.com/photo-1594552072238-b8a33785b261?auto=format&fit=crop&q=80&w=600' },
+                { id: 2, ten: 'COMBO TIẾT KIỆM', gia: 5000000, mo_ta: 'Sự lựa chọn phổ biến nhất', hinh_anh: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=600' },
+                { id: 3, ten: 'COMBO VIP TOÀN NĂNG', gia: 15000000, mo_ta: 'Trọn gói ngày cưới hoàn hảo', hinh_anh: 'https://images.unsplash.com/photo-1511285560982-1351cdeb9821?auto=format&fit=crop&q=80&w=600' }
             ]);
         }
     };
 
     useEffect(() => {
-        if (!tuKhoa.trim()) {
-            setKetQua({ sanPham: [], combo: [] });
-            return;
+        const tuKhoaThuong = tuKhoa.toLowerCase().trim();
+
+        let spTimThay = sanPham;
+
+        // Lọc theo từ khóa
+        if (tuKhoaThuong) {
+            spTimThay = spTimThay.filter(sp =>
+                sp.name.toLowerCase().includes(tuKhoaThuong) ||
+                sp.code.toLowerCase().includes(tuKhoaThuong)
+            );
         }
 
-        const tuKhoaThuong = tuKhoa.toLowerCase();
+        // Lọc theo phong cách
+        if (phongCach !== 'all') {
+            spTimThay = spTimThay.filter(sp => sp.style === phongCach);
+        }
 
-        const spTimThay = sanPham.filter(sp =>
-            sp.name.toLowerCase().includes(tuKhoaThuong) ||
-            sp.code.toLowerCase().includes(tuKhoaThuong)
-        ).slice(0, 10);
+        // Lọc theo khoảng giá
+        if (khoangGia !== 'all') {
+            spTimThay = spTimThay.filter(sp => {
+                const gia = sp.rental_price_day || 0;
+                switch (khoangGia) {
+                    case 'duoi_500k': return gia < 500000;
+                    case '500k_1tr': return gia >= 500000 && gia < 1000000;
+                    case '1tr_2tr': return gia >= 1000000 && gia < 2000000;
+                    case 'tren_2tr': return gia >= 2000000;
+                    default: return true;
+                }
+            });
+        }
 
-        const cbTimThay = danhSachCombo.filter(cb =>
+        const cbTimThay = tuKhoaThuong ? danhSachCombo.filter(cb =>
             cb.ten.toLowerCase().includes(tuKhoaThuong) ||
             cb.mo_ta.toLowerCase().includes(tuKhoaThuong)
-        ).slice(0, 5);
+        ).slice(0, 5) : [];
 
-        setKetQua({ sanPham: spTimThay, combo: cbTimThay });
-    }, [tuKhoa, sanPham, danhSachCombo]);
+        setKetQua({ sanPham: spTimThay.slice(0, 10), combo: cbTimThay });
+    }, [tuKhoa, sanPham, danhSachCombo, phongCach, khoangGia]);
 
-    const dinhDangGia = (gia) => {
-        return new Intl.NumberFormat('vi-VN').format(gia) + 'đ';
-    };
+    const dinhDangGia = (gia) => new Intl.NumberFormat('vi-VN').format(gia) + 'đ';
 
     if (!isOpen) return null;
-
-    const QuickTag = ({ text }) => (
-        <button className="tag-btn" onClick={() => setTuKhoa(text)}>
-            {text}
-        </button>
-    );
 
     return (
         <div className={`search-overlay ${isOpen ? 'active' : ''}`} onClick={(e) => {
             if (e.target === e.currentTarget) onClose();
         }}>
             <div className="search-container">
-                {/* Search Bar Wrapper */}
+                {/* Search Input - Tối giản, bo góc tròn */}
                 <div className="search-bar-wrapper">
-                    <svg className="search-icon-large" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    <svg className="search-icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.35-4.35"/>
                     </svg>
                     <input
                         ref={inputRef}
@@ -124,23 +145,59 @@ const ThanhTimKiem = ({ isOpen, onClose }) => {
                         value={tuKhoa}
                         onChange={(e) => setTuKhoa(e.target.value)}
                     />
-                    <button className="close-search-btn" onClick={onClose}>&times;</button>
+                    {tuKhoa && (
+                        <button className="search-clear-btn" onClick={() => setTuKhoa('')}>×</button>
+                    )}
+                    <button className="close-search-btn" onClick={onClose}>×</button>
                 </div>
 
-                {/* Suggestions / Quick Tags */}
-                {!tuKhoa && (
-                    <div className="quick-tags">
-                        <span style={{ color: '#999', fontSize: '0.9rem', marginRight: '10px' }}>Gợi ý:</span>
-                        <QuickTag text="Váy cưới hiện đại" />
-                        <QuickTag text="Áo dài truyền thống" />
-                        <QuickTag text="Combo Album" />
-                        <QuickTag text="Vest nam" />
-                    </div>
-                )}
+                {/* Chips gợi ý */}
+                <div className="search-chips-wrapper">
+                    {goiYTimKiem.map((goiY, index) => (
+                        <button
+                            key={index}
+                            className={`search-chip ${tuKhoa === goiY ? 'active' : ''}`}
+                            onClick={() => setTuKhoa(goiY)}
+                        >
+                            {goiY}
+                        </button>
+                    ))}
+                </div>
 
-                {/* Search Results Grid */}
+                {/* Bộ lọc - Flexbox */}
+                <div className="search-filters">
+                    <div className="filter-group">
+                        <span className="filter-label">Phong cách:</span>
+                        <div className="filter-options">
+                            {phongCachOptions.map(pc => (
+                                <button
+                                    key={pc.id}
+                                    className={`filter-btn ${phongCach === pc.id ? 'active' : ''}`}
+                                    onClick={() => setPhongCach(pc.id)}
+                                >
+                                    {pc.nhan}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="filter-group">
+                        <span className="filter-label">Khoảng giá:</span>
+                        <div className="filter-options">
+                            {khoangGiaOptions.map(kg => (
+                                <button
+                                    key={kg.id}
+                                    className={`filter-btn ${khoangGia === kg.id ? 'active' : ''}`}
+                                    onClick={() => setKhoangGia(kg.id)}
+                                >
+                                    {kg.nhan}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Kết quả tìm kiếm */}
                 <div className="search-content-grid">
-                    {/* Left: Products */}
                     <div className="results-column">
                         <div className="section-title-modern">Sản phẩm ({ketQua.sanPham.length})</div>
                         {ketQua.sanPham.length > 0 ? ketQua.sanPham.map((sp, index) => (
@@ -161,12 +218,11 @@ const ThanhTimKiem = ({ isOpen, onClose }) => {
                                     <span className="card-price">Thuê: {dinhDangGia(sp.rental_price_day)}</span>
                                 </div>
                             </Link>
-                        )) : tuKhoa && !dangTai && (
-                            <div className="no-results" style={{ fontSize: '1rem', padding: '20px 0' }}>Không thấy sản phẩm nào...</div>
+                        )) : !dangTai && (
+                            <div className="no-results">Không tìm thấy sản phẩm phù hợp</div>
                         )}
                     </div>
 
-                    {/* Right: Combos */}
                     <div className="results-column">
                         <div className="section-title-modern">Gói dịch vụ ({ketQua.combo.length})</div>
                         {ketQua.combo.length > 0 ? ketQua.combo.map((cb, index) => (
@@ -181,20 +237,17 @@ const ThanhTimKiem = ({ isOpen, onClose }) => {
                                     <img src={cb.hinh_anh} alt={cb.ten} />
                                 </div>
                                 <div className="card-details">
-                                    <h4 className="card-name" style={{ fontSize: '1rem' }}>{cb.ten}</h4>
+                                    <h4 className="card-name">{cb.ten}</h4>
                                     <span className="card-price">{dinhDangGia(cb.gia)}</span>
                                 </div>
                             </Link>
                         )) : tuKhoa && !dangTai && (
-                            <div className="no-results" style={{ fontSize: '1rem', padding: '20px 0' }}>Không thấy gói nào...</div>
+                            <div className="no-results">Không tìm thấy gói dịch vụ</div>
                         )}
                     </div>
                 </div>
 
-                {dangTai && <div style={{ textAlign: 'center', color: '#b59410', padding: '40px' }}>Đang tìm kiếm...</div>}
-                {!tuKhoa && !dangTai && (
-                    <div className="no-results">Bắt đầu gõ để khám phá bộ sưu tập của chúng tôi</div>
-                )}
+                {dangTai && <div className="search-loading">Đang tìm kiếm...</div>}
             </div>
         </div>
     );

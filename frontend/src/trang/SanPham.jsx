@@ -17,7 +17,6 @@ const SanPham = () => {
     const [sapXep, setSapXep] = useState('hot');
     const [sanPhamDaXem, setSanPhamDaXem] = useState([]);
     const [quickViewSP, setQuickViewSP] = useState(null);
-    const [tuKhoaTimKiem, setTuKhoaTimKiem] = useState('');
 
     const navigate = useNavigate();
     const { addToast } = useToast();
@@ -30,7 +29,7 @@ const SanPham = () => {
 
     useEffect(() => {
         laySanPham();
-    }, [boLoc, tieuMuc, phongCach, khoangGia, sapXep, tuKhoaTimKiem]);
+    }, [boLoc, tieuMuc, phongCach, khoangGia, sapXep]);
 
     const laySanPham = async () => {
         setDangTai(true);
@@ -41,7 +40,6 @@ const SanPham = () => {
             if (tieuMuc !== 'all') thamSo.sub_category = tieuMuc;
             if (phongCach !== 'all') thamSo.style = phongCach;
             if (khoangGia !== 'all') thamSo.price_range = khoangGia;
-            if (tuKhoaTimKiem.trim()) thamSo.search = tuKhoaTimKiem.trim();
             const phanHoi = await sanPhamAPI.layTatCa(thamSo);
             setDanhSachSanPham(Array.isArray(phanHoi.data) ? phanHoi.data : []);
         } catch (err) {
@@ -118,18 +116,6 @@ const SanPham = () => {
         { id: 'tren_2tr', nhan: 'Trên 2 triệu' },
     ];
 
-    const goiYTimKiem = [
-        'Váy cưới hiện đại',
-        'Áo dài truyền thống',
-        'Combo Album',
-        'Vest nam',
-        'Váy đuôi cá',
-    ];
-
-    const chonGoiY = (goiY) => {
-        setTuKhoaTimKiem(goiY);
-    };
-
     return (
         <div className="products-page-new">
             {/* Breadcrumb */}
@@ -138,43 +124,6 @@ const SanPham = () => {
                     <Link to="/">Trang chủ</Link>
                     <span className="sep">›</span>
                     <span>{danhSachSanPham.length} Sản phẩm</span>
-                </div>
-            </div>
-
-            {/* Thanh tìm kiếm tối giản */}
-            <div className="search-section">
-                <div className="container">
-                    <div className="search-box">
-                        <div className="search-input-wrapper">
-                            <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <circle cx="11" cy="11" r="8"/>
-                                <path d="m21 21-4.35-4.35"/>
-                            </svg>
-                            <input
-                                type="text"
-                                className="search-input"
-                                placeholder="Bạn đang tìm kiếm điều gì?"
-                                value={tuKhoaTimKiem}
-                                onChange={(e) => setTuKhoaTimKiem(e.target.value)}
-                            />
-                            {tuKhoaTimKiem && (
-                                <button className="search-clear" onClick={() => setTuKhoaTimKiem('')}>
-                                    ×
-                                </button>
-                            )}
-                        </div>
-                        <div className="search-chips">
-                            {goiYTimKiem.map((goiY, index) => (
-                                <button
-                                    key={index}
-                                    className={`search-chip ${tuKhoaTimKiem === goiY ? 'active' : ''}`}
-                                    onClick={() => chonGoiY(goiY)}
-                                >
-                                    {goiY}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
                 </div>
             </div>
 
