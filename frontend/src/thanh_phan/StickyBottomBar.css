@@ -1,0 +1,78 @@
+.sticky-bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    padding: 10px 5px;
+    z-index: 1000;
+    box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.3);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sticky-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    flex: 1;
+    max-width: 80px;
+}
+
+.sticky-btn:hover {
+    transform: translateY(-2px);
+}
+
+.sticky-btn svg {
+    width: 22px;
+    height: 22px;
+}
+
+.call-btn {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+}
+
+.call-btn:hover {
+    background: linear-gradient(135deg, #45a049, #3d8b40);
+}
+
+.zalo-btn {
+    background: linear-gradient(135deg, #0068ff, #0054cc);
+}
+
+.zalo-btn:hover {
+    background: linear-gradient(135deg, #0054cc, #0043a3);
+}
+
+.map-btn {
+    background: linear-gradient(135deg, #ff5722, #e64a19);
+}
+
+.map-btn:hover {
+    background: linear-gradient(135deg, #e64a19, #d84315);
+}
+
+.book-btn {
+    background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+}
+
+.book-btn:hover {
+    background: linear-gradient(135deg, #7b1fa2, #6a1b9a);
+}
+
+/* Thêm padding-bottom cho body khi có sticky bar */
+@media (max-width: 768px) {
+    body {
+        padding-bottom: 70px;
+    }
+}
