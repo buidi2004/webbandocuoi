@@ -242,7 +242,7 @@ def fetch_contacts_cached():
     return fetch_api_data("/api/lien_he/")
 
 
-@st.cache_data(show_spinner=False, ttl=300)  # Cache 5 phút
+@st.cache_data(show_spinner=False, ttl=60)  # Giảm xuống 1 phút cho admin
 def fetch_banners_cached():
     """Cached banners list"""
     data = fetch_api_data("/api/banner/tat_ca")
@@ -259,6 +259,9 @@ def fetch_dashboard_stats():
 
 def invalidate_cache(scope=None):
     """Xóa cache theo phạm vi hoặc toàn bộ"""
+    # CRITICAL: Luôn clear fetch_api_data vì nó là base của các function khác
+    fetch_api_data.clear()
+    
     if scope is None:
         st.cache_data.clear()
     elif scope == "products":
@@ -393,33 +396,36 @@ def upload_image(uploaded_file):
         # Đọc file content
         file_bytes = uploaded_file.getvalue()
         
-        # Thử compress ảnh
-        try:
-            img = Image.open(io.BytesIO(file_bytes))
-            
-            # Resize nếu quá lớn
-            max_size = (1000, 1000)
-            img.thumbnail(max_size, Image.Resampling.LANCZOS)
-            
-            # Convert to RGB if needed
-            if img.mode in ("RGBA", "P"):
-                img = img.convert("RGB")
-            
-            # Save to buffer
-            buffer = io.BytesIO()
-            img.save(buffer, format="JPEG", quality=80, optimize=True)
-            file_bytes = buffer.getvalue()
-            
-            # Tạo filename an toàn
-            import re
-            safe_name = re.sub(r'[^a-zA-Z0-9_-]', '_', uploaded_file.name.rsplit(".", 1)[0])
-            safe_name = safe_name[:50]
-            filename = f"{safe_name}.jpg"
-            content_type = "image/jpeg"
-            
-        except Exception as e:
-            # Nếu không compress được, dùng file gốc
-            st.warning(f"Không thể compress ảnh, sử dụng ảnh gốc...")
+        # Chỉ compress nếu file > 1MB để tránh làm chậm xử lý trên CPU yếu
+        file_size_mb = len(file_bytes) / (1024 * 1024)
+        if file_size_mb > 1.0:
+            try:
+                img = Image.open(io.BytesIO(file_bytes))
+                
+                # Resize nếu rộng > 1600px (tối ưu cho banner)
+                if img.width > 1600:
+                    new_height = int(img.height * (1600 / img.width))
+                    img = img.resize((1600, new_height), Image.Resampling.LANCZOS)
+                
+                # Convert to RGB if needed
+                if img.mode in ("RGBA", "P"):
+                    img = img.convert("RGB")
+                
+                # Save to buffer
+                buffer = io.BytesIO()
+                img.save(buffer, format="JPEG", quality=80, optimize=True)
+                file_bytes = buffer.getvalue()
+                
+                # Tạo filename mới .jpg
+                filename = f"{uploaded_file.name.rsplit('.', 1)[0][:30]}.jpg"
+                content_type = "image/jpeg"
+                st.info(f"⚡ Đã nén ảnh: {file_size_mb:.1f}MB → {len(file_bytes)/(1024*1024):.1f}MB")
+                
+            except Exception as e:
+                st.warning(f"Không thể nén ảnh, sử dụng ảnh gốc: {e}")
+                filename = uploaded_file.name
+                content_type = uploaded_file.type
+        else:
             filename = uploaded_file.name
             content_type = uploaded_file.type
         
