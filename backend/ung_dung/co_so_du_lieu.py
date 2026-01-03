@@ -270,6 +270,10 @@ class BaiViet(CoSo):
     views = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    # SEO fields
+    seo_title = Column(String)
+    seo_description = Column(String)
+    seo_keywords = Column(String)
 
 # Danh sách yêu thích
 class YeuThich(CoSo):
@@ -355,6 +359,8 @@ def khoi_tao_csdl():
                     ("color", "VARCHAR", "NULL"),
                     ("recommended_size", "TEXT", "NULL"),
                     ("makeup_tone", "TEXT", "NULL"),
+                    ("gallery_images", "TEXT", "NULL"),
+                    ("accessories", "TEXT", "NULL"),
                 ],
                 "banners": [
                     ("order", "INTEGER", "DEFAULT 0"),
@@ -371,6 +377,11 @@ def khoi_tao_csdl():
                 "combos": [
                     ("noi_bat", "BOOLEAN", "DEFAULT FALSE"),
                     ("hoat_dong", "BOOLEAN", "DEFAULT TRUE"),
+                ],
+                "blog_posts": [
+                    ("seo_title", "VARCHAR", "NULL"),
+                    ("seo_description", "VARCHAR", "NULL"),
+                    ("seo_keywords", "VARCHAR", "NULL"),
                 ]
             }
             

@@ -19,6 +19,9 @@ class BaiVietTao(BaseModel):
     image_url: str | None = None
     category: str = "tips"
     is_published: bool = False
+    seo_title: str | None = None
+    seo_description: str | None = None
+    seo_keywords: str | None = None
 
 class BaiVietPhanHoi(BaseModel):
     id: int
@@ -31,6 +34,9 @@ class BaiVietPhanHoi(BaseModel):
     is_published: bool
     views: int
     created_at: datetime | None
+    seo_title: str | None = None
+    seo_description: str | None = None
+    seo_keywords: str | None = None
     
     class Config:
         from_attributes = True
@@ -88,7 +94,10 @@ def tao_bai_viet(data: BaiVietTao, csdl: Session = Depends(lay_csdl)):
         content=data.content,
         image_url=data.image_url,
         category=data.category,
-        is_published=data.is_published
+        is_published=data.is_published,
+        seo_title=data.seo_title,
+        seo_description=data.seo_description,
+        seo_keywords=data.seo_keywords
     )
     csdl.add(bai_viet)
     csdl.commit()
@@ -108,6 +117,9 @@ def cap_nhat_bai_viet(id: int, data: BaiVietTao, csdl: Session = Depends(lay_csd
     bai_viet.image_url = data.image_url
     bai_viet.category = data.category
     bai_viet.is_published = data.is_published
+    bai_viet.seo_title = data.seo_title
+    bai_viet.seo_description = data.seo_description
+    bai_viet.seo_keywords = data.seo_keywords
     csdl.commit()
     csdl.refresh(bai_viet)
     return bai_viet
