@@ -1,24 +1,37 @@
+import os
+
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
-from .co_so_du_lieu import khoi_tao_csdl
-from .cache_utils import CacheControlMiddleware
-from .dinh_tuyen import (
-    san_pham, dich_vu, lien_he, tap_tin, 
-    noi_dung, banner, thu_vien, nguoi_dung, chat, doi_tac,
-    blog, yeu_thich, thong_ke, api_pg, don_hang
-)
 
-import os
-from dotenv import load_dotenv
+from .cache_utils import CacheControlMiddleware
+from .co_so_du_lieu import khoi_tao_csdl
+from .dinh_tuyen import (
+    api_pg,
+    banner,
+    blog,
+    chat,
+    dich_vu,
+    doi_tac,
+    don_hang,
+    lien_he,
+    nguoi_dung,
+    noi_dung,
+    san_pham,
+    tap_tin,
+    thong_ke,
+    thu_vien,
+    yeu_thich,
+)
 
 load_dotenv()
 
 ung_dung = FastAPI(
     title="IVIE Wedding Studio API (Tiếng Việt)",
     description="API cho website IVIE Wedding Studio",
-    version="1.0.0"
+    version="1.0.0",
 )
 
 # GZip Middleware - nén response > 500 bytes để giảm TTFB
@@ -28,9 +41,17 @@ ung_dung.add_middleware(GZipMiddleware, minimum_size=500)
 ung_dung.add_middleware(CacheControlMiddleware)
 
 # Cấu hình CORS
-# Cấu hình CORS
-# Cho phép tất cả các nguồn trong môi trường phát triển để tránh lỗi cổng (port)
-nguon_goc = ["*"]
+# Lấy từ biến môi trường CORS_ORIGINS (cấu hình trong render.yaml)
+# Development: cho phép localhost
+# Production: giới hạn domain cụ thể từ Render
+cors_origins_env = os.getenv(
+    "CORS_ORIGINS", "http://localhost:3000,http://localhost:5173"
+)
+nguon_goc = [origin.strip() for origin in cors_origins_env.split(",")]
+
+# Nếu không có CORS_ORIGINS trong env (development), cho phép tất cả
+if not os.getenv("CORS_ORIGINS"):
+    nguon_goc = ["*"]
 
 ung_dung.add_middleware(
     CORSMiddleware,
@@ -43,7 +64,9 @@ ung_dung.add_middleware(
 
 # Gắn thư mục tĩnh cho hình ảnh (để Admin panel và API có thể truy cập)
 # Đường dẫn tính từ backend/ung_dung/chinh.py -> ../../frontend/public/images
-thu_muc_anh = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../frontend/public/images"))
+thu_muc_anh = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "../../frontend/public/images")
+)
 if os.path.exists(thu_muc_anh):
     ung_dung.mount("/images", StaticFiles(directory=thu_muc_anh), name="images")
 else:
@@ -77,36 +100,42 @@ def su_kien_khoi_dong():
     """Khởi tạo cơ sở dữ liệu khi khởi động"""
     khoi_tao_csdl()
 
+
 @ung_dung.get("/")
 def doc_goc():
     return {
         "thong_bao": "Chào mừng đến với API IVIE Wedding Studio",
         "tai_lieu": "/docs",
-        "phien_ban": "1.0.0"
+        "phien_ban": "1.0.0",
     }
+
 
 @ung_dung.get("/suckhoe")
 def kiem_tra_suc_khoe():
     return {"trang_thai": "khoe_manh"}
+
 
 @ung_dung.get("/api/health")
 def health_check():
     """Health check endpoint for Render"""
     return {"status": "healthy"}
 
+
 @ung_dung.get("/api/db-test")
 def test_database():
     """Test database connection and table creation"""
-    from .co_so_du_lieu import dong_co, PhienLamViec, NguoiDung
-    from sqlalchemy import text
     import os
-    
+
+    from sqlalchemy import text
+
+    from .co_so_du_lieu import NguoiDung, PhienLamViec, dong_co
+
     try:
         # Test connection
         with dong_co.connect() as conn:
             result = conn.execute(text("SELECT 1"))
             conn_status = "OK"
-        
+
         # Test table exists
         db = PhienLamViec()
         try:
@@ -116,14 +145,14 @@ def test_database():
             table_status = f"ERROR - {str(e)}"
         finally:
             db.close()
-        
+
         return {
             "database_url": os.getenv("DATABASE_URL", "Not set")[:50] + "...",
             "connection": conn_status,
-            "users_table": table_status
+            "users_table": table_status,
         }
     except Exception as e:
         return {
             "error": str(e),
-            "database_url": os.getenv("DATABASE_URL", "Not set")[:50] + "..."
+            "database_url": os.getenv("DATABASE_URL", "Not set")[:50] + "...",
         }

@@ -16,8 +16,11 @@ from PIL import Image
 # Load environment variables
 load_dotenv()
 
-API_URL = os.getenv(
-    "API_BASE_URL", os.getenv("VITE_API_BASE_URL", "http://localhost:8000")
+# Priority: API_BASE_URL (Render env var) > VITE_API_BASE_URL > localhost
+API_URL = (
+    os.getenv("API_BASE_URL")
+    or os.getenv("VITE_API_BASE_URL")
+    or "http://localhost:8000"
 )
 
 # Thread pool for parallel requests (max 4 concurrent)
