@@ -74,8 +74,9 @@ services:
     plan: free
     region: singapore
 
-    # Build settings - simplified
-    buildCommand: npm install && npm run build
+    # Build settings
+    # Render auto-runs 'npm install' before buildCommand
+    buildCommand: npm run build
     publishDir: dist
 
     envVars:
