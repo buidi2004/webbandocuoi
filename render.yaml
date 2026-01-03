@@ -1,8 +1,10 @@
 # ============================================
-# IVIE Wedding Studio - Render Blueprint
+# IVIE Wedding Studio - Render Blueprint (FREE TIER OPTIMIZED)
 # ============================================
-# Deploy all services at once using Render Blueprints
-# Documentation: https://render.com/docs/blueprint-spec
+# Tối ưu cho gói miễn phí Render
+# - 512MB RAM per service
+# - Auto-sleep sau 15 phút không dùng
+# - 750 giờ/tháng
 
 # ================== DATABASE ==================
 databases:
@@ -26,7 +28,7 @@ services:
     healthCheckPath: /api/health
     dockerfilePath: ./Dockerfile
     envVars:
-      # Database connection (auto-linked from Render PostgreSQL)
+      # Database connection
       - key: DATABASE_URL
         fromDatabase:
           name: ivie-db
@@ -34,38 +36,21 @@ services:
       # Security
       - key: SECRET_KEY
         generateValue: true
-      # CORS - Update these after deployment with actual URLs
+      # CORS
       - key: CORS_ORIGINS
-        value: https://ivie-frontend.onrender.com,https://ivie-admin.onrender.com,http://localhost:5173,http://localhost:3000
-      # Python version
+        value: https://ivie-frontend.onrender.com,https://ivie-admin.onrender.com
+      # Python & Server config (tối ưu cho free tier)
       - key: PYTHON_VERSION
         value: "3.12"
-      # Server config
       - key: PORT
         value: "8000"
       - key: WEB_CONCURRENCY
-        value: "2"
-      # Email notifications (optional - replace with your values)
-      - key: SMTP_SERVER
-        value: smtp.gmail.com
-      - key: SMTP_PORT
-        value: "587"
-      - key: SMTP_USER
-        sync: false
-      - key: SMTP_PASSWORD
-        sync: false
-      - key: NOTIFY_RECEIVER_EMAIL
-        sync: false
-      # Telegram notifications (optional)
-      - key: TELEGRAM_BOT_TOKEN
-        sync: false
-      - key: TELEGRAM_CHAT_ID
-        sync: false
-      # Image hosting (optional)
-      - key: IMGBB_API_KEY
-        sync: false
+        value: "1"
+      # Giảm workers xuống 1 để tiết kiệm RAM
+      - key: WORKERS
+        value: "1"
 
-  # ============ FRONTEND (Static Site - React + Vite) ============
+  # ============ FRONTEND (Static Site) ============
   - type: web
     name: ivie-frontend
     runtime: static
@@ -82,16 +67,9 @@ services:
       # Node environment
       - key: NODE_ENV
         value: production
-      # Memory optimization for build
+      # Memory optimization - giảm xuống 1536MB cho free tier
       - key: NODE_OPTIONS
-        value: --max-old-space-size=2048
-      # Firebase config (optional - for social login)
-      - key: VITE_FIREBASE_API_KEY
-        sync: false
-      - key: VITE_FIREBASE_AUTH_DOMAIN
-        sync: false
-      - key: VITE_FIREBASE_PROJECT_ID
-        sync: false
+        value: --max-old-space-size=1536
 
   # ============ ADMIN PANEL (Streamlit) ============
   - type: web
@@ -108,10 +86,7 @@ services:
       # Backend API URL
       - key: API_BASE_URL
         value: https://ivie-backend.onrender.com
-      # Alternative env var for compatibility
-      - key: VITE_API_BASE_URL
-        value: https://ivie-backend.onrender.com
-      # Streamlit config
+      # Streamlit config (tối ưu cho free tier)
       - key: STREAMLIT_SERVER_PORT
         value: "8501"
       - key: STREAMLIT_SERVER_ADDRESS
@@ -120,13 +95,9 @@ services:
         value: "true"
       - key: STREAMLIT_THEME_BASE
         value: "dark"
-      # Redis cache (optional - for better performance)
-      - key: REDIS_URL
-        sync: false
-      # Cloudinary CDN (optional - for faster images)
-      - key: CLOUDINARY_CLOUD_NAME
-        sync: false
-      - key: CLOUDINARY_API_KEY
-        sync: false
-      - key: CLOUDINARY_API_SECRET
-        sync: false
+      # Tắt file watcher để tiết kiệm RAM
+      - key: STREAMLIT_SERVER_FILE_WATCHER_TYPE
+        value: "none"
+      # Giảm max upload size
+      - key: STREAMLIT_SERVER_MAX_UPLOAD_SIZE
+        value: "5"
