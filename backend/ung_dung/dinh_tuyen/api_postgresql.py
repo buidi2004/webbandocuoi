@@ -64,13 +64,13 @@ def lay_danh_sach_san_pham(
     truy_van = phien.query(SanPham)
     
     if danh_muc:
-        truy_van = truy_van.filter(SanPham.danh_muc == danh_muc)
+        truy_van = truy_van.filter(SanPham.category == danh_muc)
     if gioi_tinh:
-        truy_van = truy_van.filter(SanPham.gioi_tinh == gioi_tinh)
+        truy_van = truy_van.filter(SanPham.gender == gioi_tinh)
     if la_moi is not None:
-        truy_van = truy_van.filter(SanPham.la_moi == la_moi)
+        truy_van = truy_van.filter(SanPham.is_new == la_moi)
     if la_hot is not None:
-        truy_van = truy_van.filter(SanPham.la_hot == la_hot)
+        truy_van = truy_van.filter(SanPham.is_hot == la_hot)
     
     return truy_van.offset(bo_qua).limit(gioi_han).all()
 
@@ -86,11 +86,20 @@ def lay_san_pham(san_pham_id: int, phien: Session = Depends(lay_phien)):
 @bo_dinh_tuyen.post("/san-pham", response_model=SanPhamPhanHoi, summary="Tạo sản phẩm mới")
 def tao_san_pham(du_lieu: SanPhamTao, phien: Session = Depends(lay_phien)):
     # Kiểm tra mã sản phẩm đã tồn tại
-    ton_tai = phien.query(SanPham).filter(SanPham.ma == du_lieu.ma).first()
+    ton_tai = phien.query(SanPham).filter(SanPham.code == du_lieu.code).first()
     if ton_tai:
         raise HTTPException(status_code=400, detail="Mã sản phẩm đã tồn tại")
     
-    san_pham = SanPham(**du_lieu.model_dump())
+    import json
+    san_pham_dict = du_lieu.model_dump()
+    
+    # Convert lists to JSON strings for database storage
+    if san_pham_dict.get('gallery_images') and isinstance(san_pham_dict['gallery_images'], list):
+        san_pham_dict['gallery_images'] = json.dumps(san_pham_dict['gallery_images'])
+    if san_pham_dict.get('accessories') and isinstance(san_pham_dict['accessories'], list):
+        san_pham_dict['accessories'] = json.dumps(san_pham_dict['accessories'], ensure_ascii=False)
+    
+    san_pham = SanPham(**san_pham_dict)
     phien.add(san_pham)
     phien.commit()
     phien.refresh(san_pham)
@@ -144,17 +153,17 @@ def lay_san_pham_lien_quan(
     truy_van = phien.query(SanPham).filter(SanPham.id != san_pham_id)
     
     # Ưu tiên cùng danh mục
-    if san_pham.danh_muc:
-        truy_van = truy_van.filter(SanPham.danh_muc == san_pham.danh_muc)
+    if san_pham.category:
+        truy_van = truy_van.filter(SanPham.category == san_pham.category)
     
     # Ưu tiên cùng giới tính
-    if san_pham.gioi_tinh:
-        truy_van = truy_van.filter(SanPham.gioi_tinh == san_pham.gioi_tinh)
+    if san_pham.gender:
+        truy_van = truy_van.filter(SanPham.gender == san_pham.gender)
     
     # Sắp xếp: is_hot trước, sau đó theo id mới nhất
     from sqlalchemy import desc, case
     truy_van = truy_van.order_by(
-        desc(case((SanPham.la_hot == True, 1), else_=0)),
+        desc(case((SanPham.is_hot == True, 1), else_=0)),
         desc(SanPham.id)
     )
     
@@ -172,7 +181,7 @@ def lay_danh_sach_nguoi_dung(
 ):
     truy_van = phien.query(NguoiDung)
     if hoat_dong is not None:
-        truy_van = truy_van.filter(NguoiDung.hoat_dong == hoat_dong)
+        truy_van = truy_van.filter(NguoiDung.is_active == hoat_dong)
     return truy_van.offset(bo_qua).limit(gioi_han).all()
 
 
@@ -187,14 +196,14 @@ def lay_nguoi_dung(nguoi_dung_id: int, phien: Session = Depends(lay_phien)):
 @bo_dinh_tuyen.post("/nguoi-dung", response_model=NguoiDungPhanHoi, summary="Tạo người dùng mới")
 def tao_nguoi_dung(du_lieu: NguoiDungTao, phien: Session = Depends(lay_phien)):
     # Kiểm tra tên đăng nhập đã tồn tại
-    ton_tai = phien.query(NguoiDung).filter(NguoiDung.ten_dang_nhap == du_lieu.ten_dang_nhap).first()
+    ton_tai = phien.query(NguoiDung).filter(NguoiDung.username == du_lieu.username).first()
     if ton_tai:
         raise HTTPException(status_code=400, detail="Tên đăng nhập đã tồn tại")
     
     # Mã hóa mật khẩu
     du_lieu_dict = du_lieu.model_dump()
-    mat_khau = du_lieu_dict.pop("mat_khau")
-    du_lieu_dict["mat_khau_hash"] = ma_hoa.hash(mat_khau)
+    mat_khau = du_lieu_dict.pop("password")
+    du_lieu_dict["hashed_password"] = ma_hoa.hash(mat_khau)
     
     nguoi_dung = NguoiDung(**du_lieu_dict)
     phien.add(nguoi_dung)
@@ -238,8 +247,8 @@ def lay_danh_sach_don_hang(
 ):
     truy_van = phien.query(DonHang)
     if trang_thai:
-        truy_van = truy_van.filter(DonHang.trang_thai == trang_thai)
-    return truy_van.order_by(DonHang.ngay_dat.desc()).offset(bo_qua).limit(gioi_han).all()
+        truy_van = truy_van.filter(DonHang.status == trang_thai)
+    return truy_van.order_by(DonHang.order_date.desc()).offset(bo_qua).limit(gioi_han).all()
 
 
 @bo_dinh_tuyen.get("/don-hang/{don_hang_id}", response_model=DonHangPhanHoi, summary="Lấy chi tiết đơn hàng")
@@ -294,8 +303,8 @@ def lay_danh_sach_lien_he(
 ):
     truy_van = phien.query(LienHe)
     if trang_thai:
-        truy_van = truy_van.filter(LienHe.trang_thai == trang_thai)
-    return truy_van.order_by(LienHe.ngay_gui.desc()).offset(bo_qua).limit(gioi_han).all()
+        truy_van = truy_van.filter(LienHe.status == trang_thai)
+    return truy_van.order_by(LienHe.id.desc()).offset(bo_qua).limit(gioi_han).all()
 
 
 @bo_dinh_tuyen.post("/lien-he", response_model=LienHePhanHoi, summary="Gửi liên hệ mới")
@@ -328,7 +337,7 @@ def lay_danh_sach_anh(
     gioi_han: int = Query(100, ge=1, le=1000),
     phien: Session = Depends(lay_phien)
 ):
-    return phien.query(ThuVienAnh).order_by(ThuVienAnh.thu_tu).offset(bo_qua).limit(gioi_han).all()
+    return phien.query(ThuVienAnh).order_by(ThuVienAnh.order).offset(bo_qua).limit(gioi_han).all()
 
 
 @bo_dinh_tuyen.post("/thu-vien-anh", response_model=ThuVienAnhPhanHoi, summary="Thêm ảnh mới")
@@ -413,7 +422,7 @@ def lay_danh_sach_combo(
     truy_van = phien.query(Combo)
     if hoat_dong is not None:
         truy_van = truy_van.filter(Combo.hoat_dong == hoat_dong)
-    return truy_van.order_by(Combo.id).offset(bo_qua).limit(gioi_han).all()
+    return truy_van.order_by(Combo.id.desc()).offset(bo_qua).limit(gioi_han).all()
 
 
 @bo_dinh_tuyen.get("/combo/{combo_id}", response_model=ComboPhanHoi, summary="Lấy chi tiết combo")
@@ -571,19 +580,19 @@ def thong_ke_yeu_thich(phien: Session = Depends(lay_phien)):
         total_favorites = phien.query(func.count(YeuThich.id)).scalar() or 0
         
         # Số sản phẩm được yêu thích
-        products_with_favorites = phien.query(func.count(func.distinct(YeuThich.san_pham_id))).scalar() or 0
+        products_with_favorites = phien.query(func.count(func.distinct(YeuThich.product_id))).scalar() or 0
         
         # Số người dùng có yêu thích
-        users_with_favorites = phien.query(func.count(func.distinct(YeuThich.nguoi_dung_id))).scalar() or 0
+        users_with_favorites = phien.query(func.count(func.distinct(YeuThich.user_id))).scalar() or 0
         
         # Top sản phẩm được yêu thích nhất
         top_products_query = phien.execute(text("""
-            SELECT sp.id, sp.ten as name, sp.ma as code, sp.danh_muc as category, 
-                   sp.url_anh as image_url, sp.gia_thue_ngay as rental_price_day,
+            SELECT sp.id, sp.name, sp.code, sp.category, 
+                   sp.image_url, sp.rental_price_day,
                    COUNT(yt.id) as favorite_count
-            FROM san_pham sp
-            LEFT JOIN yeu_thich yt ON sp.id = yt.san_pham_id
-            GROUP BY sp.id, sp.ten, sp.ma, sp.danh_muc, sp.url_anh, sp.gia_thue_ngay
+            FROM products sp
+            LEFT JOIN wishlists yt ON sp.id = yt.product_id
+            GROUP BY sp.id, sp.name, sp.code, sp.category, sp.image_url, sp.rental_price_day
             HAVING COUNT(yt.id) > 0
             ORDER BY favorite_count DESC
             LIMIT 10

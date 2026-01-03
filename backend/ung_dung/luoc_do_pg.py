@@ -1,30 +1,35 @@
 """
 Pydantic Schemas cho PostgreSQL API - IVIE Studio
+Đã cập nhật để khớp với tên cột trong database (tiếng Anh)
 """
-from pydantic import BaseModel, field_validator
-from typing import Optional, List
+from pydantic import BaseModel, field_validator, ConfigDict
+from typing import Optional, List, Any
 from datetime import datetime
 import json
 
 
 # ============ SẢN PHẨM ============
 class SanPhamCoSo(BaseModel):
-    ten: str
-    ma: str
-    danh_muc: str
-    danh_muc_phu: Optional[str] = None
-    gioi_tinh: str
-    mo_ta: Optional[str] = None
-    gia_thue_ngay: float
-    gia_thue_tuan: float
-    gia_mua: float
-    anh_url: Optional[str] = None
-    la_moi: bool = False
-    la_hot: bool = False
-    chat_lieu: Optional[str] = None
-    mau_sac: Optional[str] = None
-    kich_thuoc: Optional[str] = None
-    tong_trang_diem: Optional[str] = None
+    name: str
+    code: str
+    category: str
+    sub_category: Optional[str] = None
+    gender: str
+    description: Optional[str] = None
+    rental_price_day: float
+    rental_price_week: float
+    purchase_price: float
+    image_url: Optional[str] = None
+    is_new: bool = False
+    is_hot: bool = False
+    fabric_type: Optional[str] = None
+    color: Optional[str] = None
+    recommended_size: Optional[str] = None
+    makeup_tone: Optional[str] = None
+    so_luong: Optional[int] = 10
+    het_hang: Optional[bool] = False
+    gallery_images: Optional[List[str]] = None
+    accessories: Optional[List[Any]] = None
 
 
 class SanPhamTao(SanPhamCoSo):
@@ -32,95 +37,108 @@ class SanPhamTao(SanPhamCoSo):
 
 
 class SanPhamCapNhat(BaseModel):
-    ten: Optional[str] = None
-    danh_muc: Optional[str] = None
-    danh_muc_phu: Optional[str] = None
-    gioi_tinh: Optional[str] = None
-    mo_ta: Optional[str] = None
-    gia_thue_ngay: Optional[float] = None
-    gia_thue_tuan: Optional[float] = None
-    gia_mua: Optional[float] = None
-    anh_url: Optional[str] = None
-    la_moi: Optional[bool] = None
-    la_hot: Optional[bool] = None
-    chat_lieu: Optional[str] = None
-    mau_sac: Optional[str] = None
-    kich_thuoc: Optional[str] = None
-    tong_trang_diem: Optional[str] = None
+    name: Optional[str] = None
+    category: Optional[str] = None
+    sub_category: Optional[str] = None
+    gender: Optional[str] = None
+    description: Optional[str] = None
+    rental_price_day: Optional[float] = None
+    rental_price_week: Optional[float] = None
+    purchase_price: Optional[float] = None
+    image_url: Optional[str] = None
+    is_new: Optional[bool] = None
+    is_hot: Optional[bool] = None
+    fabric_type: Optional[str] = None
+    color: Optional[str] = None
+    recommended_size: Optional[str] = None
+    makeup_tone: Optional[str] = None
+    so_luong: Optional[int] = None
+    het_hang: Optional[bool] = None
+    gallery_images: Optional[List[str]] = None
+    accessories: Optional[List[Any]] = None
 
 
 class SanPhamPhanHoi(SanPhamCoSo):
     id: int
-    ngay_tao: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
+    
+    @field_validator('gallery_images', 'accessories', mode='before')
+    @classmethod
+    def parse_json_fields(cls, v):
+        if v is None:
+            return []
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except:
+                return []
+        if isinstance(v, list):
+            return v
+        return []
 
 
 # ============ NGƯỜI DÙNG ============
 class NguoiDungCoSo(BaseModel):
-    ten_dang_nhap: str
+    username: str
     email: Optional[str] = None
-    ho_ten: Optional[str] = None
-    dien_thoai: Optional[str] = None
-    dia_chi: Optional[str] = None
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
 
 
 class NguoiDungTao(NguoiDungCoSo):
-    mat_khau: str
+    password: str
 
 
 class NguoiDungCapNhat(BaseModel):
     email: Optional[str] = None
-    ho_ten: Optional[str] = None
-    dien_thoai: Optional[str] = None
-    dia_chi: Optional[str] = None
-    hoat_dong: Optional[bool] = None
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    is_active: Optional[bool] = None
 
 
 class NguoiDungPhanHoi(NguoiDungCoSo):
     id: int
-    hoat_dong: bool
-    ngay_tao: datetime
+    is_active: bool = True
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ============ ĐƠN HÀNG ============
 class DonHangCoSo(BaseModel):
-    ten_khach: str
-    email_khach: str
-    dien_thoai_khach: str
-    dia_chi_giao: str
-    tong_tien: float
+    customer_name: str
+    customer_email: str
+    customer_phone: str
+    shipping_address: str
+    total_amount: float
 
 
 class DonHangTao(DonHangCoSo):
-    nguoi_dung_id: Optional[int] = None
+    user_id: Optional[int] = None
 
 
 class DonHangCapNhat(BaseModel):
-    trang_thai: Optional[str] = None
-    dia_chi_giao: Optional[str] = None
+    status: Optional[str] = None
+    shipping_address: Optional[str] = None
 
 
 class DonHangPhanHoi(DonHangCoSo):
     id: int
-    nguoi_dung_id: Optional[int]
-    trang_thai: str
-    ngay_dat: datetime
+    user_id: Optional[int] = None
+    status: str = "pending"
+    order_date: Optional[datetime] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ============ CHI TIẾT ĐƠN HÀNG ============
 class ChiTietDonHangCoSo(BaseModel):
-    don_hang_id: int
-    san_pham_id: int
-    so_luong: int
-    gia: float
+    order_id: int
+    product_id: int
+    quantity: int
+    price: float
 
 
 class ChiTietDonHangTao(ChiTietDonHangCoSo):
@@ -130,17 +148,16 @@ class ChiTietDonHangTao(ChiTietDonHangCoSo):
 class ChiTietDonHangPhanHoi(ChiTietDonHangCoSo):
     id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ============ LIÊN HỆ ============
 class LienHeCoSo(BaseModel):
-    ho_ten: str
+    name: str
     email: str
-    dien_thoai: Optional[str] = None
-    dia_chi: Optional[str] = None
-    noi_dung: str
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    message: str
 
 
 class LienHeTao(LienHeCoSo):
@@ -148,23 +165,22 @@ class LienHeTao(LienHeCoSo):
 
 
 class LienHeCapNhat(BaseModel):
-    trang_thai: Optional[str] = None
+    status: Optional[str] = None
 
 
 class LienHePhanHoi(LienHeCoSo):
     id: int
-    trang_thai: str
-    ngay_gui: datetime
+    status: str = "pending"
+    created_at: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ============ THƯ VIỆN ẢNH ============
 class ThuVienAnhCoSo(BaseModel):
-    anh_url: str
-    tieu_de: Optional[str] = None
-    thu_tu: int = 0
+    image_url: str
+    title: Optional[str] = None
+    order: int = 0
 
 
 class ThuVienAnhTao(ThuVienAnhCoSo):
@@ -172,16 +188,15 @@ class ThuVienAnhTao(ThuVienAnhCoSo):
 
 
 class ThuVienAnhCapNhat(BaseModel):
-    anh_url: Optional[str] = None
-    tieu_de: Optional[str] = None
-    thu_tu: Optional[int] = None
+    image_url: Optional[str] = None
+    title: Optional[str] = None
+    order: Optional[int] = None
 
 
 class ThuVienAnhPhanHoi(ThuVienAnhCoSo):
     id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ============ COMBO ============
@@ -213,7 +228,7 @@ class ComboCapNhat(BaseModel):
 
 class ComboPhanHoi(ComboCoSo):
     id: int
-    ngay_tao: datetime
+    ngay_tao: Optional[datetime] = None
 
     @field_validator('quyen_loi', mode='before')
     @classmethod
@@ -225,5 +240,4 @@ class ComboPhanHoi(ComboCoSo):
                 return []
         return v or []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
