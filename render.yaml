@@ -25,9 +25,10 @@ services:
         value: "3.12.0"
 
   # FRONTEND
-  - type: static
+  - type: web
     name: ivie-fe-final
-    plan: starter
+    env: static
+    plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
