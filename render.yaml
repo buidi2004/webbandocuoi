@@ -25,7 +25,7 @@ services:
       - key: PYTHON_VERSION
         value: "3.12.0"
       - key: CORS_ORIGINS
-        value: "https://ivie-wedding-final.onrender.com,https://ve-wedding-frontend.vercel.app"
+        value: "https://ivie-wedding-final.onrender.com,https://ve-wedding-frontend.vercel.app,https://ivie-ad-final.onrender.com"
       - key: SECRET_KEY
         value: "ivie_wedding_secret_key_super_secure_123"
 
