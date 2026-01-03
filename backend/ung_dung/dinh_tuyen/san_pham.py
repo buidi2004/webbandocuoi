@@ -68,7 +68,16 @@ def lay_san_pham(id_san_pham: int, csdl: Session = Depends(lay_csdl)):
 @bo_dinh_tuyen.post("/", response_model=SanPham)
 def tao_san_pham(san_pham: SanPhamTao, csdl: Session = Depends(lay_csdl)):
     """Tạo sản phẩm mới (dành cho admin)"""
-    san_pham_moi = SanPhamDB(**san_pham.dict())
+    import json
+    san_pham_dict = san_pham.dict()
+    
+    # Convert lists to JSON strings for database storage
+    if san_pham_dict.get('gallery_images') and isinstance(san_pham_dict['gallery_images'], list):
+        san_pham_dict['gallery_images'] = json.dumps(san_pham_dict['gallery_images'])
+    if san_pham_dict.get('accessories') and isinstance(san_pham_dict['accessories'], list):
+        san_pham_dict['accessories'] = json.dumps(san_pham_dict['accessories'], ensure_ascii=False)
+    
+    san_pham_moi = SanPhamDB(**san_pham_dict)
     csdl.add(san_pham_moi)
     csdl.commit()
     csdl.refresh(san_pham_moi)
@@ -77,12 +86,20 @@ def tao_san_pham(san_pham: SanPhamTao, csdl: Session = Depends(lay_csdl)):
 @bo_dinh_tuyen.put("/{id_san_pham}", response_model=SanPham)
 def cap_nhat_san_pham(id_san_pham: int, san_pham: SanPhamCapNhat, csdl: Session = Depends(lay_csdl)):
     """Cập nhật sản phẩm (dành cho admin)"""
+    import json
     san_pham_cu = csdl.query(SanPhamDB).filter(SanPhamDB.id == id_san_pham).first()
     if not san_pham_cu:
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Không tìm thấy sản phẩm")
     
     du_lieu_cap_nhat = san_pham.dict(exclude_unset=True)
+    
+    # Convert lists to JSON strings for database storage
+    if du_lieu_cap_nhat.get('gallery_images') and isinstance(du_lieu_cap_nhat['gallery_images'], list):
+        du_lieu_cap_nhat['gallery_images'] = json.dumps(du_lieu_cap_nhat['gallery_images'])
+    if du_lieu_cap_nhat.get('accessories') and isinstance(du_lieu_cap_nhat['accessories'], list):
+        du_lieu_cap_nhat['accessories'] = json.dumps(du_lieu_cap_nhat['accessories'], ensure_ascii=False)
+    
     for khoa, gia_tri in du_lieu_cap_nhat.items():
         setattr(san_pham_cu, khoa, gia_tri)
     

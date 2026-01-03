@@ -2,6 +2,7 @@
 API Endpoints cho PostgreSQL - IVIE Studio
 """
 from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import sys
@@ -509,19 +510,23 @@ def lay_danh_sach_lich_trong(
         return []
 
 
+class LichTrongTao(BaseModel):
+    date: str
+    status: str = "available"
+    slots_available: int = 3
+    note: Optional[str] = None
+
+
 @bo_dinh_tuyen.post("/lich_trong", summary="Thêm/Cập nhật ngày trong lịch")
 def tao_lich_trong(
-    date: str,
-    status: str = "available",
-    slots_available: int = 3,
-    note: str = None,
+    du_lieu: LichTrongTao,
     phien: Session = Depends(lay_phien)
 ):
     from sqlalchemy import text
     
     try:
         # Kiểm tra xem ngày đã tồn tại chưa
-        existing = phien.execute(text("SELECT id FROM lich_trong WHERE date = :date"), {"date": date}).first()
+        existing = phien.execute(text("SELECT id FROM lich_trong WHERE date = :date"), {"date": du_lieu.date}).first()
         
         if existing:
             # Cập nhật
@@ -529,13 +534,13 @@ def tao_lich_trong(
                 UPDATE lich_trong 
                 SET status = :status, slots_available = :slots, note = :note
                 WHERE date = :date
-            """), {"date": date, "status": status, "slots": slots_available, "note": note})
+            """), {"date": du_lieu.date, "status": du_lieu.status, "slots": du_lieu.slots_available, "note": du_lieu.note})
         else:
             # Thêm mới
             phien.execute(text("""
                 INSERT INTO lich_trong (date, status, slots_available, note)
                 VALUES (:date, :status, :slots, :note)
-            """), {"date": date, "status": status, "slots": slots_available, "note": note})
+            """), {"date": du_lieu.date, "status": du_lieu.status, "slots": du_lieu.slots_available, "note": du_lieu.note})
         
         phien.commit()
         return {"thong_bao": "Đã cập nhật lịch thành công"}

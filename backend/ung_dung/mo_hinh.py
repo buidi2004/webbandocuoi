@@ -1,5 +1,6 @@
 from pydantic import BaseModel, field_serializer, ConfigDict
 from datetime import datetime
+from typing import List, Optional, Any
 
 # Mô hình Sản phẩm (Product Schemas)
 class SanPhamCoBan(BaseModel):
@@ -24,6 +25,9 @@ class SanPhamCoBan(BaseModel):
     # Số lượng và hết hàng
     so_luong: int | None = 10
     het_hang: bool | None = False
+    # Gallery images và accessories
+    gallery_images: List[str] | None = None
+    accessories: List[Any] | None = None
 
 class SanPhamTao(SanPhamCoBan):
     pass
@@ -47,11 +51,23 @@ class SanPhamCapNhat(BaseModel):
     makeup_tone: str | None = None
     so_luong: int | None = None
     het_hang: bool | None = None
+    gallery_images: List[str] | None = None
+    accessories: List[Any] | None = None
 
 class SanPham(SanPhamCoBan):
     id: int
     
     model_config = ConfigDict(from_attributes=True)
+    
+    @field_serializer('gallery_images', 'accessories')
+    def serialize_json_fields(self, v):
+        import json
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except:
+                return []
+        return v or []
 
 # Mô hình Chuyên gia (Expert Schemas)
 class ChuyenGiaCoBan(BaseModel):

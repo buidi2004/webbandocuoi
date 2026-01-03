@@ -49,6 +49,9 @@ class SanPham(CoSo):
     # Số lượng và hết hàng
     so_luong = Column(Integer, default=10)
     het_hang = Column(Boolean, default=False)
+    # Gallery images và accessories (JSON strings)
+    gallery_images = Column(Text)  # JSON string of image URLs
+    accessories = Column(Text)  # JSON string of accessories
 
 class ChuyenGia(CoSo):
     __tablename__ = "experts"
