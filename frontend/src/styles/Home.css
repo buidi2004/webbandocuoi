@@ -168,6 +168,16 @@
     animation: reveal-up 0.9s cubic-bezier(0.2, 1, 0.3, 1) 0.7s forwards;
 }
 
+/* Đảm bảo buttons luôn clickable sau animation */
+.hero-buttons {
+    animation-fill-mode: forwards !important;
+}
+
+.hero-buttons a,
+.hero-buttons button {
+    transition: all 0.3s ease;
+}
+
 .hero-subtitle {
     display: block;
     font-size: 1.1rem;
@@ -208,6 +218,21 @@
     display: flex;
     gap: 1.5rem;
     justify-content: center;
+    position: relative;
+    z-index: 15;
+    pointer-events: auto;
+}
+
+.hero-buttons a {
+    display: inline-block;
+    text-decoration: none;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.hero-buttons button {
+    cursor: pointer;
+    pointer-events: auto;
 }
 
 .banner-dots {

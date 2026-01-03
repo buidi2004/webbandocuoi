@@ -15,8 +15,23 @@ IMGBB_API_KEY = os.getenv("IMGBB_API_KEY", "c525fc0204b449b541b0f0a5a4f5d9c4")
 async def tai_len_anh(file: UploadFile = File(...)):
     """Tải lên hình ảnh lên ImgBB"""
     try:
+        # Validate file type
+        allowed_types = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"]
+        if file.content_type not in allowed_types:
+            raise HTTPException(
+                status_code=422, 
+                detail=f"File type not allowed. Allowed: {', '.join(allowed_types)}. Got: {file.content_type}"
+            )
+        
         # Đọc file content
         contents = await file.read()
+        
+        # Validate file size (max 10MB)
+        if len(contents) > 10 * 1024 * 1024:  # 10MB
+            raise HTTPException(
+                status_code=422,
+                detail=f"File too large. Maximum size: 10MB. Got: {len(contents) / 1024 / 1024:.2f}MB"
+            )
         
         # Encode sang base64
         base64_image = base64.b64encode(contents).decode('utf-8')
@@ -39,9 +54,18 @@ async def tai_len_anh(file: UploadFile = File(...)):
                     image_url = result["data"]["url"]
                     return {"url": image_url}
                 else:
-                    raise HTTPException(status_code=500, detail="ImgBB upload failed")
+                    error_msg = result.get("error", {}).get("message", "Unknown error")
+                    raise HTTPException(
+                        status_code=500, 
+                        detail=f"ImgBB upload failed: {error_msg}"
+                    )
             else:
-                raise HTTPException(status_code=response.status_code, detail="ImgBB API error")
+                raise HTTPException(
+                    status_code=response.status_code, 
+                    detail=f"ImgBB API error: {response.text[:200]}"
+                )
                 
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Upload error: {str(e)}")

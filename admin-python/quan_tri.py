@@ -383,57 +383,76 @@ def call_api(method, endpoint, data=None, files=None, clear_cache=True, retries=
 
 
 def upload_image(uploaded_file):
-    if uploaded_file is not None:
-        # Compress image trước khi upload - tối ưu hơn
+    """Upload ảnh lên ImgBB với compression và error handling"""
+    if uploaded_file is None:
+        return None
+        
+    url = f"{API_URL}/api/tap_tin/upload"
+    
+    try:
+        # Đọc file content
+        file_bytes = uploaded_file.getvalue()
+        
+        # Thử compress ảnh
         try:
-            img = Image.open(uploaded_file)
-            # Resize nhỏ hơn để upload nhanh
+            img = Image.open(io.BytesIO(file_bytes))
+            
+            # Resize nếu quá lớn
             max_size = (1000, 1000)
             img.thumbnail(max_size, Image.Resampling.LANCZOS)
-
+            
             # Convert to RGB if needed
             if img.mode in ("RGBA", "P"):
                 img = img.convert("RGB")
-
-            # Save to buffer với quality thấp hơn nữa
+            
+            # Save to buffer
             buffer = io.BytesIO()
             img.save(buffer, format="JPEG", quality=80, optimize=True)
-            buffer.seek(0)
-
-            files = {
-                "file": (
-                    uploaded_file.name.rsplit(".", 1)[0] + ".jpg",
-                    buffer,
-                    "image/jpeg",
-                )
-            }
-        except:
-            # Fallback nếu không compress được
-            files = {
-                "file": (
-                    uploaded_file.name,
-                    uploaded_file.getvalue(),
-                    uploaded_file.type,
-                )
-            }
-
-        url = f"{API_URL}/api/tap_tin/upload"
-        try:
-            session = get_session()
-            # Timeout dài hơn cho upload (60s cho lần đầu khi backend sleep)
-            timeout = 60 if not st.session_state.get("backend_awake", False) else 30
-            res = session.post(url, files=files, timeout=timeout)
-            if res.status_code == 200:
-                st.session_state.backend_awake = True
-                return res.json().get("url")
-            st.error(f"Lỗi tải ảnh ({res.status_code})")
-        except requests.Timeout:
-            st.error(
-                "⏱️ Upload ảnh quá lâu. Server có thể đang khởi động, vui lòng thử lại."
-            )
+            file_bytes = buffer.getvalue()
+            
+            # Tạo filename an toàn
+            import re
+            safe_name = re.sub(r'[^a-zA-Z0-9_-]', '_', uploaded_file.name.rsplit(".", 1)[0])
+            safe_name = safe_name[:50]
+            filename = f"{safe_name}.jpg"
+            content_type = "image/jpeg"
+            
         except Exception as e:
-            st.error(f"Lỗi upload: {str(e)}")
-    return None
+            # Nếu không compress được, dùng file gốc
+            st.warning(f"Không thể compress ảnh, sử dụng ảnh gốc...")
+            filename = uploaded_file.name
+            content_type = uploaded_file.type
+        
+        # Tạo files dict đúng format cho requests
+        files = {
+            "file": (filename, file_bytes, content_type)
+        }
+        
+        # Upload - KHÔNG dùng session vì nó có Content-Type: application/json
+        # Dùng requests.post trực tiếp để tự động set multipart/form-data
+        timeout = 60 if not st.session_state.get("backend_awake", False) else 30
+        
+        res = requests.post(url, files=files, timeout=timeout)
+        
+        if res.status_code == 200:
+            st.session_state.backend_awake = True
+            result = res.json()
+            return result.get("url")
+        else:
+            # Hiển thị lỗi chi tiết
+            try:
+                error_detail = res.json().get("detail", res.text)
+            except:
+                error_detail = res.text
+            st.error(f"❌ Lỗi tải ảnh ({res.status_code}): {error_detail}")
+            return None
+            
+    except requests.Timeout:
+        st.error("⏱️ Upload ảnh quá lâu. Server có thể đang khởi động, vui lòng thử lại.")
+        return None
+    except Exception as e:
+        st.error(f"❌ Lỗi upload: {str(e)}")
+        return None
 
 
 # Upload nhiều ảnh song song

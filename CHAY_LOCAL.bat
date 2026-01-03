@@ -81,7 +81,7 @@ timeout /t 2 /nobreak >nul
 echo ┌─────────────────────────────────────────────────────────┐
 echo │ 👨‍💼 Đang khởi động Admin Panel (Port 8501)...            │
 echo └─────────────────────────────────────────────────────────┘
-start "👨‍💼 Admin Panel - Port 8501" cmd /k "cd admin-python && streamlit run quan_tri_optimized_v2.py --server.port 8501 --server.address 127.0.0.1"
+start "👨‍💼 Admin Panel - Port 8501" cmd /k "cd admin-python && streamlit run quan_tri.py --server.port 8501 --server.address 127.0.0.1"
 timeout /t 2 /nobreak >nul
 
 echo.

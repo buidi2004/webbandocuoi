@@ -1,4 +1,98 @@
-/* ===== FOOTER WRAPPER ===== */
+/* ===== FOOTER CHÂN TRANG ===== */
+.chan-trang {
+    position: relative;
+    background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+    color: #ffffff;
+    padding: 3rem 1rem 2rem;
+    overflow: hidden;
+    min-height: 280px;
+}
+
+.chan-trang-noi-dung {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 2rem;
+    position: relative;
+    z-index: 10;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.chan-trang-cot {
+    flex: 1;
+    min-width: 250px;
+}
+
+.chan-trang-cot h3 {
+    font-family: "Playfair Display", serif;
+    font-size: 1.8rem;
+    color: #d4af37;
+    margin-bottom: 1rem;
+}
+
+.chan-trang-cot h4 {
+    font-size: 1.2rem;
+    color: #d4af37;
+    margin-bottom: 0.8rem;
+}
+
+.chan-trang-cot p {
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0.5rem 0;
+}
+
+.chan-trang-cot ul {
+    list-style: none;
+    padding: 0;
+}
+
+.chan-trang-cot ul li {
+    margin: 0.5rem 0;
+}
+
+.chan-trang-cot ul li a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.chan-trang-cot ul li a:hover {
+    color: #d4af37;
+}
+
+.mang-xa-hoi {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.mang-xa-hoi a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.mang-xa-hoi a:hover {
+    color: #d4af37;
+}
+
+.chan-trang-ban-quyen {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 10;
+}
+
+.chan-trang-ban-quyen p {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* ===== FOOTER WRAPPER (OLD - KEPT FOR COMPATIBILITY) ===== */
 .footer-wrapper {
     position: relative;
     background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
