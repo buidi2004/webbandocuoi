@@ -75,7 +75,7 @@ services:
     region: singapore
 
     # Build settings with memory optimization
-    buildCommand: npm ci --legacy-peer-deps --prefer-offline && NODE_OPTIONS="--max-old-space-size=2048" npm run build
+    buildCommand: npm ci --legacy-peer-deps && npm run build
     publishDir: dist
 
     envVars:
@@ -85,6 +85,9 @@ services:
       # Node environment
       - key: NODE_ENV
         value: production
+      # Memory optimization for build
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=2048
       # Firebase config (optional - for social login)
       - key: VITE_FIREBASE_API_KEY
         sync: false
