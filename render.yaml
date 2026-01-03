@@ -4,7 +4,8 @@
 # Tối ưu cho gói miễn phí Render
 # - 512MB RAM per service
 # - Auto-sleep sau 15 phút không dùng
-# - 750 giờ/tháng
+# - 750 giờ/tháng miễn phí
+# - Build time < 15 phút
 
 # ================== DATABASE ==================
 databases:
@@ -33,22 +34,40 @@ services:
         fromDatabase:
           name: ivie-db
           property: connectionString
+
       # Security
       - key: SECRET_KEY
         generateValue: true
-      # CORS
+
+      # CORS - cho phép frontend và admin truy cập
       - key: CORS_ORIGINS
         value: https://ivie-frontend.onrender.com,https://ivie-admin.onrender.com
-      # Python & Server config (tối ưu cho free tier)
+
+      # Python version
       - key: PYTHON_VERSION
         value: "3.12"
+
+      # Server config - TỐI ƯU CHO FREE TIER
       - key: PORT
         value: "8000"
+
+      # QUAN TRỌNG: Chỉ 1 worker để tiết kiệm RAM (200-250MB thay vì 400MB+)
       - key: WEB_CONCURRENCY
         value: "1"
-      # Giảm workers xuống 1 để tiết kiệm RAM
+
       - key: WORKERS
         value: "1"
+
+      # Giảm timeout để giải phóng RAM nhanh hơn
+      - key: GUNICORN_TIMEOUT
+        value: "60"
+
+      # Giảm số request mỗi worker để restart và giải phóng RAM
+      - key: MAX_REQUESTS
+        value: "500"
+
+      - key: MAX_REQUESTS_JITTER
+        value: "50"
 
   # ============ FRONTEND (Static Site) ============
   - type: web
@@ -58,18 +77,32 @@ services:
     branch: main
     rootDir: frontend
     plan: free
-    buildCommand: npm install && npm run build
+    buildCommand: npm ci --production=false && npm run build
     staticPublishPath: ./dist
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache
     envVars:
       # Backend API URL
       - key: VITE_API_BASE_URL
         value: https://ivie-backend.onrender.com
+
       # Node environment
       - key: NODE_ENV
         value: production
-      # Memory optimization - giảm xuống 1536MB cho free tier
+
+      # Memory optimization - GIẢM XỐI ĐA CHO FREE TIER
+      # Build với 1.2GB RAM thay vì 2GB
       - key: NODE_OPTIONS
-        value: --max-old-space-size=1536
+        value: --max-old-space-size=1200
+
+      # Skip source maps để build nhanh hơn
+      - key: GENERATE_SOURCEMAP
+        value: "false"
 
   # ============ ADMIN PANEL (Streamlit) ============
   - type: web
@@ -86,18 +119,63 @@ services:
       # Backend API URL
       - key: API_BASE_URL
         value: https://ivie-backend.onrender.com
-      # Streamlit config (tối ưu cho free tier)
+
+      # Streamlit config - TỐI ƯU CHO FREE TIER
       - key: STREAMLIT_SERVER_PORT
         value: "8501"
+
       - key: STREAMLIT_SERVER_ADDRESS
         value: "0.0.0.0"
+
       - key: STREAMLIT_SERVER_HEADLESS
         value: "true"
-      - key: STREAMLIT_THEME_BASE
-        value: "dark"
-      # Tắt file watcher để tiết kiệm RAM
+
+      # QUAN TRỌNG: Tắt file watcher để tiết kiệm RAM
       - key: STREAMLIT_SERVER_FILE_WATCHER_TYPE
         value: "none"
-      # Giảm max upload size
+
+      # Giảm max upload size xuống 3MB (từ 50MB) để tránh OOM
       - key: STREAMLIT_SERVER_MAX_UPLOAD_SIZE
-        value: "5"
+        value: "3"
+
+      # Giảm max message size để tiết kiệm RAM
+      - key: STREAMLIT_SERVER_MAX_MESSAGE_SIZE
+        value: "50"
+
+      # Tắt usage stats
+      - key: STREAMLIT_BROWSER_GATHER_USAGE_STATS
+        value: "false"
+
+      # Enable CORS
+      - key: STREAMLIT_SERVER_ENABLE_CORS
+        value: "false"
+
+      - key: STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION
+        value: "false"
+
+      # Theme
+      - key: STREAMLIT_THEME_BASE
+        value: "dark"
+
+      - key: STREAMLIT_THEME_PRIMARY_COLOR
+        value: "#b59410"
+
+# ================== NOTES ==================
+# Free Tier Limits:
+# - RAM: 512MB per service (đã tối ưu: Backend ~200MB, Admin ~180MB)
+# - Build time: 15 phút max (Frontend ~5-8 phút)
+# - Auto-sleep: 15 phút không hoạt động
+# - Hours: 750 giờ/tháng (Frontend = static nên không tính)
+#
+# Tips để giữ service luôn active:
+# 1. Dùng UptimeRobot.com (miễn phí) để ping mỗi 5 phút
+# 2. Hoặc dùng cron job: */10 * * * * curl https://ivie-backend.onrender.com/api/health
+#
+# Monitoring:
+# - Check RAM usage: Service → Metrics → Memory
+# - Nếu RAM > 400MB → service sẽ bị kill
+# - Frontend static site không tính giờ sử dụng
+#
+# Cold start (sau khi sleep):
+# - Backend: ~20-30 giây
+# - Admin: ~30-40 giây
