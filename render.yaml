@@ -36,7 +36,7 @@ services:
     staticPublishPath: ./dist
     envVars:
       - key: NODE_VERSION
-        value: "20.11.0"
+        value: "22.12.0"
       - key: VITE_API_BASE_URL
         value: "https://ivie-be-final.onrender.com"
       - key: VITE_IMGBB_API_KEY
