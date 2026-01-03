@@ -843,7 +843,7 @@ def ui_quan_ly_lich_trong():
                 note = st.text_input("Ghi chú", placeholder="VD: Đã có 2 đám cưới")
 
             if st.form_submit_button(
-                "💾 Lưu", use_column_width=True, type="primary"
+                "💾 Lưu", use_container_width=True, type="primary"
             ):
                 data = {
                     "date": selected_date.strftime("%Y-%m-%d"),
@@ -1167,21 +1167,21 @@ def ui_san_pham():
                     "📷 Váy Mẫu 2", type=["jpg", "png", "jpeg", "webp"], key="mau2"
                 )
                 if img_mau_2:
-                    st.image(img_mau_2, use_column_width=True)
+                    st.image(img_mau_2, use_container_width=True)
 
             with col_img3:
                 img_mau_3 = st.file_uploader(
                     "📷 Váy Mẫu 3", type=["jpg", "png", "jpeg", "webp"], key="mau3"
                 )
                 if img_mau_3:
-                    st.image(img_mau_3, use_column_width=True)
+                    st.image(img_mau_3, use_container_width=True)
 
             with col_img4:
                 img_mau_4 = st.file_uploader(
                     "📷 Váy Mẫu 4", type=["jpg", "png", "jpeg", "webp"], key="mau4"
                 )
                 if img_mau_4:
-                    st.image(img_mau_4, use_column_width=True)
+                    st.image(img_mau_4, use_container_width=True)
 
             st.markdown("---")
             st.markdown("#### 🖼️ Bộ sưu tập ảnh bổ sung (tùy chọn)")
@@ -1199,7 +1199,7 @@ def ui_san_pham():
                 cols = st.columns(min(len(gallery_files), 4))
                 for idx, f in enumerate(gallery_files[:4]):
                     with cols[idx]:
-                        st.image(f, caption=f"Ảnh {idx + 1}", use_column_width=True)
+                        st.image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
                 if len(gallery_files) > 4:
                     st.caption(f"... và {len(gallery_files) - 4} ảnh khác")
 
@@ -1227,7 +1227,7 @@ def ui_san_pham():
             submit_col1, submit_col2 = st.columns([3, 1])
             with submit_col2:
                 submitted = st.form_submit_button(
-                    "✨ THÊM SẢN PHẨM", use_column_width=True, type="primary"
+                    "✨ THÊM SẢN PHẨM", use_container_width=True, type="primary"
                 )
 
             if submitted:
@@ -1406,7 +1406,7 @@ def ui_san_pham():
             with col_info:
                 st.text(f"📊 Hiển thị: {len(filtered_prods)}/{len(prods)} sản phẩm")
             with col_export:
-                if st.button("📥 XUẤT EXCEL", use_column_width=True):
+                if st.button("📥 XUẤT EXCEL", use_container_width=True):
                     # Tạo DataFrame
                     export_data = []
                     for p in filtered_prods:
@@ -1484,7 +1484,7 @@ def ui_san_pham():
                             with c1:
                                 st.image(
                                     lay_url_anh(p["image_url"]),
-                                    use_column_width=True,
+                                    use_container_width=True,
                                 )
                                 new_img = st.file_uploader(
                                     "Đổi ảnh đại diện (Váy Mẫu 1)",
@@ -1500,7 +1500,7 @@ def ui_san_pham():
                                     st.image(
                                         lay_url_anh(p["image_url"]),
                                         caption="Mẫu 1 (Đại diện)",
-                                        use_column_width=True,
+                                        use_container_width=True,
                                     )
                                     for idx, g in enumerate(
                                         current_gallery[1:4]
@@ -1508,7 +1508,7 @@ def ui_san_pham():
                                         st.image(
                                             lay_url_anh(g),
                                             caption=f"Mẫu {idx + 2}",
-                                            use_column_width=True,
+                                            use_container_width=True,
                                         )
                                 else:
                                     st.caption("Chưa có ảnh mẫu")
@@ -1715,7 +1715,7 @@ def ui_san_pham():
                         c1, c2, c3, c4 = st.columns([1, 2, 1, 1])
                         with c1:
                             st.image(
-                                lay_url_anh(p["image_url"]), use_column_width=True
+                                lay_url_anh(p["image_url"]), use_container_width=True
                             )
                         with c2:
                             st.write(f"**{p['code']}**")
@@ -1764,7 +1764,7 @@ def ui_thu_vien():
             cols = st.columns(4)
             for idx, item in enumerate(gal):
                 with cols[idx % 4]:
-                    st.image(lay_url_anh(item["image_url"]), use_column_width=True)
+                    st.image(lay_url_anh(item["image_url"]), use_container_width=True)
                     if st.button("XÓA", key=f"dg_{item['id']}"):
                         if call_api("DELETE", f"/api/thu_vien/{item['id']}"):
                             st.toast("Đã xóa ảnh")
@@ -2052,7 +2052,7 @@ def ui_tu_van_khach_hang():
                 if st.button(
                     f"{s['full_name'] or s['username']}",
                     key=f"user_chat_{s['id']}",
-                    use_column_width=True,
+                    use_container_width=True,
                 ):
                     st.session_state.selected_chat_user = s["id"]
                     st.rerun()
@@ -2324,7 +2324,7 @@ def ui_blog():
             st.image(img, caption="Xem trước ảnh bìa", width=400)
 
         # Nút tạo bài viết
-        if st.button("💾 TẠO BÀI VIẾT", type="primary", use_column_width=True):
+        if st.button("💾 TẠO BÀI VIẾT", type="primary", use_container_width=True):
             if not title:
                 st.error("⚠️ Vui lòng nhập tiêu đề bài viết!")
             elif not content:
@@ -2392,7 +2392,7 @@ def ui_blog():
                     with c1:
                         if p.get("image_url"):
                             st.image(
-                                lay_url_anh(p["image_url"]), use_column_width=True
+                                lay_url_anh(p["image_url"]), use_container_width=True
                             )
                         else:
                             st.info("📷")
@@ -2553,12 +2553,12 @@ def ui_blog():
             # Buttons
             col_btn1, col_btn2 = st.columns(2)
             with col_btn1:
-                if st.button("❌ HỦY", use_column_width=True):
+                if st.button("❌ HỦY", use_container_width=True):
                     st.session_state.pop("editing_blog", None)
                     st.rerun()
             with col_btn2:
                 if st.button(
-                    "💾 LƯU THAY ĐỔI", type="primary", use_column_width=True
+                    "💾 LƯU THAY ĐỔI", type="primary", use_container_width=True
                 ):
                     with st.spinner("Đang lưu..."):
                         img_url = editing_blog.get("image_url", "")
@@ -2925,7 +2925,7 @@ if "Tổng quan" in choice:
                     showlegend=True,
                     legend=dict(orientation="h", yanchor="bottom", y=-0.2),
                 )
-                st.plotly_chart(fig_pie, use_column_width=True)
+                st.plotly_chart(fig_pie, use_container_width=True)
             else:
                 st.info("Chưa có dữ liệu đơn hàng")
         else:
@@ -2981,7 +2981,7 @@ if "Tổng quan" in choice:
                 xaxis=dict(showgrid=False),
                 yaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.1)"),
             )
-            st.plotly_chart(fig_bar, use_column_width=True)
+            st.plotly_chart(fig_bar, use_container_width=True)
         else:
             st.info("Chưa có dữ liệu doanh thu")
 
@@ -3084,7 +3084,7 @@ elif "Nội dung Trang chủ" in choice:
                 st.markdown("**Ảnh hiện tại:**")
                 if about_data and about_data.get("image_url"):
                     st.image(
-                        lay_url_anh(about_data["image_url"]), use_column_width=True
+                        lay_url_anh(about_data["image_url"]), use_container_width=True
                     )
                 else:
                     st.info("Chưa có ảnh")
@@ -3096,7 +3096,7 @@ elif "Nội dung Trang chủ" in choice:
                 )
                 if new_about_img:
                     st.image(
-                        new_about_img, caption="Xem trước", use_column_width=True
+                        new_about_img, caption="Xem trước", use_container_width=True
                     )
 
             with col2:
@@ -3160,7 +3160,7 @@ elif "Nội dung Trang chủ" in choice:
                         else "Hài Lòng",
                     )
 
-            if st.form_submit_button("💾 LƯU CÂU CHUYỆN", use_column_width=True):
+            if st.form_submit_button("💾 LƯU CÂU CHUYỆN", use_container_width=True):
                 img_url = about_data.get("image_url", "") if about_data else ""
                 if new_about_img:
                     uploaded = upload_image(new_about_img)
@@ -3213,7 +3213,7 @@ elif "Nội dung Trang chủ" in choice:
 
                 with col1:
                     if hl.get("image_url"):
-                        st.image(lay_url_anh(hl["image_url"]), use_column_width=True)
+                        st.image(lay_url_anh(hl["image_url"]), use_container_width=True)
                     else:
                         st.info("Chưa có ảnh")
 
@@ -3224,7 +3224,7 @@ elif "Nội dung Trang chủ" in choice:
                     )
                     if new_hl_img:
                         st.image(
-                            new_hl_img, caption="Xem trước", use_column_width=True
+                            new_hl_img, caption="Xem trước", use_container_width=True
                         )
 
                 with col2:
@@ -3242,7 +3242,7 @@ elif "Nội dung Trang chủ" in choice:
                     )
 
                 if st.form_submit_button(
-                    f"💾 LƯU DỊCH VỤ {idx + 1}", use_column_width=True
+                    f"💾 LƯU DỊCH VỤ {idx + 1}", use_container_width=True
                 ):
                     img_url = hl.get("image_url", "")
                     if new_hl_img:
@@ -3316,7 +3316,7 @@ elif "Nội dung Trang chủ" in choice:
                     with c1:
                         if hl.get("image_url"):
                             st.image(
-                                lay_url_anh(hl["image_url"]), use_column_width=True
+                                lay_url_anh(hl["image_url"]), use_container_width=True
                             )
                     with c2:
                         st.write(f"**{hl.get('title', 'Không có tiêu đề')}**")
@@ -3350,7 +3350,7 @@ if choice == "🎁 Quản lý Combo":
                     with col1:
                         if combo.get("hinh_anh"):
                             st.image(
-                                lay_url_anh(combo["hinh_anh"]), use_column_width=True
+                                lay_url_anh(combo["hinh_anh"]), use_container_width=True
                             )
                         else:
                             st.info("Chưa có ảnh")
@@ -3513,14 +3513,14 @@ if choice == "🎁 Quản lý Combo":
 
             with col_btn2:
                 if editing_combo:
-                    cancel = st.form_submit_button("❌ HỦY", use_column_width=True)
+                    cancel = st.form_submit_button("❌ HỦY", use_container_width=True)
                     if cancel:
                         st.session_state.pop("editing_combo", None)
                         st.rerun()
 
             with col_btn3:
                 submitted = st.form_submit_button(
-                    "💾 LƯU COMBO", use_column_width=True, type="primary"
+                    "💾 LƯU COMBO", use_container_width=True, type="primary"
                 )
 
             if submitted:
