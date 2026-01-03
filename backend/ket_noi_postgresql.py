@@ -12,7 +12,11 @@ DUONG_DAN_CSDL = os.getenv(
     "postgresql://postgres:123456@localhost:2014/postgres"
 )
 
-dong_co = create_engine(DUONG_DAN_CSDL, echo=True)
+# Render dùng postgres:// nhưng SQLAlchemy cần postgresql://
+if DUONG_DAN_CSDL.startswith("postgres://"):
+    DUONG_DAN_CSDL = DUONG_DAN_CSDL.replace("postgres://", "postgresql://", 1)
+
+dong_co = create_engine(DUONG_DAN_CSDL, echo=False, pool_pre_ping=True)
 PhienLamViec = sessionmaker(autocommit=False, autoflush=False, bind=dong_co)
 CoSo = declarative_base()
 
