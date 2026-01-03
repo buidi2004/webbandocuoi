@@ -27,14 +27,14 @@ services:
         value: "https://ivie-fe-final.onrender.com,https://ve-wedding-frontend.vercel.app"
 
   # FRONTEND
-  - type: web
+  # FRONTEND
+  - type: static
     name: ivie-fe-final
-    runtime: node
     plan: free
     region: singapore
     rootDir: frontend
     buildCommand: npm install --include=dev && npm run build
-    startCommand: npx serve -s dist -l $PORT
+    staticPublishPath: ./dist
     envVars:
       - key: NODE_VERSION
         value: "20.11.0"
@@ -42,6 +42,10 @@ services:
         value: "https://ivie-be-final.onrender.com"
       - key: VITE_IMGBB_API_KEY
         value: "c525fc0204b449b541b0f0a5a4f5d9c4"
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
 
   # ADMIN
   - type: web
