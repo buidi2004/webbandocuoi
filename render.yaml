@@ -30,9 +30,9 @@ services:
         value: "ivie_wedding_secret_key_super_secure_123"
 
   # FRONTEND
-  - type: static
+  - type: web
     name: ivie-wedding-final
-    plan: free
+    runtime: static
     region: singapore
     rootDir: frontend
     buildCommand: npm install --include=dev && npm run build
