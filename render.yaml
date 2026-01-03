@@ -73,7 +73,6 @@ services:
     branch: main
     rootDir: frontend
     plan: free
-    region: singapore
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     envVars:
