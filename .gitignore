@@ -233,3 +233,6 @@ build/Release
 
 # TypeScript cache
 *.tsbuildinfo
+
+# Old documentation
+docs_cu/

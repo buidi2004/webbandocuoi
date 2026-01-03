@@ -1,0 +1,86 @@
+================================================================
+HUONG DAN DEPLOY NHANH LEN RENDER
+================================================================
+
+BUOC 1: PUSH CODE LEN GITHUB
+----------------------------------------------------------------
+git add .
+git commit -m "Ready for Render deployment"
+git push origin main
+
+BUOC 2: DEPLOY TREN RENDER
+----------------------------------------------------------------
+1. Vao: https://dashboard.render.com
+2. Click: "New +" -> "Blueprint"
+3. Chon repository: buidi2004/webbandocuoi
+4. Click: "Apply"
+
+BUOC 3: DOI 12-19 PHUT
+----------------------------------------------------------------
+Render se tu dong:
+- Tao Database (PostgreSQL 1GB)
+- Deploy Backend (FastAPI)
+- Deploy Frontend (Static site)
+- Deploy Admin (Streamlit)
+
+================================================================
+SAU KHI DEPLOY XONG
+================================================================
+
+URLS:
+----------------------------------------------------------------
+Frontend: https://ivie-frontend.onrender.com
+Backend:  https://ivie-backend.onrender.com
+Admin:    https://ivie-admin.onrender.com
+API Docs: https://ivie-backend.onrender.com/docs
+
+LOGIN ADMIN:
+----------------------------------------------------------------
+Username: admin
+Password: admin123
+LUU Y: DOI MAT KHAU NGAY SAU KHI LOGIN!
+
+KIEM TRA:
+----------------------------------------------------------------
+1. Tat ca services status = Live (mau xanh)
+2. Test Frontend - trang chu hien thi
+3. Test Admin - login duoc
+4. Test dat hang - tao don hang thu
+5. Kiem tra Admin - don hang moi xuat hien
+
+================================================================
+CAU HINH QUAN TRONG
+================================================================
+
+1. DOI MAT KHAU ADMIN
+   - Vao Admin -> Settings -> Change Password
+
+2. SETUP MONITORING (de service khong bi sleep)
+   - Dang ky: https://uptimerobot.com
+   - Tao monitor cho Backend va Admin
+   - Interval: 5 phut
+
+3. BACKUP DATABASE (moi tuan)
+   - Dashboard -> ivie-db -> Backups -> Manual Backup
+
+================================================================
+DA TOI UU CHO GOI MIEN PHI
+================================================================
+
+RAM: 200MB (Backend) + 180MB (Admin) = 380MB < 512MB
+Build time: 5-8 phut moi service < 15 phut
+Frontend: Static site (khong tinh gio su dung)
+Database: PostgreSQL 1GB mien phi
+SSL/HTTPS: Tu dong
+
+================================================================
+TAI LIEU CHI TIET
+================================================================
+
+huong_dan_deploy.md          - Huong dan day du
+kiem_tra_lien_ket.md         - Kiem tra va fix lien ket
+danh_sach_kiem_tra.md        - Checklist truoc deploy
+
+================================================================
+CHUC BAN DEPLOY THANH CONG!
+================================================================
