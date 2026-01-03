@@ -7,8 +7,9 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
 
 # Cache durations (seconds)
+CACHE_TINY = 60        # 1 phút - cho banners
 CACHE_SHORT = 300      # 5 phút - cho product list
-CACHE_MEDIUM = 600     # 10 phút - cho banners
+CACHE_MEDIUM = 600     # 10 phút - cho combos
 CACHE_LONG = 3600      # 1 giờ - cho static content (gallery, blog)
 CACHE_NONE = 0         # Không cache - cho mutations
 
@@ -16,8 +17,8 @@ CACHE_NONE = 0         # Không cache - cho mutations
 CACHE_RULES = {
     # Product endpoints - 5 phút
     "/api/san_pham": CACHE_SHORT,
-    # Banner endpoints - 10 phút  
-    "/api/banner": CACHE_MEDIUM,
+    # Banner endpoints - 1 phút  
+    "/api/banner": CACHE_TINY,
     # Static content - 1 giờ
     "/api/thu_vien": CACHE_LONG,
     "/api/blog": CACHE_LONG,
