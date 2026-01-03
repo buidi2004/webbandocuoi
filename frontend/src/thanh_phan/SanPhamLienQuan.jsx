@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { laySanPhamLienQuan, layUrlHinhAnh } from '../api/khach_hang';
-import './RelatedProducts.css';
+import './SanPhamLienQuan.css';
 
 const RelatedProducts = ({ productId }) => {
     const [products, setProducts] = useState([]);

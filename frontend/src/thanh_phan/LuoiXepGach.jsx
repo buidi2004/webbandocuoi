@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import GalleryImage from './GalleryImage';
-import './MasonryGrid.css';
+import './LuoiXepGach.css';
 
 /**
  * MasonryGrid - Component layout masonry responsive

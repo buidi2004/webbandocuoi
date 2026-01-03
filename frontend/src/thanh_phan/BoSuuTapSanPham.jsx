@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { layUrlHinhAnh } from '../api/khach_hang';
-import './ProductGallery.css';
+import './BoSuuTapSanPham.css';
 
 const ProductGallery = ({ images = [], videoUrl = null, productName = 'Sản phẩm' }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
