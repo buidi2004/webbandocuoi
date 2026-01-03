@@ -313,6 +313,37 @@ def lay_csdl():
     finally:
         db.close()
 
-# Create tables
+# Create tables and handle migrations
 def khoi_tao_csdl():
+    """Khởi tạo CSDL và tự động nâng cấp schema nếu cần"""
     CoSo.metadata.create_all(bind=dong_co)
+    
+    # Kiểm tra và thêm các cột thiếu cho bảng users (Migration đơn giản)
+    if "postgresql" in DATABASE_URL:
+        from sqlalchemy import text
+        with dong_co.connect() as conn:
+            # Danh sách cột mới cần thêm
+            columns_to_check = [
+                ("username", "VARCHAR", "NOT NULL DEFAULT 'user_' || id::text"),
+                ("phone", "VARCHAR", "NULL"),
+                ("address", "VARCHAR", "NULL"),
+                ("email", "VARCHAR", "NULL")
+            ]
+            
+            for col_name, col_type, col_params in columns_to_check:
+                try:
+                    # Kiểm tra cột tồn tại chưa
+                    conn.execute(text(f"SELECT {col_name} FROM users LIMIT 1"))
+                except Exception:
+                    # Nếu lỗi nghĩa là cột chưa có, tiến hành add
+                    print(f"Adding missing column {col_name} to users table...")
+                    try:
+                        conn.execute(text(f"ALTER TABLE users ADD COLUMN {col_name} {col_type} {col_params}"))
+                        conn.commit()
+                        # Xóa default sau khi add nếu cần
+                        if "DEFAULT" in col_params:
+                            conn.execute(text(f"ALTER TABLE users ALTER COLUMN {col_name} DROP DEFAULT"))
+                            conn.commit()
+                    except Exception as e:
+                        print(f"Error adding column {col_name}: {e}")
+                        conn.rollback()

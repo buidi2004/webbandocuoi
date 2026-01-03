@@ -18,7 +18,8 @@ bo_dinh_tuyen = APIRouter(
     tags=["nguoi_dung"]
 )
 
-SECRET_KEY = config('SECRET_KEY', default='secret_key_mac_dinh_rat_dai_va_bao_mat_123')
+# Sync with bao_mat.py default or env
+SECRET_KEY = os.getenv("SECRET_KEY", "ivie_wedding_secret_key_super_secure_123")
 ALGORITHM = "HS256"
 
 def lay_user_tu_token(token: str, csdl: Session):
@@ -107,7 +108,8 @@ def dang_nhap(du_lieu: DangNhapForm, csdl: Session = Depends(lay_csdl)):
             "token_type": "bearer",
             "user": user
         }
-    except HTTPException:
+    except HTTPException as e:
+        print(f"HTTP Error login: {e.detail}")
         raise
     except Exception as e:
         print(f"Lỗi đăng nhập: {str(e)}")
