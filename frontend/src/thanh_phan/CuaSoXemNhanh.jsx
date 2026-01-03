@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { layUrlHinhAnh } from '../api/khach_hang';
 import { useToast } from './Toast';
-import './QuickViewModal.css';
+import './CuaSoXemNhanh.css';
 
 const QuickViewModal = ({ sanPham, onClose }) => {
     const [hinhHienTai, setHinhHienTai] = useState(0);
