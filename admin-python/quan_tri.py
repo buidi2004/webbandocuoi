@@ -1167,21 +1167,21 @@ def ui_san_pham():
                     "📷 Váy Mẫu 2", type=["jpg", "png", "jpeg", "webp"], key="mau2"
                 )
                 if img_mau_2:
-                    st.image(img_mau_2, use_container_width=True)
+                    st.image(img_mau_2, use_column_width=True)
 
             with col_img3:
                 img_mau_3 = st.file_uploader(
                     "📷 Váy Mẫu 3", type=["jpg", "png", "jpeg", "webp"], key="mau3"
                 )
                 if img_mau_3:
-                    st.image(img_mau_3, use_container_width=True)
+                    st.image(img_mau_3, use_column_width=True)
 
             with col_img4:
                 img_mau_4 = st.file_uploader(
                     "📷 Váy Mẫu 4", type=["jpg", "png", "jpeg", "webp"], key="mau4"
                 )
                 if img_mau_4:
-                    st.image(img_mau_4, use_container_width=True)
+                    st.image(img_mau_4, use_column_width=True)
 
             st.markdown("---")
             st.markdown("#### 🖼️ Bộ sưu tập ảnh bổ sung (tùy chọn)")
@@ -1199,7 +1199,7 @@ def ui_san_pham():
                 cols = st.columns(min(len(gallery_files), 4))
                 for idx, f in enumerate(gallery_files[:4]):
                     with cols[idx]:
-                        st.image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
+                        st.image(f, caption=f"Ảnh {idx + 1}", use_column_width=True)
                 if len(gallery_files) > 4:
                     st.caption(f"... và {len(gallery_files) - 4} ảnh khác")
 
@@ -1764,7 +1764,7 @@ def ui_thu_vien():
             cols = st.columns(4)
             for idx, item in enumerate(gal):
                 with cols[idx % 4]:
-                    st.image(lay_url_anh(item["image_url"]), use_container_width=True)
+                    st.image(lay_url_anh(item["image_url"]), use_column_width=True)
                     if st.button("XÓA", key=f"dg_{item['id']}"):
                         if call_api("DELETE", f"/api/thu_vien/{item['id']}"):
                             st.toast("Đã xóa ảnh")
@@ -3084,7 +3084,7 @@ elif "Nội dung Trang chủ" in choice:
                 st.markdown("**Ảnh hiện tại:**")
                 if about_data and about_data.get("image_url"):
                     st.image(
-                        lay_url_anh(about_data["image_url"]), use_container_width=True
+                        lay_url_anh(about_data["image_url"]), use_column_width=True
                     )
                 else:
                     st.info("Chưa có ảnh")
@@ -3213,7 +3213,7 @@ elif "Nội dung Trang chủ" in choice:
 
                 with col1:
                     if hl.get("image_url"):
-                        st.image(lay_url_anh(hl["image_url"]), use_container_width=True)
+                        st.image(lay_url_anh(hl["image_url"]), use_column_width=True)
                     else:
                         st.info("Chưa có ảnh")
 
