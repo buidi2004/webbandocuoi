@@ -39,7 +39,7 @@ export const lienHeAPI = {
 
 // Banner API
 export const bannerAPI = {
-    layTatCa: () => api.get('/api/banner/', { headers: { 'Cache-Control': 'no-cache' } }),
+    layTatCa: () => api.get(`/api/banner/?_t=${Date.now()}`, { headers: { 'Cache-Control': 'no-cache' } }),
 };
 
 // Gallery API (API Thư viện)
@@ -73,8 +73,8 @@ export const donHangAPI = {
 
 // Nội dung trang chủ
 export const noiDungAPI = {
-    layGioiThieu: () => api.get('/api/noi_dung/gioi_thieu', { headers: { 'Cache-Control': 'no-cache' } }),
-    layDiemNhan: () => api.get('/api/noi_dung/diem_nhan', { headers: { 'Cache-Control': 'no-cache' } }),
+    layGioiThieu: () => api.get(`/api/noi_dung/gioi_thieu?_t=${Date.now()}`, { headers: { 'Cache-Control': 'no-cache' } }),
+    layDiemNhan: () => api.get(`/api/noi_dung/diem_nhan?_t=${Date.now()}`, { headers: { 'Cache-Control': 'no-cache' } }),
 };
 
 // Helper to get image URL

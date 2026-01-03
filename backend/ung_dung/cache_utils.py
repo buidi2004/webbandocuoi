@@ -17,12 +17,13 @@ CACHE_NONE = 0         # Không cache - cho mutations
 CACHE_RULES = {
     # Product endpoints - 5 phút
     "/api/san_pham": CACHE_SHORT,
-    # Banner endpoints - 1 phút  
-    "/api/banner": CACHE_TINY,
+    # Banner endpoints - INSTANT (No cache)
+    "/api/banner": CACHE_NONE,
     # Static content - 1 giờ
     "/api/thu_vien": CACHE_LONG,
     "/api/blog": CACHE_LONG,
-    "/api/noi_dung": CACHE_LONG,
+    # Home content - INSTANT (No cache)
+    "/api/noi_dung": CACHE_NONE,
     "/api/chuyen_gia": CACHE_LONG,
     "/api/combo": CACHE_MEDIUM,
 }
