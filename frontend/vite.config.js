@@ -12,7 +12,9 @@ export default defineConfig({
           // Tách vendor libraries
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
           'vendor-animation': ['framer-motion', 'gsap'],
-          'vendor-3d': ['three', '@react-three/fiber', '@react-three/drei'],
+          // Tách 3D libraries thành chunks nhỏ hơn để tránh OOM
+          'vendor-three': ['three'],
+          'vendor-r3f': ['@react-three/fiber', '@react-three/drei'],
           'vendor-utils': ['axios', 'atropos'],
         },
         // Tối ưu tên file cho caching
@@ -21,8 +23,8 @@ export default defineConfig({
         assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
-    // Tối ưu chunk size
-    chunkSizeWarningLimit: 500,
+    // Tăng chunk size limit vì 3D libraries lớn
+    chunkSizeWarningLimit: 1000,
     // Minify CSS
     cssMinify: true,
     // CSS code splitting
@@ -33,6 +35,8 @@ export default defineConfig({
     sourcemap: false,
     // Target modern browsers
     target: 'es2020',
+    // Giảm memory usage khi build
+    reportCompressedSize: false,
   },
   // Tối ưu dependencies
   optimizeDeps: {

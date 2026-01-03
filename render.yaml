@@ -74,14 +74,17 @@ services:
     plan: free
     region: singapore
 
-    # Build settings
-    buildCommand: npm ci --legacy-peer-deps && npm run build
+    # Build settings with memory optimization
+    buildCommand: npm ci --legacy-peer-deps --prefer-offline && NODE_OPTIONS="--max-old-space-size=2048" npm run build
     publishDir: dist
 
     envVars:
       # Backend API URL
       - key: VITE_API_BASE_URL
         value: https://ivie-backend.onrender.com
+      # Node environment
+      - key: NODE_ENV
+        value: production
       # Firebase config (optional - for social login)
       - key: VITE_FIREBASE_API_KEY
         sync: false
