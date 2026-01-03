@@ -9,10 +9,25 @@ const api = axios.create({
     },
 });
 
+// Cache-busting interceptor: Tự động thêm timestamp vào tất cả GET requests
+api.interceptors.request.use((config) => {
+    if (config.method === 'get') {
+        const separator = config.url.includes('?') ? '&' : '?';
+        config.url = `${config.url}${separator}_t=${Date.now()}`;
+        // Loại bỏ cache ở tầng trình duyệt
+        config.headers['Cache-Control'] = 'no-cache';
+        config.headers['Pragma'] = 'no-cache';
+        config.headers['Expires'] = '0';
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
+
 // Products API (API Sản phẩm)
 export const sanPhamAPI = {
-    layTatCa: (params) => api.get('/api/san_pham/', { params, headers: { 'Cache-Control': 'no-cache' } }),
-    layTheoId: (id) => api.get(`/api/san_pham/${id}`, { headers: { 'Cache-Control': 'no-cache' } }),
+    layTatCa: (params) => api.get('/api/san_pham/', { params }),
+    layTheoId: (id) => api.get(`/api/san_pham/${id}`),
     layDanhGia: (id) => api.get(`/api/san_pham/${id}/danh_gia`),
     guiDanhGia: (id, formData) => api.post(`/api/san_pham/${id}/danh_gia`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -39,7 +54,7 @@ export const lienHeAPI = {
 
 // Banner API
 export const bannerAPI = {
-    layTatCa: () => api.get(`/api/banner/?_t=${Date.now()}`, { headers: { 'Cache-Control': 'no-cache' } }),
+    layTatCa: () => api.get('/api/banner/'),
 };
 
 // Gallery API (API Thư viện)
@@ -73,8 +88,8 @@ export const donHangAPI = {
 
 // Nội dung trang chủ
 export const noiDungAPI = {
-    layGioiThieu: () => api.get(`/api/noi_dung/gioi_thieu?_t=${Date.now()}`, { headers: { 'Cache-Control': 'no-cache' } }),
-    layDiemNhan: () => api.get(`/api/noi_dung/diem_nhan?_t=${Date.now()}`, { headers: { 'Cache-Control': 'no-cache' } }),
+    layGioiThieu: () => api.get('/api/noi_dung/gioi_thieu'),
+    layDiemNhan: () => api.get('/api/noi_dung/diem_nhan'),
 };
 
 // Helper to get image URL
