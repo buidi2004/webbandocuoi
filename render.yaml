@@ -1,6 +1,7 @@
 databases:
   - name: ivie-db-final
     plan: free
+    region: singapore
     databaseName: ivie_wedding
     user: ivie_user
 
