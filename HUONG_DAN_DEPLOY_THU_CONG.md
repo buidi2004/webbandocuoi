@@ -220,7 +220,9 @@ Hoặc tạo dữ liệu qua Admin Panel.
 - **Auto-sleep**: 15 phút không dùng
 - **Cold start**: 20-40 giây
 - **Build time**: Max 15 phút
-- **Hours**: 750 giờ/tháng (Static site không tính)
+- **Hours**: 750 giờ/tháng TỔNG (mỗi service tối đa 500 giờ)
+- **Static site**: Frontend không tính giờ sử dụng
+- **Lưu ý**: Backend + Admin = 2 services, cần để auto-sleep để tiết kiệm giờ
 
 ### Giữ Service Active:
 Dùng [UptimeRobot](https://uptimerobot.com) (miễn phí):

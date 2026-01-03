@@ -6,7 +6,8 @@
 # - RAM: 512MB per service
 # - Build time: 15 phút max
 # - Auto-sleep: 15 phút không hoạt động
-# - 750 giờ/tháng (Static site không tính)
+# - 750 giờ/tháng TỔNG (mỗi service tối đa 500 giờ)
+# - Static site không tính giờ sử dụng
 
 # ================== DATABASE ==================
 databases:
@@ -146,3 +147,5 @@ services:
 #   - Cold start mất 20-40 giây để wake up
 #   - Dùng UptimeRobot.com (miễn phí) để ping giữ active
 #   - Static site (frontend) không tính giờ sử dụng
+#   - Tổng 750 giờ/tháng, mỗi service tối đa 500 giờ
+#   - Backend + Admin = 2 services, cần quản lý giờ sử dụng

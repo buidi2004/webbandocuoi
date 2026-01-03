@@ -55,7 +55,9 @@ Render sẽ tự động tạo theo thứ tự:
 - **Auto-sleep**: Service ngủ sau 15 phút không dùng
 - **Cold start**: 20-40 giây để wake up
 - **Build time**: Max 15 phút
-- **Hours**: 750 giờ/tháng (Static site không tính)
+- **Hours**: 750 giờ/tháng TỔNG (mỗi service tối đa 500 giờ)
+- **Static site**: Frontend không tính giờ sử dụng
+- **Lưu ý**: Backend + Admin = 2 services, để auto-sleep để tiết kiệm
 
 ### Giữ Service Active (Tùy chọn):
 Dùng [UptimeRobot](https://uptimerobot.com) (miễn phí) để ping mỗi 5 phút:
