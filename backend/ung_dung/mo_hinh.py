@@ -1,6 +1,7 @@
-from pydantic import BaseModel, field_serializer, ConfigDict
+from pydantic import BaseModel, field_serializer, field_validator, ConfigDict
 from datetime import datetime
 from typing import List, Optional, Any
+import json
 
 # Mô hình Sản phẩm (Product Schemas)
 class SanPhamCoBan(BaseModel):
@@ -59,15 +60,19 @@ class SanPham(SanPhamCoBan):
     
     model_config = ConfigDict(from_attributes=True)
     
-    @field_serializer('gallery_images', 'accessories')
-    def serialize_json_fields(self, v):
-        import json
+    @field_validator('gallery_images', 'accessories', mode='before')
+    @classmethod
+    def parse_json_fields(cls, v):
+        if v is None:
+            return []
         if isinstance(v, str):
             try:
                 return json.loads(v)
             except:
                 return []
-        return v or []
+        if isinstance(v, list):
+            return v
+        return []
 
 # Mô hình Chuyên gia (Expert Schemas)
 class ChuyenGiaCoBan(BaseModel):
