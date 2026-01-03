@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { chatAPI } from '../api/chat';
+import { chatAPI } from '../api/tro_chuyen';
 import '../styles/auth.css'; // Will add chat styles here
 
 const ChatBox = () => {

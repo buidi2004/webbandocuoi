@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { sanPhamAPI, layUrlHinhAnh } from "../api/khach_hang";
 import { useToast } from "../thanh_phan/Toast";
-import QuickViewModal from "../thanh_phan/QuickViewModal";
-import LazyImage from "../thanh_phan/LazyImage";
+import QuickViewModal from "../thanh_phan/CuaSoXemNhanh";
+import LazyImage from "../thanh_phan/AnhTaiCham";
 import "../styles/products.css";
 
 const SanPham = () => {

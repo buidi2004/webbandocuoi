@@ -334,32 +334,67 @@ def khoi_tao_csdl():
             time.sleep(retry_delay)
             retry_delay *= 2  # Exponential backoff
     
-    # Kiểm tra và thêm các cột thiếu cho bảng users (Migration đơn giản)
+    # Migration mechanism for existing tables
     if "postgresql" in DATABASE_URL:
         from sqlalchemy import text
         with dong_co.connect() as conn:
-            # Danh sách cột mới cần thêm
-            columns_to_check = [
-                ("username", "VARCHAR", "NOT NULL DEFAULT 'user_' || id::text"),
-                ("phone", "VARCHAR", "NULL"),
-                ("address", "VARCHAR", "NULL"),
-                ("email", "VARCHAR", "NULL")
-            ]
+            # Tables and columns to check/add
+            migrations = {
+                "users": [
+                    ("username", "VARCHAR", "NULL"),
+                    ("phone", "VARCHAR", "NULL"),
+                    ("address", "VARCHAR", "NULL"),
+                ],
+                "products": [
+                    ("so_luong", "INTEGER", "DEFAULT 10"),
+                    ("het_hang", "BOOLEAN", "DEFAULT FALSE"),
+                    ("fabric_type", "VARCHAR", "NULL"),
+                    ("color", "VARCHAR", "NULL"),
+                    ("recommended_size", "TEXT", "NULL"),
+                    ("makeup_tone", "TEXT", "NULL"),
+                ],
+                "banners": [
+                    ("order", "INTEGER", "DEFAULT 0"),
+                ],
+                "home_highlights": [
+                    ("order", "INTEGER", "DEFAULT 0"),
+                ],
+                "gallery": [
+                    ("order", "INTEGER", "DEFAULT 0"),
+                ],
+                "contact_submissions": [
+                     ("address", "VARCHAR", "NULL"),
+                ],
+                "combos": [
+                    ("noi_bat", "BOOLEAN", "DEFAULT FALSE"),
+                    ("hoat_dong", "BOOLEAN", "DEFAULT TRUE"),
+                ]
+            }
             
-            for col_name, col_type, col_params in columns_to_check:
-                try:
-                    # Kiểm tra cột tồn tại chưa
-                    conn.execute(text(f"SELECT {col_name} FROM users LIMIT 1"))
-                except Exception:
-                    # Nếu lỗi nghĩa là cột chưa có, tiến hành add
-                    print(f"Adding missing column {col_name} to users table...")
+            for table_name, columns in migrations.items():
+                for col_name, col_type, col_params in columns:
                     try:
-                        conn.execute(text(f"ALTER TABLE users ADD COLUMN {col_name} {col_type} {col_params}"))
-                        conn.commit()
-                        # Xóa default sau khi add nếu cần
-                        if "DEFAULT" in col_params:
-                            conn.execute(text(f"ALTER TABLE users ALTER COLUMN {col_name} DROP DEFAULT"))
+                        # Check if column exists
+                        conn.execute(text(f"SELECT {col_name} FROM {table_name} LIMIT 1"))
+                    except Exception:
+                        # If error, column might be missing
+                        print(f"Adding missing column {col_name} to {table_name} table...")
+                        try:
+                            # Use a separate transaction for each column add to avoid total failure
+                            conn.execute(text(f"ALTER TABLE {table_name} ADD COLUMN {col_name} {col_type} {col_params}"))
                             conn.commit()
-                    except Exception as e:
-                        print(f"Error adding column {col_name}: {e}")
-                        conn.rollback()
+                        except Exception as inner_e:
+                            print(f"Failed to add column {col_name} to {table_name}: {inner_e}")
+                            # No need to rollback on ALTER if it failed before execution
+                            pass
+    
+    # Extra check for users.username (must not be null if we use it for login)
+    if "postgresql" in DATABASE_URL:
+        from sqlalchemy import text
+        with dong_co.connect() as conn:
+            try:
+                # Update null usernames to a default value
+                conn.execute(text("UPDATE users SET username = 'user_' || id::text WHERE username IS NULL"))
+                conn.commit()
+            except Exception:
+                pass

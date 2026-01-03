@@ -33,7 +33,7 @@ loading_placeholder.markdown(
 
 # Import authentication module
 try:
-    from auth import (
+    from xac_thuc import (
         MENU_PERMISSIONS,
         get_allowed_menu_items,
         has_permission,
@@ -49,7 +49,7 @@ except ImportError as e:
 
 # Import analytics module
 try:
-    from analytics import (
+    from phan_tich import (
         du_bao_moving_average,
         goi_y_san_pham,
         phan_tich_cam_xuc,

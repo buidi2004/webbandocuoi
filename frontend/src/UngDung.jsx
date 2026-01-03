@@ -8,17 +8,17 @@ import 'sal.js/dist/sal.css';
 import DauTrang from './thanh_phan/DauTrang';
 import ChanTrang from './thanh_phan/ChanTrang';
 import CuonLenDau from './thanh_phan/CuonLenDau';
-import StickyBottomBar from './thanh_phan/StickyBottomBar';
+import StickyBottomBar from './thanh_phan/ThanhDuoiCoDinh';
 
 // Lazy load heavy components
-const ChatBox = lazy(() => import('./thanh_phan/ChatBox'));
+const ChatBox = lazy(() => import('./thanh_phan/KhungTroChuyen'));
 const HieuUngLaRoi = lazy(() => import('./thanh_phan/HieuUngLaRoi'));
 const HieuUngChuyenTrang = lazy(() => import('./thanh_phan/HieuUngChuyenTrang'));
 
 // Lazy load pages - Code splitting
 const TrangChu = lazy(() => import('./trang/TrangChu'));
 const SanPham = lazy(() => import('./trang/SanPham'));
-const ProductDetail = lazy(() => import('./trang/ProductDetail'));
+const ProductDetail = lazy(() => import('./trang/ChiTietSanPham'));
 const ThuVien = lazy(() => import('./trang/ThuVien'));
 const DichVuTrangDiem = lazy(() => import('./trang/DichVuTrangDiem'));
 const ChonCombo = lazy(() => import('./trang/ChonCombo'));
@@ -28,14 +28,14 @@ const DangNhap = lazy(() => import('./trang/DangNhap'));
 const DangKy = lazy(() => import('./trang/DangKy'));
 const GioHang = lazy(() => import('./trang/GioHang'));
 const DoiTacPortal = lazy(() => import('./trang/DoiTacPortal'));
-const Blog = lazy(() => import('./trang/Blog'));
+const Blog = lazy(() => import('./trang/BaiViet'));
 const ChiTietBlog = lazy(() => import('./trang/ChiTietBlog'));
 const ChinhSach = lazy(() => import('./trang/ChinhSach'));
 const CamOn = lazy(() => import('./trang/CamOn'));
 
 // Demo pages - rarely used
-const AntiGravityLanding = lazy(() => import('./trang/AntiGravityLanding'));
-const GalleryDemo = lazy(() => import('./trang/GalleryDemo'));
+const AntiGravityLanding = lazy(() => import('./trang/TrangChuBay'));
+const GalleryDemo = lazy(() => import('./trang/DemoThuVien'));
 const CuonPhongTo = lazy(() => import('./trang/CuonPhongTo'));
 const DemoHieuUng = lazy(() => import('./trang/DemoHieuUng'));
 const DemoCuonDinh = lazy(() => import('./trang/DemoCuonDinh'));
@@ -83,13 +83,13 @@ function UngDung() {
       <div className="App">
         <CuonLenDau />
         <SalInitializer />
-        
+
         {/* Lazy load decorative effects */}
         <Suspense fallback={null}>
           <HieuUngLaRoi />
           <HieuUngChuyenTrang />
         </Suspense>
-        
+
         <DauTrang />
         <main>
           <Suspense fallback={<PageLoader />}>
@@ -121,12 +121,12 @@ function UngDung() {
           </Suspense>
         </main>
         <ChanTrang />
-        
+
         {/* Lazy load chat */}
         <Suspense fallback={null}>
           <ChatBox />
         </Suspense>
-        
+
         <StickyBottomBar />
       </div>
     </Router>

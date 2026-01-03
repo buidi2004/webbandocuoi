@@ -9,10 +9,10 @@ from fastapi.staticfiles import StaticFiles
 from .cache_utils import CacheControlMiddleware
 from .co_so_du_lieu import khoi_tao_csdl
 from .dinh_tuyen import (
-    api_pg,
-    banner,
-    blog,
-    chat,
+    api_postgresql as api_pg,
+    anh_bia as banner,
+    bai_viet as blog,
+    tro_chuyen as chat,
     dich_vu,
     doi_tac,
     don_hang,
@@ -20,7 +20,7 @@ from .dinh_tuyen import (
     nguoi_dung,
     noi_dung,
     san_pham,
-    tap_tin,
+    tep_tin as tap_tin,
     thong_ke,
     thu_vien,
     yeu_thich,

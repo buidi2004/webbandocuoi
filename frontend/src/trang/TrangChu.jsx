@@ -8,9 +8,9 @@ import The from '../thanh_phan/The';
 import HieuUngSong from '../thanh_phan/HieuUngSong';
 import HieuUngHat from '../thanh_phan/HieuUngHat';
 import WrapperAtropos from '../thanh_phan/WrapperAtropos';
-import InstagramFeed from '../thanh_phan/InstagramFeed';
+import InstagramFeed from '../thanh_phan/TinTucInstagram';
 import LichTrong from '../thanh_phan/LichTrong';
-import LazyImage from '../thanh_phan/LazyImage';
+import LazyImage from '../thanh_phan/AnhTaiCham';
 import '../styles/Home.css';
 
 const TrangChu = () => {
@@ -81,7 +81,7 @@ const TrangChu = () => {
     // GSAP Zoom in/out liên tục - 12s zoom ra, 12s thu lại
     useEffect(() => {
         if (banners.length === 0) return;
-        
+
         // Kill animation cũ
         if (kenBurnsTimeline.current) {
             kenBurnsTimeline.current.kill();
@@ -90,7 +90,7 @@ const TrangChu = () => {
         // Tìm element hình ảnh của slide active
         const activeSlide = slideRefs.current[idxBanner];
         if (!activeSlide) return;
-        
+
         const imageEl = activeSlide.querySelector('.hero-slide-image');
         if (!imageEl) return;
 
@@ -125,7 +125,7 @@ const TrangChu = () => {
                             ref={el => slideRefs.current[i] = el}
                             className={`hero-slide ${i === idxBanner ? 'active' : ''}`}
                         >
-                            <div 
+                            <div
                                 className="hero-slide-image"
                                 style={{
                                     backgroundImage: `url(${layUrlHinhAnh(b.image_url)})`
@@ -183,7 +183,7 @@ const TrangChu = () => {
             </section>
 
             {/* Khung hiệu ứng hạt - responsive */}
-            <section className="particle-section" style={{ 
+            <section className="particle-section" style={{
                 padding: '40px 20px',
                 background: '#fff'
             }}>
@@ -199,7 +199,7 @@ const TrangChu = () => {
                 }}>
                     {/* Giảm số hạt - component sẽ tự giảm thêm trên mobile */}
                     <HieuUngHat particleCount={120} nenTrang={false} />
-                    
+
                     {/* Content overlay */}
                     <div style={{
                         position: 'absolute',
@@ -223,11 +223,11 @@ const TrangChu = () => {
                             fontFamily: "'Be Vietnam Pro', system-ui, sans-serif",
                             textShadow: '0 2px 4px rgba(0,0,0,0.5)'
                         }}>
-                            Khám Phá<br/>
-                            Vẻ Đẹp<br/>
+                            Khám Phá<br />
+                            Vẻ Đẹp<br />
                             Tinh Tế
                         </h2>
-                        
+
                         <div style={{ display: 'flex', gap: '12px', pointerEvents: 'auto' }}>
                             <Link to="/san-pham" style={{
                                 padding: '10px 20px',
@@ -245,7 +245,7 @@ const TrangChu = () => {
                         </div>
                     </div>
                 </div>
-                
+
                 {/* CSS responsive cho particle section */}
                 <style>{`
                     @media (max-width: 768px) {
@@ -446,7 +446,7 @@ const TrangChu = () => {
                         <h2 className="section-title">Khách Hàng Nói Gì Về IVIE</h2>
                         <p className="section-subtitle">Hơn 500+ cặp đôi đã tin tưởng lựa chọn chúng tôi</p>
                     </div>
-                    
+
                     <div className="testimonials-grid fade-in-section">
                         <div className="testimonial-card">
                             <div className="testimonial-rating">⭐⭐⭐⭐⭐</div>
@@ -459,7 +459,7 @@ const TrangChu = () => {
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div className="testimonial-card">
                             <div className="testimonial-rating">⭐⭐⭐⭐⭐</div>
                             <p className="testimonial-text">"Chất lượng váy cưới tuyệt vời, nhiều mẫu đẹp để lựa chọn. Giá cả hợp lý so với chất lượng. Nhân viên tư vấn rất tận tâm và chuyên nghiệp."</p>
@@ -471,7 +471,7 @@ const TrangChu = () => {
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div className="testimonial-card">
                             <div className="testimonial-rating">⭐⭐⭐⭐⭐</div>
                             <p className="testimonial-text">"Album cưới của mình được chụp rất đẹp, góc máy sáng tạo và blend màu rất nghệ thuật. Mình đã giới thiệu IVIE cho nhiều bạn bè rồi!"</p>

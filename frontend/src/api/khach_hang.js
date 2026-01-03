@@ -9,12 +9,10 @@ const api = axios.create({
     },
 });
 
-// Cache-busting interceptor: Tự động thêm timestamp vào tất cả GET requests
+// Cache-busting interceptor: Đảm bảo luôn lấy dữ liệu mới nhất
 api.interceptors.request.use((config) => {
     if (config.method === 'get') {
-        const separator = config.url.includes('?') ? '&' : '?';
-        config.url = `${config.url}${separator}_t=${Date.now()}`;
-        // Loại bỏ cache ở tầng trình duyệt
+        // Loại bỏ cache ở tầng trình duyệt bằng headers
         config.headers['Cache-Control'] = 'no-cache';
         config.headers['Pragma'] = 'no-cache';
         config.headers['Expires'] = '0';
