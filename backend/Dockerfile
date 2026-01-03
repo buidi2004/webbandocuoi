@@ -1,22 +1,39 @@
-# Sử dụng Python 3.12 Slim để tối ưu dung lượng và tương thích Pydantic v2
+# IVIE Wedding Studio - Backend Dockerfile
+# Python 3.12 Slim for Pydantic v2 compatibility
+
 FROM python:3.12-slim
 
-# Thiết lập thư mục làm việc
+# Set working directory
 WORKDIR /app
 
-# Copy file requirements và cài đặt dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    dos2unix \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy toàn bộ mã nguồn backend
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
 COPY . .
 
-# Mở port 8000
+# Fix line endings (CRLF to LF) for shell scripts
+RUN dos2unix start.sh && chmod +x start.sh
+
+# Create directory for file uploads
+RUN mkdir -p tep_tin && chmod 755 tep_tin
+
+# Expose port
 EXPOSE 8000
 
-# Copy và cấp quyền thực thi cho script khởi động
-COPY start.sh .
-RUN chmod +x start.sh
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8000/api/health || exit 1
 
-# Lệnh chạy ứng dụng (chạy migration trước)
+# Run the application
 CMD ["./start.sh"]

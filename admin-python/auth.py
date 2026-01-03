@@ -1,17 +1,24 @@
 """
 Module xác thực và phân quyền cho IVIE Wedding Admin
 """
+
 import bcrypt
 import streamlit as st
 
 # Dữ liệu người dùng (hardcoded)
 # Password hashes được tạo bằng bcrypt
 USERS = {
+    "admin": {
+        "password_hash": "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.V9KsLHEWskiLay",  # admin123
+        "role": "Admin",
+        "full_name": "Quản trị viên",
+        "permissions": ["all"],  # Có tất cả quyền
+    },
     "ceo": {
         "password_hash": "$2b$12$A/EYGItuXo9FojOoG/Km3.mgArpw87G1DlJPVGJ555LhgO6XLCYAO",  # 123456
         "role": "CEO",
         "full_name": "Giám đốc điều hành",
-        "permissions": ["all"]  # Có tất cả quyền
+        "permissions": ["all"],  # Có tất cả quyền
     },
     "nhanvien": {
         "password_hash": "$2b$12$/EccbPLpIX4jhSX5Go7S.OFhZpRp3Nsl2YHIjS4OUDBZYx4k9EgWa",  # 12345
@@ -28,9 +35,9 @@ USERS = {
             "gallery",
             "experts",
             "blog",
-            "homepage"
-        ]  # Không có "products" và "reviews"
-    }
+            "homepage",
+        ],  # Không có "products" và "reviews"
+    },
 }
 
 # Mapping menu items với permissions
@@ -50,17 +57,17 @@ MENU_PERMISSIONS = {
     "📁 Thư viện ảnh mẫu": "gallery",
     "✨ Dịch vụ Chuyên gia": "experts",
     "📰 Blog & Tin tức": "blog",
-    "🏠 Nội dung Trang chủ": "homepage"
+    "🏠 Nội dung Trang chủ": "homepage",
 }
 
 
 def hash_password(password: str) -> str:
     """
     Hash password bằng bcrypt (chỉ dùng để tạo hash ban đầu)
-    
+
     Args:
         password: Mật khẩu plain text
-        
+
     Returns:
         Password hash dạng string
     """
@@ -71,22 +78,22 @@ def hash_password(password: str) -> str:
 def authenticate(username: str, password: str) -> dict | None:
     """
     Xác thực người dùng
-    
+
     Args:
         username: Tên đăng nhập
         password: Mật khẩu plain text
-        
+
     Returns:
         User dict nếu thành công, None nếu thất bại
     """
     if not username or not password:
         return None
-    
+
     if username not in USERS:
         return None
-    
+
     user = USERS[username]
-    
+
     # Verify password với bcrypt
     try:
         if bcrypt.checkpw(password.encode(), user["password_hash"].encode()):
@@ -94,11 +101,11 @@ def authenticate(username: str, password: str) -> dict | None:
                 "username": username,
                 "role": user["role"],
                 "full_name": user["full_name"],
-                "permissions": user["permissions"]
+                "permissions": user["permissions"],
             }
     except Exception:
         return None
-    
+
     return None
 
 
@@ -113,7 +120,7 @@ def init_session():
 def login(user_data: dict):
     """
     Đăng nhập và lưu session
-    
+
     Args:
         user_data: Dictionary chứa thông tin user
     """
@@ -130,7 +137,7 @@ def logout():
 def is_authenticated() -> bool:
     """
     Kiểm tra đã đăng nhập chưa
-    
+
     Returns:
         True nếu đã đăng nhập, False nếu chưa
     """
@@ -140,7 +147,7 @@ def is_authenticated() -> bool:
 def get_current_user() -> dict | None:
     """
     Lấy thông tin user hiện tại
-    
+
     Returns:
         User dict hoặc None nếu chưa đăng nhập
     """
@@ -150,66 +157,71 @@ def get_current_user() -> dict | None:
 def has_permission(permission: str) -> bool:
     """
     Kiểm tra user có quyền không
-    
+
     Args:
         permission: Tên quyền cần kiểm tra
-        
+
     Returns:
         True nếu có quyền, False nếu không
     """
     user = get_current_user()
     if not user:
         return False
-    
+
     # CEO có tất cả quyền
     if "all" in user["permissions"]:
         return True
-    
+
     return permission in user["permissions"]
 
 
 def get_allowed_menu_items() -> list:
     """
     Lấy danh sách menu items mà user được phép truy cập
-    
+
     Returns:
         List các menu items
     """
     user = get_current_user()
     if not user:
         return []
-    
+
     # CEO thấy tất cả
     if "all" in user["permissions"]:
         return list(MENU_PERMISSIONS.keys())
-    
+
     # Nhân viên chỉ thấy menu có quyền
     allowed = []
     for menu_item, permission in MENU_PERMISSIONS.items():
         if permission in user["permissions"]:
             allowed.append(menu_item)
-    
+
     return allowed
 
 
 def show_login_page():
     """Hiển thị trang đăng nhập"""
-    st.markdown("""
+    st.markdown(
+        """
         <div style='text-align: center; padding: 50px 0 30px 0;'>
             <h1 style='font-size: 3em; margin-bottom: 10px;'>🏯 IVIE WEDDING STUDIO</h1>
             <h3 style='font-weight: 300; color: #999;'>Hệ thống quản trị</h3>
         </div>
-    """, unsafe_allow_html=True)
-    
+    """,
+        unsafe_allow_html=True,
+    )
+
     col1, col2, col3 = st.columns([1, 2, 1])
-    
+
     with col2:
         with st.form("login_form"):
             st.subheader("Đăng nhập")
             username = st.text_input("Tên đăng nhập", placeholder="Nhập username")
-            password = st.text_input("Mật khẩu", type="password", placeholder="Nhập password")
+            password = st.text_input(
+                "Mật khẩu", type="password", placeholder="Nhập password"
+            )
             submit = st.form_submit_button("ĐĂNG NHẬP", use_container_width=True)
-            
+
             if submit:
                 if not username or not password:
                     st.error("⚠️ Vui lòng nhập đầy đủ thông tin")
@@ -217,7 +229,9 @@ def show_login_page():
                     user_data = authenticate(username, password)
                     if user_data:
                         login(user_data)
-                        st.success(f"✅ Đăng nhập thành công! Xin chào {user_data['full_name']}")
+                        st.success(
+                            f"✅ Đăng nhập thành công! Xin chào {user_data['full_name']}"
+                        )
                         st.rerun()
                     else:
                         st.error("❌ Tên đăng nhập hoặc mật khẩu không đúng")
@@ -231,7 +245,7 @@ def show_user_info_sidebar():
         st.sidebar.markdown(f"**👤 {user['full_name']}**")
         st.sidebar.markdown(f"*Vai trò: {user['role']}*")
         st.sidebar.markdown(f"*Username: {user['username']}*")
-        
+
         if st.sidebar.button("🚪 Đăng xuất", use_container_width=True):
             logout()
             st.rerun()
@@ -240,11 +254,11 @@ def show_user_info_sidebar():
 def require_permission(permission: str, error_message: str = None):
     """
     Decorator/helper để kiểm tra quyền trước khi hiển thị nội dung
-    
+
     Args:
         permission: Quyền cần kiểm tra
         error_message: Thông báo lỗi tùy chỉnh
-        
+
     Returns:
         True nếu có quyền, False và hiển thị error nếu không
     """
