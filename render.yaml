@@ -1,27 +1,17 @@
 # ============================================
-# IVIE Wedding Studio - Render Blueprint
-# FREE TIER OPTIMIZED - Tối ưu cho gói miễn phí
+# IVIE Wedding Studio - Render Blueprint (FIXED)
 # ============================================
-# Giới hạn Free Tier:
-# - RAM: 512MB per service
-# - Build time: 15 phút max
-# - Auto-sleep: 15 phút không hoạt động
-# - 750 giờ/tháng TỔNG (mỗi service tối đa 500 giờ)
-# - Static site không tính giờ sử dụng
-
-# ================== DATABASE ==================
 databases:
-  - name: ivie-db
+  - name: ivie-db-new
     plan: free
-    databaseName: ivie_wedding
-    user: ivie_user
+    databaseName: ivie_wedding_db
+    user: ivie_admin
     region: singapore
 
-# ================== SERVICES ==================
 services:
   # ============ BACKEND API (FastAPI) ============
   - type: web
-    name: ivie-backend
+    name: ivie-backend-v2 # Đã đổi tên để tránh trùng
     runtime: docker
     plan: free
     region: singapore
@@ -29,34 +19,23 @@ services:
     dockerfilePath: ./Dockerfile
     healthCheckPath: /api/health
     envVars:
-      # Database - tự động lấy từ database đã tạo
       - key: DATABASE_URL
         fromDatabase:
-          name: ivie-db
+          name: ivie-db-new
           property: connectionString
-      # Security
       - key: SECRET_KEY
         generateValue: true
-      # CORS - URL frontend và admin (sẽ cập nhật sau khi deploy)
       - key: CORS_ORIGINS
-        value: https://ivie-frontend.onrender.com,https://ivie-admin.onrender.com
-      # Server config - TỐI ƯU FREE TIER
+        # Tự động cập nhật dựa trên tên service mới bên dưới
+        value: https://ivie-frontend-v2.onrender.com,https://ivie-admin-v2.onrender.com
       - key: PORT
         value: "8000"
       - key: WEB_CONCURRENCY
         value: "1"
-      - key: WORKERS
-        value: "1"
-      - key: GUNICORN_TIMEOUT
-        value: "60"
-      - key: MAX_REQUESTS
-        value: "500"
-      - key: MAX_REQUESTS_JITTER
-        value: "50"
 
-  # ============ FRONTEND (Static Site - MIỄN PHÍ) ============
+  # ============ FRONTEND (Static Site) ============
   - type: web
-    name: ivie-frontend
+    name: ivie-frontend-v2 # Đã đổi tên
     runtime: static
     plan: free
     rootDir: frontend
@@ -66,24 +45,15 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
-    headers:
-      - path: /assets/*
-        name: Cache-Control
-        value: public, max-age=31536000, immutable
-      - path: /index.html
-        name: Cache-Control
-        value: no-cache, no-store, must-revalidate
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://ivie-backend.onrender.com
+        value: https://ivie-backend-v2.onrender.com # Trỏ về Backend mới
       - key: NODE_ENV
         value: production
-      - key: NODE_OPTIONS
-        value: --max-old-space-size=1536
 
   # ============ ADMIN PANEL (Streamlit) ============
   - type: web
-    name: ivie-admin
+    name: ivie-admin-v2 # Đã đổi tên
     runtime: docker
     plan: free
     region: singapore
@@ -92,60 +62,8 @@ services:
     healthCheckPath: /_stcore/health
     envVars:
       - key: API_BASE_URL
-        value: https://ivie-backend.onrender.com
+        value: https://ivie-backend-v2.onrender.com # Trỏ về Backend mới
       - key: STREAMLIT_SERVER_PORT
         value: "8501"
-      - key: STREAMLIT_SERVER_ADDRESS
-        value: "0.0.0.0"
       - key: STREAMLIT_SERVER_HEADLESS
         value: "true"
-      - key: STREAMLIT_SERVER_FILE_WATCHER_TYPE
-        value: "none"
-      - key: STREAMLIT_SERVER_MAX_UPLOAD_SIZE
-        value: "3"
-      - key: STREAMLIT_BROWSER_GATHER_USAGE_STATS
-        value: "false"
-      - key: STREAMLIT_SERVER_ENABLE_CORS
-        value: "false"
-      - key: STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION
-        value: "false"
-      - key: STREAMLIT_THEME_BASE
-        value: "dark"
-      - key: STREAMLIT_THEME_PRIMARY_COLOR
-        value: "#b59410"
-
-# ============================================
-# HƯỚNG DẪN DEPLOY VỚI BLUEPRINT
-# ============================================
-# 
-# BƯỚC 1: Push code lên GitHub
-#   git add .
-#   git commit -m "Update render.yaml for deployment"
-#   git push origin main
-#
-# BƯỚC 2: Tạo Blueprint trên Render
-#   1. Đăng nhập https://dashboard.render.com
-#   2. Click "New" → "Blueprint"
-#   3. Kết nối GitHub repo của bạn
-#   4. Render tự động đọc file render.yaml
-#   5. Click "Apply" để deploy
-#
-# BƯỚC 3: Chờ deploy hoàn tất (~10-15 phút)
-#   - Database tạo trước (~2 phút)
-#   - Backend build (~5 phút)
-#   - Frontend build (~5 phút)
-#   - Admin build (~3 phút)
-#
-# SAU KHI DEPLOY THÀNH CÔNG:
-#   - Backend API: https://ivie-backend.onrender.com
-#   - Frontend: https://ivie-frontend.onrender.com
-#   - Admin: https://ivie-admin.onrender.com
-#   - API Docs: https://ivie-backend.onrender.com/docs
-#
-# LƯU Ý QUAN TRỌNG (FREE TIER):
-#   - Services sẽ tự động sleep sau 15 phút không dùng
-#   - Cold start mất 20-40 giây để wake up
-#   - Dùng UptimeRobot.com (miễn phí) để ping giữ active
-#   - Static site (frontend) không tính giờ sử dụng
-#   - Tổng 750 giờ/tháng, mỗi service tối đa 500 giờ
-#   - Backend + Admin = 2 services, cần quản lý giờ sử dụng
