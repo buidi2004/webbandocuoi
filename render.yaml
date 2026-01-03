@@ -1,69 +1,52 @@
-# ============================================
-# IVIE Wedding Studio - Render Blueprint (FIXED)
-# ============================================
 databases:
-  - name: ivie-db-new
+  - name: ivie-db-final
     plan: free
-    databaseName: ivie_wedding_db
-    user: ivie_admin
-    region: singapore
+    databaseName: ivie_wedding
+    user: ivie_user
 
 services:
-  # ============ BACKEND API (FastAPI) ============
+  # BACKEND
   - type: web
-    name: ivie-backend-v2 # Đã đổi tên để tránh trùng
-    runtime: docker
+    name: ivie-be-final
+    runtime: python
     plan: free
     region: singapore
     rootDir: backend
-    dockerfilePath: ./Dockerfile
-    healthCheckPath: /api/health
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn ung_dung.chinh:ung_dung --bind 0.0.0.0:$PORT --workers 1 --worker-class uvicorn.workers.UvicornWorker --timeout 60
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: ivie-db-new
+          name: ivie-db-final
           property: connectionString
-      - key: SECRET_KEY
-        generateValue: true
-      - key: CORS_ORIGINS
-        # Tự động cập nhật dựa trên tên service mới bên dưới
-        value: https://ivie-frontend-v2.onrender.com,https://ivie-admin-v2.onrender.com
       - key: PORT
         value: "8000"
-      - key: WEB_CONCURRENCY
-        value: "1"
+      - key: PYTHON_VERSION
+        value: "3.12.0"
 
-  # ============ FRONTEND (Static Site) ============
-  - type: web
-    name: ivie-frontend-v2 # Đã đổi tên
-    runtime: static
-    plan: free
+  # FRONTEND
+  - type: static
+    name: ivie-fe-final
+    plan: starter
     rootDir: frontend
-    buildCommand: npm ci && npm run build
+    buildCommand: npm install && npm run build
     staticPublishPath: ./dist
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-    envVars:
-      - key: VITE_API_BASE_URL
-        value: https://ivie-backend-v2.onrender.com # Trỏ về Backend mới
-      - key: NODE_ENV
-        value: production
 
-  # ============ ADMIN PANEL (Streamlit) ============
+  # ADMIN
   - type: web
-    name: ivie-admin-v2 # Đã đổi tên
-    runtime: docker
+    name: ivie-ad-final
+    runtime: python
     plan: free
     region: singapore
     rootDir: admin-python
-    dockerfilePath: ./Dockerfile
-    healthCheckPath: /_stcore/health
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run quan_tri_optimized_v2.py --server.port=$PORT --server.address=0.0.0.0 --server.headless=true
     envVars:
-      - key: API_BASE_URL
-        value: https://ivie-backend-v2.onrender.com # Trỏ về Backend mới
-      - key: STREAMLIT_SERVER_PORT
+      - key: PORT
         value: "8501"
-      - key: STREAMLIT_SERVER_HEADLESS
-        value: "true"
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+      - key: STREAMLIT_SERVER_FILE_WATCHER_TYPE
+        value: "none"
+      - key: STREAMLIT_SERVER_MAX_UPLOAD_SIZE
+        value: "3"
