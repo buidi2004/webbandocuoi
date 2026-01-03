@@ -24,12 +24,11 @@ services:
       - key: PYTHON_VERSION
         value: "3.12.0"
       - key: CORS_ORIGINS
-        value: "https://ivie-fe-final.onrender.com,https://ve-wedding-frontend.vercel.app"
+        value: "https://ivie-wedding-fe.onrender.com,https://ve-wedding-frontend.vercel.app"
 
   # FRONTEND
-  # FRONTEND
   - type: static
-    name: ivie-fe-final
+    name: ivie-wedding-fe
     plan: free
     region: singapore
     rootDir: frontend
