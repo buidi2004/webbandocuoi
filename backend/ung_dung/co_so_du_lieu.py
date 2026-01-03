@@ -315,8 +315,24 @@ def lay_csdl():
 
 # Create tables and handle migrations
 def khoi_tao_csdl():
-    """Khởi tạo CSDL và tự động nâng cấp schema nếu cần"""
-    CoSo.metadata.create_all(bind=dong_co)
+    """Khởi tạo CSDL và tự động nâng cấp schema nếu cần (Có cơ chế thử lại)"""
+    import time
+    max_retries = 5
+    retry_delay = 5
+    
+    for i in range(max_retries):
+        try:
+            print(f"Attempting to connect to database (Attempt {i+1}/{max_retries})...")
+            CoSo.metadata.create_all(bind=dong_co)
+            print("Database connection and table creation successful!")
+            break
+        except Exception as e:
+            if i == max_retries - 1:
+                print(f"Final attempt failed: {e}")
+                raise e
+            print(f"Database connection failed, retrying in {retry_delay}s... Error: {e}")
+            time.sleep(retry_delay)
+            retry_delay *= 2  # Exponential backoff
     
     # Kiểm tra và thêm các cột thiếu cho bảng users (Migration đơn giản)
     if "postgresql" in DATABASE_URL:
