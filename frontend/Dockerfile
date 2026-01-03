@@ -21,11 +21,15 @@ ENV VITE_FIREBASE_AUTH_DOMAIN=$VITE_FIREBASE_AUTH_DOMAIN
 ENV VITE_FIREBASE_PROJECT_ID=$VITE_FIREBASE_PROJECT_ID
 ENV NODE_ENV=$NODE_ENV
 
+# Increase Node memory limit to prevent build crashes (OOM)
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 # Install dependencies first (better layer caching)
 COPY package.json package-lock.json ./
 
-# Clean install dependencies
-RUN npm ci --legacy-peer-deps
+# Use npm install instead of ci to handle potential lockfile mismatches
+# --legacy-peer-deps to avoid dependency conflict errors
+RUN npm install --legacy-peer-deps
 
 # Copy source code
 COPY . .

@@ -7,9 +7,13 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # Install system dependencies
+# gcc, libpq-dev, build-essential are required for building some python packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     dos2unix \
+    gcc \
+    libpq-dev \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
