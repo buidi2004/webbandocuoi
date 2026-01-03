@@ -24,36 +24,43 @@ def lay_danh_sach_san_pham(
     csdl: Session = Depends(lay_csdl)
 ):
     """Lấy tất cả sản phẩm với bộ lọc và sắp xếp tùy chọn"""
-    truy_van = csdl.query(SanPhamDB)
-    
-    if danh_muc:
-        # Support combined categories like 'vest'
-        truy_van = truy_van.filter(SanPhamDB.category == danh_muc)
-    if sub_category:
-        truy_van = truy_van.filter(SanPhamDB.sub_category == sub_category)
-    if gioi_tinh:
-        truy_van = truy_van.filter(SanPhamDB.gender == gioi_tinh)
-    
-    # Sorting logic
-    if sort_by == "price_asc":
-        truy_van = truy_van.order_by(SanPhamDB.rental_price_day.asc())
-    elif sort_by == "price_desc":
-        truy_van = truy_van.order_by(SanPhamDB.rental_price_day.desc())
-    elif sort_by == "hot":
-        truy_van = truy_van.order_by(SanPhamDB.is_hot.desc())
-    elif sort_by == "new":
-        truy_van = truy_van.order_by(SanPhamDB.is_new.desc(), SanPhamDB.id.desc())
-    else:
-        # Default sort by ID desc
-        truy_van = truy_van.order_by(SanPhamDB.id.desc())
-    
-    tong_so = truy_van.count()
-    if phan_hoi is not None:
-        phan_hoi.headers["X-Total-Count"] = str(tong_so)
+    try:
+        truy_van = csdl.query(SanPhamDB)
+        
+        if danh_muc:
+            # Support combined categories like 'vest'
+            truy_van = truy_van.filter(SanPhamDB.category == danh_muc)
+        if sub_category:
+            truy_van = truy_van.filter(SanPhamDB.sub_category == sub_category)
+        if gioi_tinh:
+            truy_van = truy_van.filter(SanPhamDB.gender == gioi_tinh)
+        
+        # Sorting logic
+        if sort_by == "price_asc":
+            truy_van = truy_van.order_by(SanPhamDB.rental_price_day.asc())
+        elif sort_by == "price_desc":
+            truy_van = truy_van.order_by(SanPhamDB.rental_price_day.desc())
+        elif sort_by == "hot":
+            truy_van = truy_van.order_by(SanPhamDB.is_hot.desc())
+        elif sort_by == "new":
+            truy_van = truy_van.order_by(SanPhamDB.is_new.desc(), SanPhamDB.id.desc())
+        else:
+            # Default sort by ID desc
+            truy_van = truy_van.order_by(SanPhamDB.id.desc())
+        
+        tong_so = truy_van.count()
+        if phan_hoi is not None:
+            phan_hoi.headers["X-Total-Count"] = str(tong_so)
 
-    if gioi_han and gioi_han > 0:
-        return truy_van.offset(bo_qua).limit(gioi_han).all()
-    return truy_van.all()
+        if gioi_han and gioi_han > 0:
+            return truy_van.offset(bo_qua).limit(gioi_han).all()
+        return truy_van.all()
+    except Exception as e:
+        from fastapi import HTTPException
+        import traceback
+        print(f"[ERROR] lay_danh_sach_san_pham: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Lỗi database: {str(e)}")
 
 
 @bo_dinh_tuyen.get("/{id_san_pham}", response_model=SanPham)

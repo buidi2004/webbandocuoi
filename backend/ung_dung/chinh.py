@@ -118,7 +118,98 @@ def kiem_tra_suc_khoe():
 @ung_dung.get("/api/health")
 def health_check():
     """Health check endpoint for Render"""
-    return {"status": "healthy"}
+    return {"status": "healthy", "version": "2.0.1"}
+
+
+@ung_dung.get("/api/test-products")
+def test_products():
+    """Test endpoint to check products API"""
+    from .co_so_du_lieu import PhienLamViec, SanPham as SanPhamDB
+    import traceback
+    try:
+        db = PhienLamViec()
+        count = db.query(SanPhamDB).count()
+        first = db.query(SanPhamDB).first()
+        db.close()
+        return {
+            "count": count,
+            "first_product": {
+                "id": first.id if first else None,
+                "name": first.name if first else None,
+                "gallery_images": first.gallery_images if first else None,
+                "accessories": first.accessories if first else None,
+            } if first else None
+        }
+    except Exception as e:
+        return {"error": str(e), "traceback": traceback.format_exc()}
+
+
+@ung_dung.get("/api/debug-san-pham")
+def debug_san_pham():
+    """Debug endpoint để kiểm tra lỗi API sản phẩm"""
+    from .co_so_du_lieu import PhienLamViec, SanPham as SanPhamDB
+    import traceback
+    import json
+    
+    results = {
+        "step": "init",
+        "errors": []
+    }
+    
+    try:
+        # Step 1: Kết nối DB
+        results["step"] = "connect_db"
+        db = PhienLamViec()
+        results["db_connected"] = True
+        
+        # Step 2: Count products
+        results["step"] = "count_products"
+        count = db.query(SanPhamDB).count()
+        results["product_count"] = count
+        
+        # Step 3: Get first product raw
+        results["step"] = "get_first_product"
+        first = db.query(SanPhamDB).first()
+        
+        if first:
+            results["first_product_raw"] = {
+                "id": first.id,
+                "name": first.name,
+                "code": first.code,
+                "category": first.category,
+                "gender": first.gender,
+                "gallery_images_type": type(first.gallery_images).__name__,
+                "gallery_images_value": str(first.gallery_images)[:200] if first.gallery_images else None,
+                "accessories_type": type(first.accessories).__name__,
+                "accessories_value": str(first.accessories)[:200] if first.accessories else None,
+            }
+            
+            # Step 4: Test JSON parsing
+            results["step"] = "parse_json"
+            if first.gallery_images:
+                try:
+                    if isinstance(first.gallery_images, str):
+                        parsed = json.loads(first.gallery_images)
+                        results["gallery_images_parsed"] = True
+                    else:
+                        results["gallery_images_parsed"] = "already_list"
+                except Exception as e:
+                    results["gallery_images_parsed"] = False
+                    results["errors"].append(f"gallery_images parse error: {str(e)}")
+        else:
+            results["first_product_raw"] = None
+            results["note"] = "Database có 0 sản phẩm - cần seed data"
+        
+        db.close()
+        results["step"] = "complete"
+        results["success"] = True
+        
+    except Exception as e:
+        results["success"] = False
+        results["error"] = str(e)
+        results["traceback"] = traceback.format_exc()
+    
+    return results
 
 
 @ung_dung.get("/api/db-test")

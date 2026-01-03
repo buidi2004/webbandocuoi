@@ -31,7 +31,7 @@ const SanPham = () => {
     laySanPham();
   }, [boLoc, tieuMuc, phongCach, khoangGia, sapXep]);
 
-  const laySanPham = async () => {
+  const laySanPham = async (retry = 0) => {
     setDangTai(true);
     setLoi(null);
     try {
@@ -42,8 +42,14 @@ const SanPham = () => {
       if (khoangGia !== "all") thamSo.price_range = khoangGia;
       const phanHoi = await sanPhamAPI.layTatCa(thamSo);
       setDanhSachSanPham(Array.isArray(phanHoi.data) ? phanHoi.data : []);
-    } catch {
-      setLoi("Không thể tải dữ liệu sản phẩm.");
+    } catch (err) {
+      // Retry once if server might be waking up (Render free tier)
+      if (retry < 1) {
+        setLoi("Đang kết nối server... Vui lòng đợi.");
+        setTimeout(() => laySanPham(retry + 1), 3000);
+        return;
+      }
+      setLoi("Không thể tải dữ liệu sản phẩm. Server có thể đang khởi động, vui lòng thử lại sau 30 giây.");
     } finally {
       setDangTai(false);
     }
@@ -320,7 +326,17 @@ const SanPham = () => {
       {/* Products Grid */}
       <div className="products-section">
         <div className="container">
-          {loi && <div className="error-msg">{loi}</div>}
+          {loi && (
+            <div className="error-msg">
+              {loi}
+              <button 
+                onClick={() => laySanPham(0)} 
+                style={{ marginLeft: '10px', padding: '5px 15px', cursor: 'pointer' }}
+              >
+                Thử lại
+              </button>
+            </div>
+          )}
           {dangTai ? (
             <div className="loading-msg">Đang tải sản phẩm...</div>
           ) : (
