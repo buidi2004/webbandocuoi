@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import './LazyImage.css';
+import './AnhTaiCham.css';
 
 /**
  * LazyImage - Component tải ảnh lazy với Intersection Observer
