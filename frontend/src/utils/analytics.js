@@ -53,9 +53,17 @@ export const trackFormSubmission = (formName, formData = {}) => {
     });
 };
 
+// Track generate lead (for contact forms)
+export const trackGenerateLead = (leadData = {}) => {
+    trackConversion('generate_lead', {
+        ...leadData
+    });
+};
+
 export default {
     trackConversion,
     trackPageView,
     trackButtonClick,
-    trackFormSubmission
+    trackFormSubmission,
+    trackGenerateLead
 };
