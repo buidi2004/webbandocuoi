@@ -24,7 +24,6 @@ services:
     repo: https://github.com/buidi2004/webbandocuoi.git
     branch: main
     rootDir: backend
-    plan: free
     region: singapore
     healthCheckPath: /api/health
     dockerfilePath: ./Dockerfile
@@ -76,7 +75,6 @@ services:
     repo: https://github.com/buidi2004/webbandocuoi.git
     branch: main
     rootDir: frontend
-    plan: free
     buildCommand: npm ci --production=false && npm run build
     staticPublishPath: ./dist
     headers:
@@ -111,7 +109,6 @@ services:
     repo: https://github.com/buidi2004/webbandocuoi.git
     branch: main
     rootDir: admin-python
-    plan: free
     region: singapore
     healthCheckPath: /_stcore/health
     dockerfilePath: ./Dockerfile
