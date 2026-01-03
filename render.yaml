@@ -74,8 +74,8 @@ services:
     plan: free
     region: singapore
 
-    # Build settings with memory optimization
-    buildCommand: npm ci --legacy-peer-deps && npm run build
+    # Build settings - simplified
+    buildCommand: npm install && npm run build
     publishDir: dist
 
     envVars:
