@@ -418,6 +418,10 @@ def lazy_load_ui_module(module_name: str):
 
 # Import auth
 auth = lazy_import_auth()
+if auth is None:
+    st.error("❌ Không thể load auth module. Vui lòng kiểm tra cài đặt.")
+    st.stop()
+    raise SystemExit("Auth module not loaded")  # Type hint for static analysis
 init_session = auth["init_session"]
 is_authenticated = auth["is_authenticated"]
 show_login_page = auth["show_login_page"]
@@ -427,6 +431,10 @@ has_permission = auth["has_permission"]
 
 # Import API client
 api = lazy_import_api_client()
+if api is None:
+    st.error("❌ Không thể load API client module. Vui lòng kiểm tra cài đặt.")
+    st.stop()
+    raise SystemExit("API client module not loaded")  # Type hint for static analysis
 API_URL = api["API_URL"]
 call_api = api["call_api"]
 fetch_api_data = api["fetch_api_data"]
@@ -440,6 +448,10 @@ upload_image = api["upload_image"]
 
 # Import utils
 utils = lazy_import_utils()
+if utils is None:
+    st.error("❌ Không thể load utils module. Vui lòng kiểm tra cài đặt.")
+    st.stop()
+    raise SystemExit("Utils module not loaded")  # Type hint for static analysis
 paginate_list = utils["paginate_list"]
 show_pagination = utils["show_pagination"]
 format_currency = utils["format_currency"]

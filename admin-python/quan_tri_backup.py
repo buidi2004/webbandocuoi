@@ -664,7 +664,7 @@ def ui_quan_ly_khach_hang():
     st.header("👥 Quản lý Khách hàng")
 
     # Lấy danh sách người dùng
-    users = call_api("GET", "/pg/nguoi_dung", clear_cache=False)
+    users = call_api("GET", "/pg/nguoi-dung", clear_cache=False)
 
     if users is None:
         st.error("❌ Không thể kết nối đến server")

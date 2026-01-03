@@ -134,14 +134,14 @@ def fetch_dashboard_stats() -> Optional[Dict]:
 
 @st.cache_data(show_spinner=False, ttl=300)  # Cache 5 phút
 def fetch_reviews_cached() -> Optional[List]:
-    """Cached reviews list"""
-    return fetch_api_data("/api/danh_gia/")
+    """Cached reviews list - Lấy đánh giá chờ duyệt"""
+    return fetch_api_data("/api/san_pham/admin/danh_gia_cho_duyet")
 
 
 @st.cache_data(show_spinner=False, ttl=300)  # Cache 5 phút
 def fetch_users_cached() -> Optional[List]:
     """Cached users list"""
-    return fetch_api_data("/pg/nguoi_dung")
+    return fetch_api_data("/pg/nguoi-dung")
 
 
 @st.cache_data(show_spinner=False, ttl=300)  # Cache 5 phút

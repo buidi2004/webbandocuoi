@@ -1,11 +1,38 @@
-streamlit
-requests
-python-dotenv
-pandas
-Pillow
-openpyxl
-bcrypt==4.1.2
-streamlit-quill
-plotly
-redis
-cloudinary
+# Streamlit Core
+streamlit>=1.32.0
+
+# HTTP Requests
+requests>=2.31.0
+
+# Environment Variables
+python-dotenv>=1.0.0
+
+# Data Processing
+pandas>=2.2.0
+
+# Image Processing
+Pillow>=10.2.0
+
+# Excel Export
+openpyxl>=3.1.2
+
+# Password Hashing
+bcrypt>=4.1.2
+
+# Rich Text Editor for Blog
+streamlit-quill>=0.0.4
+
+# Charts and Visualization
+plotly>=5.18.0
+
+# Redis Cache (optional - for advanced caching)
+redis>=5.0.0
+
+# Cloudinary (optional - for CDN image hosting)
+cloudinary>=1.38.0
+
+# Additional utilities
+python-dateutil>=2.8.2
+
+# For concurrent requests
+urllib3>=2.1.0
