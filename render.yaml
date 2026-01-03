@@ -65,16 +65,19 @@ services:
       - key: IMGBB_API_KEY
         sync: false
 
-  # ============ FRONTEND (React + Vite) ============
-  - type: web
+  # ============ FRONTEND (Static Site - React + Vite) ============
+  - type: static_site
     name: ivie-frontend
-    runtime: docker
     repo: https://github.com/buidi2004/webbandocuoi.git
     branch: main
     rootDir: frontend
     plan: free
     region: singapore
-    dockerfilePath: ./Dockerfile
+
+    # Build settings
+    buildCommand: npm ci --legacy-peer-deps && npm run build
+    publishDir: dist
+
     envVars:
       # Backend API URL
       - key: VITE_API_BASE_URL
