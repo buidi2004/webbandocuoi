@@ -1,20 +1,6 @@
-# IVIE Wedding Studio - Admin Panel (Pinned deps for Render)
-# Goal: maximize install stability on Render free tier by pinning versions
-# Note: streamlit-quill intentionally removed (optional feature; UI has fallback)
-
-streamlit==1.39.0
-requests==2.32.3
-python-dotenv==1.0.1
-
-pandas==2.2.3
-Pillow==10.4.0
-openpyxl==3.1.5
-
-bcrypt==4.2.0
-plotly==5.24.1
-
-redis==5.1.1
-cloudinary==1.41.0
-
-python-dateutil==2.9.0.post0
-urllib3==2.2.3
+streamlit==1.31.0
+requests==2.31.0
+pandas==2.1.4
+plotly==5.18.0
+python-dotenv==1.0.0
+Pillow==10.2.0
