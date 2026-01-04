@@ -6,6 +6,7 @@ Trang quản trị đơn giản cho website cưới
 import streamlit as st
 import requests
 import os
+import base64
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -73,15 +74,13 @@ def api_delete(endpoint):
         return False
 
 # ============ UPLOAD ẢNH ============
-def upload_image(uploaded_file):
+def upload_image(file_bytes, file_name):
     """Upload ảnh lên ImgBB và trả về URL"""
-    if uploaded_file is None:
+    if file_bytes is None:
         return None
     
     try:
-        import base64
-        # Đọc file và encode base64
-        file_bytes = uploaded_file.read()
+        # Encode base64
         base64_image = base64.b64encode(file_bytes).decode('utf-8')
         
         # Upload lên ImgBB
@@ -90,7 +89,7 @@ def upload_image(uploaded_file):
             data={
                 "key": IMGBB_API_KEY,
                 "image": base64_image,
-                "name": uploaded_file.name
+                "name": file_name
             },
             timeout=60
         )
@@ -99,6 +98,10 @@ def upload_image(uploaded_file):
             data = response.json()
             if data.get("success"):
                 return data["data"]["url"]
+            else:
+                st.error(f"ImgBB error: {data.get('error', {}).get('message', 'Unknown')}")
+        else:
+            st.error(f"HTTP error: {response.status_code}")
         return None
     except Exception as e:
         st.error(f"Lỗi upload: {e}")
@@ -118,31 +121,34 @@ def image_uploader(label="Chọn ảnh", key=None):
     with col2:
         image_url = st.text_input("Hoặc nhập URL", key=f"{key}_url" if key else "url_input")
     
-    # Preview
+    # Preview và lưu bytes ngay khi có file
     if uploaded_file:
-        st.image(uploaded_file, width=200, caption="Preview")
-        return {"file": uploaded_file, "url": None}
+        # Đọc bytes ngay và lưu vào session state
+        file_bytes = uploaded_file.getvalue()
+        file_name = uploaded_file.name
+        st.image(file_bytes, width=200, caption="Preview")
+        return {"file_bytes": file_bytes, "file_name": file_name, "url": None}
     elif image_url:
         try:
             st.image(image_url, width=200, caption="Preview từ URL")
         except:
             pass
-        return {"file": None, "url": image_url}
+        return {"file_bytes": None, "file_name": None, "url": image_url}
     
-    return {"file": None, "url": None}
+    return {"file_bytes": None, "file_name": None, "url": None}
 
 def get_image_url(image_data):
     """Lấy URL từ file upload hoặc URL nhập tay"""
-    if image_data["file"]:
+    if image_data.get("file_bytes"):
         with st.spinner("Đang upload ảnh..."):
-            url = upload_image(image_data["file"])
+            url = upload_image(image_data["file_bytes"], image_data["file_name"])
             if url:
                 st.success("✅ Upload thành công!")
                 return url
             else:
                 st.error("❌ Upload thất bại!")
                 return None
-    elif image_data["url"]:
+    elif image_data.get("url"):
         return image_data["url"]
     return None
 
