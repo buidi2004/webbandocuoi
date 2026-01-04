@@ -68,3 +68,5 @@ services:
         value: "admin"
       - key: ADMIN_PASSWORD
         value: "ivie2024"
+      - key: IMGBB_API_KEY
+        value: "c525fc0204b449b541b0f0a5a4f5d9c4"

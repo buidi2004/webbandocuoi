@@ -14,6 +14,7 @@ load_dotenv()
 API_BASE = os.getenv("API_BASE_URL", "https://ivie-be-final.onrender.com")
 ADMIN_USER = os.getenv("ADMIN_USERNAME", "admin")
 ADMIN_PASS = os.getenv("ADMIN_PASSWORD", "admin123")
+IMGBB_API_KEY = os.getenv("IMGBB_API_KEY", "c525fc0204b449b541b0f0a5a4f5d9c4")
 
 # Page config
 st.set_page_config(
@@ -70,6 +71,80 @@ def api_delete(endpoint):
         return r.ok
     except:
         return False
+
+# ============ UPLOAD ẢNH ============
+def upload_image(uploaded_file):
+    """Upload ảnh lên ImgBB và trả về URL"""
+    if uploaded_file is None:
+        return None
+    
+    try:
+        import base64
+        # Đọc file và encode base64
+        file_bytes = uploaded_file.read()
+        base64_image = base64.b64encode(file_bytes).decode('utf-8')
+        
+        # Upload lên ImgBB
+        response = requests.post(
+            "https://api.imgbb.com/1/upload",
+            data={
+                "key": IMGBB_API_KEY,
+                "image": base64_image,
+                "name": uploaded_file.name
+            },
+            timeout=60
+        )
+        
+        if response.ok:
+            data = response.json()
+            if data.get("success"):
+                return data["data"]["url"]
+        return None
+    except Exception as e:
+        st.error(f"Lỗi upload: {e}")
+        return None
+
+def image_uploader(label="Chọn ảnh", key=None):
+    """Component upload ảnh với preview"""
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
+        uploaded_file = st.file_uploader(
+            label, 
+            type=["jpg", "jpeg", "png", "gif", "webp"],
+            key=key
+        )
+    
+    with col2:
+        image_url = st.text_input("Hoặc nhập URL", key=f"{key}_url" if key else "url_input")
+    
+    # Preview
+    if uploaded_file:
+        st.image(uploaded_file, width=200, caption="Preview")
+        return {"file": uploaded_file, "url": None}
+    elif image_url:
+        try:
+            st.image(image_url, width=200, caption="Preview từ URL")
+        except:
+            pass
+        return {"file": None, "url": image_url}
+    
+    return {"file": None, "url": None}
+
+def get_image_url(image_data):
+    """Lấy URL từ file upload hoặc URL nhập tay"""
+    if image_data["file"]:
+        with st.spinner("Đang upload ảnh..."):
+            url = upload_image(image_data["file"])
+            if url:
+                st.success("✅ Upload thành công!")
+                return url
+            else:
+                st.error("❌ Upload thất bại!")
+                return None
+    elif image_data["url"]:
+        return image_data["url"]
+    return None
 
 
 # ============ DASHBOARD ============
@@ -138,42 +213,47 @@ def quan_ly_san_pham():
             st.info("Chưa có sản phẩm nào")
     
     with tab2:
-        with st.form("add_product"):
-            name = st.text_input("Tên sản phẩm *")
-            code = st.text_input("Mã sản phẩm *")
-            category = st.selectbox("Danh mục", ["Váy cưới", "Vest", "Áo dài", "Phụ kiện"])
-            gender = st.selectbox("Giới tính", ["Nữ", "Nam", "Unisex"])
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                rental_price = st.number_input("Giá thuê/ngày", min_value=0, step=100000)
-            with col2:
-                sale_price = st.number_input("Giá bán", min_value=0, step=100000)
-            
-            image_url = st.text_input("URL hình ảnh")
-            description = st.text_area("Mô tả")
-            
-            if st.form_submit_button("➕ Thêm sản phẩm"):
-                if name and code:
-                    data = {
-                        "name": name,
-                        "code": code,
-                        "category": category,
-                        "gender": gender,
-                        "rental_price_day": rental_price,
-                        "sale_price": sale_price,
-                        "image_url": image_url,
-                        "description": description,
-                        "is_available": True
-                    }
-                    ok, res = api_post("/api/san_pham/", data)
-                    if ok:
-                        st.success("Thêm thành công!")
-                        st.rerun()
-                    else:
-                        st.error(f"Lỗi: {res}")
+        st.subheader("➕ Thêm sản phẩm mới")
+        
+        name = st.text_input("Tên sản phẩm *")
+        code = st.text_input("Mã sản phẩm *")
+        category = st.selectbox("Danh mục", ["Váy cưới", "Vest", "Áo dài", "Phụ kiện"])
+        gender = st.selectbox("Giới tính", ["Nữ", "Nam", "Unisex"])
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            rental_price = st.number_input("Giá thuê/ngày", min_value=0, step=100000)
+        with col2:
+            sale_price = st.number_input("Giá bán", min_value=0, step=100000)
+        
+        st.write("**Hình ảnh sản phẩm:**")
+        image_data = image_uploader("Chọn ảnh sản phẩm", key="product_img")
+        
+        description = st.text_area("Mô tả")
+        
+        if st.button("➕ Thêm sản phẩm", use_container_width=True):
+            if name and code:
+                image_url = get_image_url(image_data)
+                
+                data = {
+                    "name": name,
+                    "code": code,
+                    "category": category,
+                    "gender": gender,
+                    "rental_price_day": rental_price,
+                    "sale_price": sale_price,
+                    "image_url": image_url or "",
+                    "description": description,
+                    "is_available": True
+                }
+                ok, res = api_post("/api/san_pham/", data)
+                if ok:
+                    st.success("✅ Thêm sản phẩm thành công!")
+                    st.rerun()
                 else:
-                    st.warning("Vui lòng nhập tên và mã sản phẩm!")
+                    st.error(f"❌ Lỗi: {res}")
+            else:
+                st.warning("⚠️ Vui lòng nhập tên và mã sản phẩm!")
 
 
 # ============ QUẢN LÝ ĐƠN HÀNG ============
@@ -289,22 +369,26 @@ def quan_ly_thu_vien():
             st.info("Chưa có ảnh nào")
     
     with tab2:
-        with st.form("add_gallery"):
-            title = st.text_input("Tiêu đề")
-            image_url = st.text_input("URL hình ảnh *")
-            category = st.selectbox("Danh mục", ["Váy cưới", "Vest", "Áo dài", "Studio", "Outdoor"])
-            
-            if st.form_submit_button("➕ Thêm ảnh"):
-                if image_url:
-                    data = {"title": title, "image_url": image_url, "category": category}
-                    ok, res = api_post("/api/thu_vien/", data)
-                    if ok:
-                        st.success("Thêm thành công!")
-                        st.rerun()
-                    else:
-                        st.error(f"Lỗi: {res}")
+        st.subheader("➕ Thêm ảnh mới")
+        
+        title = st.text_input("Tiêu đề")
+        category = st.selectbox("Danh mục", ["Váy cưới", "Vest", "Áo dài", "Studio", "Outdoor"])
+        
+        st.write("**Hình ảnh:**")
+        image_data = image_uploader("Chọn ảnh", key="gallery_img")
+        
+        if st.button("➕ Thêm ảnh", use_container_width=True):
+            image_url = get_image_url(image_data)
+            if image_url:
+                data = {"title": title, "image_url": image_url, "category": category}
+                ok, res = api_post("/api/thu_vien/", data)
+                if ok:
+                    st.success("✅ Thêm ảnh thành công!")
+                    st.rerun()
                 else:
-                    st.warning("Vui lòng nhập URL hình ảnh!")
+                    st.error(f"❌ Lỗi: {res}")
+            else:
+                st.warning("⚠️ Vui lòng chọn ảnh hoặc nhập URL!")
 
 
 # ============ QUẢN LÝ BANNER ============
@@ -333,23 +417,27 @@ def quan_ly_banner():
             st.info("Chưa có banner nào")
     
     with tab2:
-        with st.form("add_banner"):
-            title = st.text_input("Tiêu đề")
-            image_url = st.text_input("URL hình ảnh *")
-            link = st.text_input("Link (khi click)")
-            is_active = st.checkbox("Hiển thị", value=True)
-            
-            if st.form_submit_button("➕ Thêm banner"):
-                if image_url:
-                    data = {"title": title, "image_url": image_url, "link": link, "is_active": is_active}
-                    ok, res = api_post("/api/anh_bia/", data)
-                    if ok:
-                        st.success("Thêm thành công!")
-                        st.rerun()
-                    else:
-                        st.error(f"Lỗi: {res}")
+        st.subheader("➕ Thêm banner mới")
+        
+        title = st.text_input("Tiêu đề")
+        link = st.text_input("Link (khi click)")
+        is_active = st.checkbox("Hiển thị", value=True)
+        
+        st.write("**Hình ảnh banner:**")
+        image_data = image_uploader("Chọn ảnh banner", key="banner_img")
+        
+        if st.button("➕ Thêm banner", use_container_width=True):
+            image_url = get_image_url(image_data)
+            if image_url:
+                data = {"title": title, "image_url": image_url, "link": link, "is_active": is_active}
+                ok, res = api_post("/api/anh_bia/", data)
+                if ok:
+                    st.success("✅ Thêm banner thành công!")
+                    st.rerun()
                 else:
-                    st.warning("Vui lòng nhập URL hình ảnh!")
+                    st.error(f"❌ Lỗi: {res}")
+            else:
+                st.warning("⚠️ Vui lòng chọn ảnh hoặc nhập URL!")
 
 # ============ CÀI ĐẶT ============
 def cai_dat():
